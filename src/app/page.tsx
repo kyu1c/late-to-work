@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './page.module.css';
-import { Button, Input, RadioGroup, Radio } from '@heroui/react';
+import { Button, Input, RadioGroup, Radio, Alert, Card, Chip, Checkbox, Badge } from '@heroui/react';
 
 // ---------------------------------------------------------------------------
 // 타입 (lib/types와 동일 — 여기서는 화면 전용으로 재선언하지 않고 필요한 것만)
@@ -831,12 +831,17 @@ export default function Home() {
 
                   {/* 날씨 정보 */}
                   {recommendResult.weather && (
-                    <div className={`${styles.weatherAlert} ${recommendResult.weather.isRaining ? styles.weatherAlertRain : styles.weatherAlertClear}`}>
-                      <span className={styles.weatherIcon}>
-                        {recommendResult.weather.isRaining ? '☔' : '☀️'}
-                      </span>
-                      <span>{recommendResult.weather.note}</span>
-                    </div>
+                    <Alert
+                      color={recommendResult.weather.isRaining ? 'danger' : 'success'}
+                      className={styles.weatherAlert}
+                    >
+                      <Alert.Description>
+                        <span className={styles.weatherIcon}>
+                          {recommendResult.weather.isRaining ? '☔' : '☀️'}
+                        </span>
+                        <span>{recommendResult.weather.note}</span>
+                      </Alert.Description>
+                    </Alert>
                   )}
 
                   <div className={styles.compareTable}>
