@@ -43,12 +43,12 @@ export async function transitChain(
     };
   }
 
-  // 3) 모두 실패 → 평균/패턴 추정
+  // 3) 모두 실패 → 실시간 정보 없음 (추정치 금지)
   return {
-    durationMinutes: 31,
+    durationMinutes: null,
     transfers: null,
     distanceMeters: null,
-    source: 'estimate',
-    note: '평균/패턴 기반 추정치(대중교통 기본 가정값)',
+    source: 'none',
+    note: '실시간 대중교통 정보를 가져올 수 없습니다.',
   };
 }
