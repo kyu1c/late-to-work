@@ -71,6 +71,7 @@ Python 백엔드 (Koyeb / Render 배포 예정)
 - **TypeScript 5**
 - **Tailwind CSS v4** + **@tailwindcss/postcss** (PostCSS 플러그인)
 - **@heroui/react 3.2.5** / **@heroui/styles 3.2.5** — React Aria 기반 접근성 컴포넌트. Provider 불필요, CSS 임포트로 사용.
+- **next-themes** — 시스템 환경 기반 다크/라이트 테마 전환 + `class="dark"` 토글. ThemeProvider는 App 레이아웃에 통합돼 있으며, 메인 화면에 수동 테마 토글 버튼이 제공된다.
 - **ESLint** (Next.js 전용 설정)
 
 ## 로컬 개발
@@ -144,9 +145,10 @@ curl -X POST http://localhost:3000/api/recommend \
 late-to-work/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx            # 개발용 메인 UI ('use client')
-│   │   ├── globals.css         # Tailwind v4 + HeroUI 스타일 + 프로젝트 CSS 변수
-│   │   ├── layout.tsx          # 루트 레이아웃 (Geist 폰트)
+│   │   ├── page.tsx            # 개발용 메인 UI ('use client'), 다크모드 토글 버튼 포함
+│   │   ├── globals.css         # Tailwind v4 + HeroUI 스타일 + 프로젝트 CSS 변수 (:root / .dark)
+│   │   ├── layout.tsx          # 루트 레이아웃 (Geist 폰트, ThemeProvider 통합, suppressHydrationWarning)
+│   │   ├── ThemeProvider.tsx   # next-themes 기반 ThemeProvider (system 감지, class="dark" 토글)
 │   │   └── api/                # API 라우트
 │   │       ├── recommend/
 │   │       ├── night-before/
@@ -170,14 +172,22 @@ late-to-work/
 │   │   ├── transitChain.ts     # 대중교통 체인
 │   │   └── taxiChain.ts        # 택시 체인
 │   └── ...
-├── .env.example                # 키 이름만 (커밋 대상)
-├── .env.local                  # 실제 키 (gitignore)
-├── .gitignore
+├── .env.example                # 키 이름만 (커밋 대상, 값 없음)
+├── .gitignore                  # .env, .env.local, .env.*.local, .next/, node_modules/ 등 제외
+├── eslint.config.mjs           # ESLint 설정 (npm run lint)
 ├── postcss.config.mjs          # Tailwind v4 PostCSS
 ├── next.config.ts
 ├── package.json
 └── tsconfig.json
 ```
+
+## 파일 구성 원칙
+
+- **`.env.example`** (커밋 대상): 환경변수 이름만 나열. 실제 값은 넣지 않는다. 로컬 개발을 시작할 때 `.env.local`을 만들고 값을 채우는 템플릿 역할.
+- **`.env.local`** (gitignore 대상, 커밋 금지): 실제 API 키 값. 로컬에서만 사용.
+- **`.gitignore`**: `.env`, `.env.local`, `.env.*.local`, `.next/`, `node_modules/`, `.vercel/` 등 민감/생성 파일 제외.
+- **`public/*.svg`, `favicon.ico`**: Create Next App 기본 에셋 중 현재 코드에서 사용되지 않는 파일은 제거 대상. 코드의 JSX/TS에서 `<link>`나 `<img>`로 참조되지 않으면 레포에 둘 이유가 없다.
+- **API 키는 절대 코드·로그·응답·README·Git에 값으로 노출하지 않는다.** 키 이름만 문서화한다.
 
 ## 문서
 
