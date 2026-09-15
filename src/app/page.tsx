@@ -43,6 +43,13 @@ import {
   Tabs,
   NumberField,
   Separator,
+  Breadcrumbs,
+  BreadcrumbsRoot,
+  BreadcrumbsItem,
+  ProgressBar,
+  ProgressBarRoot,
+  ProgressBarFill,
+  TypographyRoot,
 } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { parseTime } from '@internationalized/date';
@@ -753,7 +760,7 @@ export default function Home() {
                 </div>
                 <div className={styles.nightBeforeNote}>{nightBeforeResult.tight.transportNote}</div>
                 <div className={styles.nightBeforeNote}>{nightBeforeResult.tight.arrivalNote}</div>
-                <div className={styles.nightBeforeDivider}></div>
+                <Separator className={styles.nightBeforeDivider} />
                 <div>
                   <span className={styles.nightBeforeLabel}>여유:</span>{' '}
                   <strong>{nightBeforeResult.loose.departureTime}</strong> 출발

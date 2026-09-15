@@ -738,15 +738,8 @@
 }
 .searchInput input {
   height: 52px;
-  padding: 0 16px;
-  font-size: 16px;
-  color: var(--foreground);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-right: none;
   border-radius: 12px 0 0 12px;
-  outline: none;
-  transition: border-color 140ms ease, box-shadow 140ms ease;
+  border-right: none;
 }
 .searchInput input::placeholder {
   color: var(--muted);
@@ -1044,7 +1037,6 @@
 /* ---- 하단 추천 버튼 영역 ---- */
 .recommendButtonArea {
   width: 100%;
-  max-width: 420px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1060,7 +1052,6 @@
 /* ---- API 정보 ---- */
 .apiInfo {
   width: 100%;
-  max-width: 420px;
   margin-top: 20px;
   padding: 14px 16px;
   border: 1px solid var(--border);
@@ -1090,7 +1081,7 @@
 }
 @media (prefers-color-scheme: dark) {
   .apiInfo {
-    background: var(--foreground);
+    background: var(--surface-secondary);
     border-color: var(--border);
   }
   .apiInfoTitle {
