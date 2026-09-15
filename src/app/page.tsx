@@ -259,14 +259,14 @@ async function fetchNightBefore(body: Record<string, unknown>): Promise<{ ok: bo
 type OnboardStep = 'welcome' | 'home' | 'work' | 'time' | 'prefs' | 'done';
 
 export default function Home() {
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [activeTheme, setActiveTheme] = useState<'dark' | 'light' | undefined>(undefined);
 
   useEffect(() => {
-    if (theme !== undefined) {
-      setActiveTheme(theme === 'dark' ? 'dark' : 'light');
+    if (resolvedTheme !== undefined) {
+      setActiveTheme(resolvedTheme === 'dark' ? 'dark' : 'light');
     }
-  }, [theme]);
+  }, [resolvedTheme]);
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [onboardStep, setOnboardStep] = useState<OnboardStep>('welcome');
