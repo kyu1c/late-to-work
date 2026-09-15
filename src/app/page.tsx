@@ -29,6 +29,19 @@ import {
   Chip,
   Checkbox,
   Badge,
+  Fieldset,
+  Label,
+  Description,
+  ErrorMessage,
+  FieldError,
+  Skeleton,
+  ListBox,
+  ListBoxItem,
+  TimeField,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectPopover,
 } from '@heroui/react';
 import { useTheme } from 'next-themes';
 
@@ -684,7 +697,7 @@ export default function Home() {
           )}
 
           {/* 온보딩 단계 */}
-          {onboardStep !== 'welcome' && onboardStep !== 'done' && profile === null && (
+          {onboardStep !== 'welcome' && onboardStep !== 'done' && (
             <Card className={styles.onboardingCard}>
               <div className={styles.onboardingSteps}>
                 {['집 위치', '출근지 위치', '목표 도착 시각', '선호 교통수단'].map((label, i) => {
@@ -694,12 +707,14 @@ export default function Home() {
                   return (
                     <Chip
                       key={label}
-                      variant={
-                        i <= stepIndex ? 'primary' : 'soft'
-                      }
+                      variant="soft"
                       color="default"
                       size="sm"
-                      className={styles.onboardingStep}
+                      className={cn(
+                        styles.onboardingStep,
+                        i < stepIndex && styles.stepDone,
+                        i === stepIndex && styles.stepCurrent,
+                      )}
                     >
                       {label}
                     </Chip>
