@@ -1,21 +1,6 @@
 /* src/app/page.module.css — late-to-work 메인 화면 스타일 */
 
 .page {
-  --background: #fafafa;
-  --foreground: #fff;
-  --text-primary: #000;
-  --text-secondary: #666;
-  --muted: #9aa0a6;
-  --border: #e5e5e5;
-  --card: #fff;
-  --card-border: #e5e5e5;
-  --button-primary: #111;
-  --button-primary-hover: #333;
-  --button-secondary: #fff;
-  --button-secondary-border: #cfcfcf;
-  --button-secondary-hover: #f5f5f5;
-  --accent: #111;
-
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -23,747 +8,1857 @@
   width: 100%;
   font-family: var(--font-geist-sans);
   background-color: var(--background);
-  min-height: 100vh;
-}
-
-.dark .page {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --text-primary: #ededed;
-  --text-secondary: #9ca3af;
-  --muted: #6b7280;
-  --border: #2e2e2e;
-  --card: #171717;
-  --card-border: #2e2e2e;
-  --button-primary: #f97316;
-  --button-primary-hover: #fb923c;
-  --button-secondary: #171717;
-  --button-secondary-border: #333;
-  --button-secondary-hover: #252525;
-  --accent: #f97316;
 }
 
 .main {
   display: flex;
-  flex: 1;
-  width: 100%;
-  max-width: 720px;
   flex-direction: column;
-  align-items: flex-start;
-  padding: 40px 20px;
-  background-color: var(--foreground);
-  border: 1px solid var(--border);
-  border-radius: 0;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
+  padding: 16px 16px 24px;
+  gap: 14px;
 }
 
-.dark .main {
-  background-color: var(--background);
-  border-color: var(--border);
+@media (min-width: 768px) {
+  .main {
+    max-width: 680px;
+    padding: 24px 24px 32px;
+    gap: 18px;
+  }
 }
 
-.intro {
+/* ========== 상단 헤더 ========== */
+
+.header {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px 16px;
+  text-align: center;
+  gap: 8px;
+  background-color: #f7facc;
+  background-image: linear-gradient(
+    180deg,
+    #fdf8e3 0%,
+    #f7facc 55%,
+    #eaf3d7 100%
+  );
+  border-bottom: 1px solid #e5e5e5;
 }
 
-.muted {
-  color: var(--muted);
+@media (prefers-color-scheme: dark) {
+  .header {
+    background-color: #1b2218;
+    background-image: linear-gradient(
+      180deg,
+      #1b2218 0%,
+      #22301b 55%,
+      #16200f 100%
+    );
+  }
 }
 
-.dot {
-  color: var(--muted);
-  margin: 0 6px;
+.dark .header {
+  background-color: #1b2218;
+  background-image: linear-gradient(
+    180deg,
+    #1b2218 0%,
+    #22301b 55%,
+    #16200f 100%
+  );
 }
 
-.linkButton {
+.hamburgerIcon {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  color: #171717;
+  font-size: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .hamburgerIcon {
+    background: #171717;
+    border-color: #2e2e2e;
+    color: #ededed;
+  }
+}
+
+.dark .hamburgerIcon {
+  background: #171717;
+  border-color: #2e2e2e;
+  color: #ededed;
+}
+
+.headerTitle {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  .headerTitle {
+    color: #ededed;
+  }
+}
+
+.dark .headerTitle {
+  color: #ededed;
+}
+
+.headerSubtitle {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #5f6770;
+}
+
+@media (prefers-color-scheme: dark) {
+  .headerSubtitle {
+    color: #9ca3af;
+  }
+}
+
+.dark .headerSubtitle {
+  color: #9ca3af;
+}
+
+.themeToggle {
+  align-self: flex-end;
   background: none;
   border: none;
-  color: var(--text-secondary);
   font: inherit;
+  font-size: 12px;
+  color: #9aa0a6;
   cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 140ms ease;
 }
 
-.linkButton:hover {
-  color: var(--text-primary);
+.themeToggle:hover {
+  background: rgba(0, 0, 0, 0.04);
 }
 
-/* HeroUI Button + 링크 스타일 */
-.herouiLinkButton {
-  color: var(--text-secondary);
-  font-size: 13px;
-  text-decoration: underline;
-  padding: 0;
-  background: none;
-  border: none;
+@media (prefers-color-scheme: dark) {
+  .themeToggle {
+    color: #9ca3af;
+  }
+  .themeToggle:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
 }
 
-.herouiLinkButton:hover {
-  color: var(--text-primary);
+.dark .themeToggle {
+  color: #9ca3af;
+}
+.dark .themeToggle:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
-/* 프로필 요약 */
-.profileSummary {
-  border: 1px solid var(--border);
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--card);
+/* ========== 카드 공통 ========== */
+
+.card {
   width: 100%;
+  border: 1px solid var(--card-border, #e5e5e5);
+  border-radius: 14px;
+  background: var(--card, #ffffff);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 }
 
-.profileMeta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-top: 6px;
-  flex-wrap: wrap;
+@media (prefers-color-scheme: dark) {
+  .card {
+    --card-border: #2e2e2e;
+    --card: #171717;
+  }
 }
 
-/* 전날 밤 추천 */
-.nightBeforeCard {
-  border: 1px solid var(--border);
-  padding: 14px;
-  border-radius: 12px;
-  background: var(--card);
-  width: 100%;
-  margin-top: 4px;
+.dark .card {
+  --card-border: #2e2e2e;
+  --card: #171717;
 }
 
-.dark .nightBeforeCard {
-  background: var(--card);
+.cardHeader {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border, #e5e5e5);
+  background: transparent;
 }
 
-.nightBeforeHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 8px;
+@media (prefers-color-scheme: dark) {
+  .cardHeader {
+    --border: #2e2e2e;
+  }
 }
 
-.nightBeforeLabel {
-  color: var(--text-secondary);
-  font-size: 13px;
+.dark .cardHeader {
+  --border: #2e2e2e;
 }
 
-.nightBeforeNote {
-  font-size: 13px;
-  color: var(--text-secondary);
+.cardHeaderTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary, #171717);
+}
+
+@media (prefers-color-scheme: dark) {
+  .cardHeaderTitle {
+    color: #ededed;
+  }
+}
+
+.dark .cardHeaderTitle {
+  color: #ededed;
+}
+
+.cardHeaderSub {
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
   margin-top: 2px;
 }
 
-.nightBeforeDivider {
-  border: none;
-  border-top: 1px dashed var(--border);
-  margin: 10px 0;
+@media (prefers-color-scheme: dark) {
+  .cardHeaderSub {
+    color: #9ca3af;
+  }
 }
 
-.nightBeforeBottom {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 8px;
+.dark .cardHeaderSub {
+  color: #9ca3af;
 }
 
-/* 환영 카드 */
-.welcomeCard {
-  border: 1px solid var(--border);
-  padding: 18px;
-  border-radius: 12px;
-  background: var(--card);
-  width: 100%;
+.cardContent {
+  padding: 14px 16px;
+}
+
+/* ========== 프로필 요약 ========== */
+
+.profile {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f2f4f2;
 }
 
-/* 온보딩 */
-.onboardingCard {
-  border: 1px solid var(--border);
-  padding: 16px;
-  border-radius: 12px;
-  background: var(--card);
+@media (prefers-color-scheme: dark) {
+  .profile {
+    background-color: #1f261d;
+  }
+}
+
+.dark .profile {
+  background-color: #1f261d;
+}
+
+.profileTitle {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary, #5f6770);
+  margin-bottom: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .profileTitle {
+    color: #9ca3af;
+  }
+}
+
+.dark .profileTitle {
+  color: #9ca3af;
+}
+
+.profileRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
+}
+
+.profileFrom {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  .profileFrom {
+    color: #ededed;
+  }
+}
+
+.dark .profileFrom {
+  color: #ededed;
+}
+
+.profileArrow {
+  font-size: 13px;
+  color: #9aa0a6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .profileArrow {
+    color: #9ca3af;
+  }
+}
+
+.dark .profileArrow {
+  color: #9ca3af;
+}
+
+.profileTo {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  .profileTo {
+    color: #ededed;
+  }
+}
+
+.dark .profileTo {
+  color: #ededed;
+}
+
+.profileFields {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ========== 온보딩 전체 ========== */
+
+.onboarding {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .onboardingSteps {
   display: flex;
-  gap: 6px;
-  margin-bottom: 16px;
   flex-wrap: wrap;
-}
-
-.onboardingStep {
-  padding: 5px 10px;
-  border-radius: 14px;
-  font-size: 12px;
-  color: var(--muted);
-  border: 1px solid var(--border);
-  background: var(--background);
-}
-
-.onboardingStepActive {
-  color: var(--text-primary);
-  border-color: var(--text-primary);
-  background: var(--card);
-  font-weight: 600;
-}
-
-.onboardingSection {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
-.fieldLabel {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-  display: flex;
-  flex-direction: column;
   gap: 6px;
+  justify-content: center;
 }
 
-.searchRow {
+.stepChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #d4d4d4;
+  background: #ffffff;
+  color: #5f6770;
+}
+
+@media (prefers-color-scheme: dark) {
+  .stepChip {
+    border-color: #3a3a3a;
+    background: #1f261d;
+    color: #d1d5db;
+  }
+}
+
+.dark .stepChip {
+  border-color: #3a3a3a;
+  background: #1f261d;
+  color: #d1d5db;
+}
+
+.stepChip.isDone {
+  background: #111111;
+  border-color: #111111;
+  color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .stepChip.isDone {
+    background: #f97316;
+    border-color: #f97316;
+    color: #171717;
+  }
+}
+
+.dark .stepChip.isDone {
+  background: #f97316;
+  border-color: #f97316;
+  color: #171717;
+}
+
+.stepChip.isCurrent {
+  border-color: #111111;
+  color: #111111;
+  font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  .stepChip.isCurrent {
+    border-color: #f97316;
+    color: #f97316;
+  }
+}
+
+.dark .stepChip.isCurrent {
+  border-color: #f97316;
+  color: #f97316;
+}
+
+/* ========== 온보딩 단계들 ========== */
+
+.onboardingField {
   display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.searchInput {
-  flex: 1;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font: inherit;
-  font-size: 14px;
-}
-
-.searchButton {
-  padding: 8px 14px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--button-secondary);
-  font: inherit;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.searchButton:hover:not(:disabled) {
-  background: var(--button-secondary-hover);
-}
-
-.searchButton:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.errorText {
-  color: #b00020;
+.onboardingFieldLabel {
   font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #171717);
+}
+
+@media (prefers-color-scheme: dark) {
+  .onboardingFieldLabel {
+    color: #ededed;
+  }
+}
+
+.dark .onboardingFieldLabel {
+  color: #ededed;
+}
+
+.onboardingHelp {
+  font-size: 12px;
+  color: #9aa0a6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .onboardingHelp {
+    color: #9ca3af;
+  }
+}
+
+.dark .onboardingHelp {
+  color: #9ca3af;
+}
+
+.searchInput {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.searchInput input {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 15px;
+  color: #171717;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.searchInput input::placeholder {
+  color: #b0b0b0;
+}
+
+.searchInput input:focus {
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .searchInput input {
+    background: #1f261d;
+    border-color: #3a3a3a;
+    color: #ededed;
+  }
+  .searchInput input::placeholder {
+    color: #6b7280;
+  }
+  .searchInput input:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+  }
+}
+
+.dark .searchInput input {
+  background: #1f261d;
+  border-color: #3a3a3a;
+  color: #ededed;
+}
+.dark .searchInput input::placeholder {
+  color: #6b7280;
+}
+.dark .searchInput input:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+}
+
+.searchInput button {
+  height: 44px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #111111;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 140ms ease, opacity 140ms ease;
+}
+
+.searchInput button:hover:not(:disabled) {
+  background: #333333;
+}
+
+.searchInput button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .searchInput button {
+    background: #f97316;
+  }
+  .searchInput button:hover:not(:disabled) {
+    background: #fb923c;
+  }
+}
+
+.dark .searchInput button {
+  background: #f97316;
+}
+.dark .searchInput button:hover:not(:disabled) {
+  background: #fb923c;
 }
 
 .searchResults {
   list-style: none;
-  padding: 0;
   margin: 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  max-height: 180px;
+  padding: 0;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  max-height: 220px;
   overflow-y: auto;
-  background: var(--background);
 }
 
-.searchResultItem {
-  border-bottom: 1px solid var(--border);
+@media (prefers-color-scheme: dark) {
+  .searchResults {
+    border-color: #2e2e2e;
+    background: #1f261d;
+  }
 }
 
-.searchResultItem:last-child {
+.dark .searchResults {
+  border-color: #2e2e2e;
+  background: #1f261d;
+}
+
+.resultItem {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.resultItem:last-child {
   border-bottom: none;
 }
 
-.searchResultButton {
+.resultInner {
   display: block;
   width: 100%;
-  padding: 8px 10px;
-  border: none;
-  background: none;
+  padding: 11px 14px;
   text-align: left;
-  font: inherit;
-  cursor: pointer;
-  color: var(--text-primary);
-}
-
-.searchResultButton:hover {
-  background: var(--button-secondary-hover);
-}
-
-.selectedItem {
-  font-size: 13px;
-  color: var(--text-secondary);
-  padding: 6px 0;
-}
-
-.nextButton {
-  padding: 9px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--button-secondary);
-  font: inherit;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.nextButton:hover:not(:disabled) {
-  background: var(--button-secondary-hover);
-}
-
-.nextButton:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.backButton {
-  padding: 9px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
   background: none;
-  color: var(--text-secondary);
-  font: inherit;
+  border: none;
   cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: background 120ms ease;
 }
 
-.backButton:hover {
-  color: var(--text-primary);
+.resultInner:hover {
+  background: #f5f5f5;
 }
 
-.primaryButton {
-  padding: 9px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--button-primary);
-  background: var(--button-primary);
-  color: #fff;
-  font: inherit;
-  cursor: pointer;
+.resultName {
+  font-size: 14px;
   font-weight: 600;
+  color: #171717;
 }
 
-.primaryButton:hover:not(:disabled) {
-  background: var(--button-primary-hover);
+.resultAddr {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
 }
 
-.primaryButton:disabled {
-  opacity: 0.6;
-  cursor: default;
+.resultError {
+  margin: 10px 2px;
+  font-size: 12px;
+  color: #b00020;
 }
 
-.secondaryButton {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--button-secondary-border);
-  background: var(--button-secondary);
-  font: inherit;
-  cursor: pointer;
-}
-
-.secondaryButton:hover {
-  background: var(--button-secondary-hover);
-}
-
-.secondaryButton:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.timeInput {
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font: inherit;
-  font-size: 14px;
-}
-
-.radioGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.radio {
-  display: flex;
+.selectedTag {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  cursor: pointer;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #f2f4f2;
+  color: #333333;
+  font-size: 13px;
+  border: 1px dashed #cfcfcf;
+  margin: 6px 0 2px;
+  word-break: break-word;
 }
 
-.numberInput {
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font: inherit;
-  font-size: 14px;
-  width: 80px;
-  margin-top: 4px;
+@media (prefers-color-scheme: dark) {
+  .selectedTag {
+    background: #1f261d;
+    color: #e5e7eb;
+    border-color: #4a4a4a;
+  }
 }
 
-/* 추천 영역 */
-.recommendArea {
+.dark .selectedTag {
+  background: #1f261d;
+  color: #e5e7eb;
+  border-color: #4a4a4a;
+}
+
+.selectedTagName {
+  font-weight: 700;
+}
+
+.onboardingBackButton {
+  display: block;
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #171717;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.onboardingBackButton:hover {
+  background: #f5f5f5;
+  border-color: #b0b0b0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .onboardingBackButton {
+    background: #1f261d;
+    border-color: #3a3a3a;
+    color: #ededed;
+  }
+  .onboardingBackButton:hover {
+    background: #2a3026;
+    border-color: #4a4a4a;
+  }
+}
+
+.dark .onboardingBackButton {
+  background: #1f261d;
+  border-color: #3a3a3a;
+  color: #ededed;
+}
+.dark .onboardingBackButton:hover {
+  background: #2a3026;
+  border-color: #4a4a4a;
+}
+
+.onboardingNextButton {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #111111;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 140ms ease, opacity 140ms ease;
+}
+
+.onboardingNextButton:hover:not(:disabled) {
+  background: #333333;
+}
+
+.onboardingNextButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .onboardingNextButton {
+    background: #f97316;
+  }
+  .onboardingNextButton:hover:not(:disabled) {
+    background: #fb923c;
+  }
+}
+
+.dark .onboardingNextButton {
+  background: #f97316;
+}
+.dark .onboardingNextButton:hover:not(:disabled) {
+  background: #fb923c;
+}
+
+.timeField input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 16px;
+  color: #171717;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 12px;
+  outline: none;
+}
+
+.timeField input:focus {
+  border-color: #111111;
+}
+
+@media (prefers-color-scheme: dark) {
+  .timeField input {
+    background: #1f261d;
+    border-color: #3a3a3a;
+    color: #ededed;
+  }
+  .timeField input:focus {
+    border-color: #f97316;
+  }
+}
+
+.dark .timeField input {
+  background: #1f261d;
+  border-color: #3a3a3a;
+  color: #ededed;
+}
+.dark .timeField input:focus {
+  border-color: #f97316;
+}
+
+.prefsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 12px;
 }
 
-.recommendControls {
+@media (min-width: 768px) {
+  .prefsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.preferredTransportButtons {
   display: flex;
-  flex-direction: column;
   gap: 8px;
-  width: 100%;
 }
 
-.departureTimeRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.label {
-  font-size: 13px;
+.preferredTransportButtons button {
+  flex: 1;
+  padding: 11px 8px;
+  font-size: 14px;
   font-weight: 600;
-}
-
-.chipRow {
-  display: flex;
-  gap: 6px;
-}
-
-.chip {
-  padding: 5px 10px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: var(--background);
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.chip:hover {
-  border-color: var(--text-primary);
-}
-
-.departureTimeHint {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.hint {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-/* 비교표 */
-.compareCard {
-  border: 1px solid var(--border);
-  padding: 14px;
+  border: 1px solid #cfcfcf;
   border-radius: 12px;
-  background: var(--card);
-  width: 100%;
-}
-
-.compareHeader {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-
-.compareTable {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.compareRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--background);
-}
-
-.compareCell {
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.compareLabel {
-  font-weight: 600;
-}
-
-.compareSource {
-  font-size: 11px;
-  color: var(--muted);
-  margin-left: 6px;
-}
-
-/* 날씨 알림 */
-.weatherAlert {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-.weatherAlertRain {
-  background: #e8f4fd;
-  color: #0066cc;
-  border: 1px solid #b3d4f0;
-}
-
-.dark .weatherAlertRain {
-  background: #0a2a40;
-  color: #88bbff;
-  border-color: #1a4a6a;
-}
-
-.weatherAlertClear {
-  background: #fff8e6;
-  color: #996600;
-  border: 1px solid #ffecb3;
-}
-
-.dark .weatherAlertClear {
-  background: #2a2510;
-  color: #ffcc66;
-  border-color: #4a3a1a;
-}
-
-.weatherIcon {
-  font-size: 18px;
-  line-height: 1;
-}
-
-/* 택시 링크 버튼 */
-.taxiLinkButton {
-  margin-top: 4px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--button-secondary-border);
-  background: var(--button-secondary);
-  font: inherit;
-  font-size: 12px;
+  background: #ffffff;
+  color: #333333;
   cursor: pointer;
-  width: fit-content;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
 }
 
-.taxiLinkButton:hover {
-  background: var(--button-secondary-hover);
+.preferredTransportButtons button:hover {
+  background: #f5f5f5;
+  border-color: #b0b0b0;
 }
 
-.conclusion {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
+.preferredTransportButtons button.isSelected {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
 }
 
-.dark .conclusion {
-  color: #0a0a0a;
+@media (prefers-color-scheme: dark) {
+  .preferredTransportButtons button {
+    background: #1f261d;
+    border-color: #3a3a3a;
+    color: #e5e7eb;
+  }
+  .preferredTransportButtons button:hover {
+    background: #2a3026;
+    border-color: #4a4a4a;
+  }
+  .preferredTransportButtons button.isSelected {
+    background: #f97316;
+    border-color: #f97316;
+    color: #171717;
+  }
 }
 
-.actions {
-  margin-top: 10px;
+.dark .preferredTransportButtons button {
+  background: #1f261d;
+  border-color: #3a3a3a;
+  color: #e5e7eb;
+}
+.dark .preferredTransportButtons button:hover {
+  background: #2a3026;
+  border-color: #4a4a4a;
+}
+.dark .preferredTransportButtons button.isSelected {
+  background: #f97316;
+  border-color: #f97316;
+  color: #171717;
+}
+
+.numberField {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.actionItem {
-  font-size: 13px;
-  padding: 6px 8px;
-  border-left: 3px solid var(--border);
-  background: var(--background);
-  border-radius: 0 6px 6px 0;
-}
-
-.note {
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--muted);
-  padding: 6px 10px;
-  background: var(--background);
-  border-radius: 6px;
-}
-
-.nightBeforeTrigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-.nightBeforeTrigger .muted {
-  font-size: 12px;
-}
-
-/* 고급 설정 */
-.advancedCard {
+.numberField input {
   width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 15px;
+  color: #171717;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 12px;
+  outline: none;
+  text-align: center;
+}
+
+.numberField input:focus {
+  border-color: #111111;
+}
+
+.numberFieldSmall input {
+  height: 40px;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .numberField input {
+    background: #1f261d;
+    border-color: #3a3a3a;
+    color: #ededed;
+  }
+  .numberField input:focus {
+    border-color: #f97316;
+  }
+}
+
+.dark .numberField input {
+  background: #1f261d;
+  border-color: #3a3a3a;
+  color: #ededed;
+}
+.dark .numberField input:focus {
+  border-color: #f97316;
+}
+
+/* ========== 추천 영역 ========== */
+
+.recommendation {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  gap: 14px;
+}
+
+@media (min-width: 768px) {
+  .recommendation {
+    max-width: 680px;
+    gap: 18px;
+  }
+}
+
+.dividerBar {
+  width: 100%;
+  max-width: 420px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #cfcfcf, transparent);
+  margin: 2px 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dividerBar {
+    background: linear-gradient(90deg, transparent, #3a3a3a, transparent);
+  }
+}
+
+.dark .dividerBar {
+  background: linear-gradient(90deg, transparent, #3a3a3a, transparent);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.actionButtons button {
+  flex: 1;
+  max-width: 180px;
+  height: 44px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, opacity 140ms ease;
+}
+
+.bigCalcBtn {
+  color: #ffffff;
+  background: #111111;
+  border: none;
+}
+
+.bigCalcBtn:hover:not(:disabled) {
+  background: #333333;
+}
+
+.bigCalcBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bigCalcBtn {
+    background: #f97316;
+  }
+  .bigCalcBtn:hover:not(:disabled) {
+    background: #fb923c;
+  }
+}
+
+.dark .bigCalcBtn {
+  background: #f97316;
+}
+.dark .bigCalcBtn:hover:not(:disabled) {
+  background: #fb923c;
+}
+
+.tinyCalcBtn {
+  color: #333333;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+}
+
+.tinyCalcBtn:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.tinyCalcBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tinyCalcBtn {
+    color: #ededed;
+    background: #1f261d;
+    border-color: #3a3a3a;
+  }
+  .tinyCalcBtn:hover:not(:disabled) {
+    background: #2a3026;
+  }
+}
+
+.dark .tinyCalcBtn {
+  color: #ededed;
+  background: #1f261d;
+  border-color: #3a3a3a;
+}
+.dark .tinyCalcBtn:hover:not(:disabled) {
+  background: #2a3026;
+}
+
+.departureChips {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.departureChips button {
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333333;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+}
+
+.departureChips button:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #b0b0b0;
+}
+
+.departureChips button.isSelected {
+  border-color: #111111;
+  background: #f2f2f2;
+  color: #111111;
+  font-weight: 700;
+}
+
+.departureChips button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .departureChips button {
+    background: #1f261d;
+    border-color: #3a3a3a;
+    color: #e5e7eb;
+  }
+  .departureChips button:hover:not(:disabled) {
+    background: #2a3026;
+    border-color: #4a4a4a;
+  }
+  .departureChips button.isSelected {
+    background: #f97316;
+    border-color: #f97316;
+    color: #171717;
+  }
+}
+
+.dark .departureChips button {
+  background: #1f261d;
+  border-color: #3a3a3a;
+  color: #e5e7eb;
+}
+.dark .departureChips button:hover:not(:disabled) {
+  background: #2a3026;
+  border-color: #4a4a4a;
+}
+.dark .departureChips button.isSelected {
+  background: #f97316;
+  border-color: #f97316;
+  color: #171717;
+}
+
+.depTimeInput {
+  width: 100%;
+  max-width: 140px;
+  height: 36px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #171717;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 999px;
   margin-top: 4px;
 }
 
-.advancedToggle {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font: inherit;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 13px;
-  padding: 0;
+.depTimeInput:focus {
+  border-color: #111111;
+  outline: none;
 }
 
-.advancedForm {
-  margin-top: 10px;
-  border: 1px solid var(--border);
-  padding: 12px;
-  border-radius: 10px;
-  background: var(--background);
+@media (prefers-color-scheme: dark) {
+  .depTimeInput {
+    background: #1f261d;
+    border-color: #3a3a3a;
+    color: #ededed;
+  }
+  .depTimeInput:focus {
+    border-color: #f97316;
+  }
+}
+
+.dark .depTimeInput {
+  background: #1f261d;
+  border-color: #3a3a3a;
+  color: #ededed;
+}
+.dark .depTimeInput:focus {
+  border-color: #f97316;
+}
+
+.calcResult {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.checkRow {
+.calcResultHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+}
+
+@media (prefers-color-scheme: dark) {
+  .calcResultHead {
+    color: #9ca3af;
+  }
+}
+
+.dark .calcResultHead {
+  color: #9ca3af;
+}
+
+.calcResultHeadMid {
+  font-weight: 700;
+  color: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  .calcResultHeadMid {
+    color: #ededed;
+  }
+}
+
+.dark .calcResultHeadMid {
+  color: #ededed;
+}
+
+.calcResultHeadRight {
+  font-size: 11px;
+}
+
+.calcResultRow {
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .calcResultRow {
+    border-color: #2e2e2e;
+    background: #1f261d;
+  }
+}
+
+.dark .calcResultRow {
+  border-color: #2e2e2e;
+  background: #1f261d;
+}
+
+.calcResultRowTitle {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  .calcResultRowTitle {
+    color: #ededed;
+  }
+}
+
+.dark .calcResultRowTitle {
+  color: #ededed;
+}
+
+.calcResultRowTitleSub {
+  font-size: 10px;
+  color: #9aa0a6;
+}
+
+.calcResultBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: #333333;
+}
+
+.calcResultBodyBig {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  .calcResultBodyBig {
+    color: #f97316;
+  }
+}
+
+.dark .calcResultBodyBig {
+  color: #f97316;
+}
+
+.calcResultBodySmall {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.calcResultExtra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.calcResultExtraItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.calcResultNote {
+  font-size: 11px;
+  color: #9aa0a6;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.calcResultAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333333;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+
+.calcResultAction:hover {
+  background: #f5f5f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .calcResultAction {
+    color: #ededed;
+    background: #1f261d;
+    border-color: #3a3a3a;
+  }
+  .calcResultAction:hover {
+    background: #2a3026;
+  }
+}
+
+.dark .calcResultAction {
+  color: #ededed;
+  background: #1f261d;
+  border-color: #3a3a3a;
+}
+.dark .calcResultAction:hover {
+  background: #2a3026;
+}
+
+.conclusion {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f7facc;
+  color: #171717;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .conclusion {
+    background: #22301b;
+    color: #e5e7eb;
+  }
+}
+
+.dark .conclusion {
+  background: #22301b;
+  color: #e5e7eb;
+}
+
+.tinyEmphasis {
+  color: #5f6770;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tinyEmphasis {
+    color: #9ca3af;
+  }
+}
+
+.dark .tinyEmphasis {
+  color: #9ca3af;
+}
+
+.readMoreLink {
+  color: #111111;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .readMoreLink {
+    color: #f97316;
+  }
+}
+
+.dark .readMoreLink {
+  color: #f97316;
+}
+
+.liveBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #111111;
+  background: #f7facc;
+}
+
+@media (prefers-color-scheme: dark) {
+  .liveBadge {
+    color: #f97316;
+    background: transparent;
+    border: 1px solid #4a4a4a;
+  }
+}
+
+.dark .liveBadge {
+  color: #f97316;
+  background: transparent;
+  border: 1px solid #4a4a4a;
+}
+
+.calcError {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #b00020;
+  font-size: 13px;
+  line-height: 1.45;
+  border: 1px solid #fecaca;
+}
+
+@media (prefers-color-scheme: dark) {
+  .calcError {
+    background: #2a1414;
+    color: #fca5a5;
+    border-color: #4a2a2a;
+  }
+}
+
+.dark .calcError {
+  background: #2a1414;
+  color: #fca5a5;
+  border-color: #4a2a2a;
+}
+
+.calcEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 16px;
+  color: #9aa0a6;
+  font-size: 13px;
+  text-align: center;
+  gap: 6px;
+}
+
+.calcEmptyIcon {
+  font-size: 28px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .calcEmpty {
+    color: #9ca3af;
+  }
+}
+
+.dark .calcEmpty {
+  color: #9ca3af;
 }
 
 .message {
   margin-top: 8px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #111111;
+  color: #ffffff;
   font-size: 13px;
+  text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .message {
+    background: #f97316;
+    color: #171717;
+  }
 }
 
 .dark .message {
-  color: #0a0a0a;
+  background: #f97316;
+  color: #171717;
 }
 
-/* 미래 운행 정보 카드 */
+/* ========== 고급 설정 ========== */
+
+.advancedSettings {
+  width: 100%;
+}
+
+.advancedSettingsToggle {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.advancedSettingsToggle:hover {
+  background: #f5f5f5;
+  border-color: #b0b0b0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .advancedSettingsToggle {
+    color: #e5e7eb;
+    background: #1f261d;
+    border-color: #3a3a3a;
+  }
+  .advancedSettingsToggle:hover {
+    background: #2a3026;
+    border-color: #4a4a4a;
+  }
+}
+
+.dark .advancedSettingsToggle {
+  color: #e5e7eb;
+  background: #1f261d;
+  border-color: #3a3a3a;
+}
+.dark .advancedSettingsToggle:hover {
+  background: #2a3026;
+  border-color: #4a4a4a;
+}
+
+.advancedSettingsBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  margin-top: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .advancedSettingsBody {
+    background: #171717;
+    border-color: #2e2e2e;
+  }
+}
+
+.dark .advancedSettingsBody {
+  background: #171717;
+  border-color: #2e2e2e;
+}
+
+.advancedField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.advancedFieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  .advancedFieldLabel {
+    color: #ededed;
+  }
+}
+
+.dark .advancedFieldLabel {
+  color: #ededed;
+}
+
+.advancedField input {
+  height: 44px;
+  padding: 0 14px;
+  font-size: 15px;
+  color: #171717;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 12px;
+  outline: none;
+  text-align: center;
+}
+
+.advancedField input:focus {
+  border-color: #111111;
+}
+
+.advancedFieldSmall input {
+  height: 40px;
+  font-size: 14px;
+}
+
+.advancedCheckRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.advancedCheckRow input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #111111;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .advancedCheckRow input[type="checkbox"] {
+    accent-color: #f97316;
+  }
+}
+
+.dark .advancedCheckRow input[type="checkbox"] {
+  accent-color: #f97316;
+}
+
+.advancedCheckLabel {
+  font-size: 14px;
+  color: #333333;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .advancedCheckLabel {
+    color: #e5e7eb;
+  }
+}
+
+.dark .advancedCheckLabel {
+  color: #e5e7eb;
+}
+
+.advancedNote {
+  font-size: 11px;
+  color: #9aa0a6;
+  line-height: 1.45;
+}
+
+@media (prefers-color-scheme: dark) {
+  .advancedNote {
+    color: #9ca3af;
+  }
+}
+
+.dark .advancedNote {
+  color: #9ca3af;
+}
+
+.advancedSaveButton {
+  height: 44px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #111111;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+
+.advancedSaveButton:hover {
+  background: #333333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .advancedSaveButton {
+    background: #f97316;
+  }
+  .advancedSaveButton:hover {
+    background: #fb923c;
+  }
+}
+
+.dark .advancedSaveButton {
+  background: #f97316;
+}
+.dark .advancedSaveButton:hover {
+  background: #fb923c;
+}
+
+/* ========== 마지막 출발 시간 ========== */
+
+.lastDepartureWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: #f7facc;
+  border-radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .lastDepartureWrapper {
+    background: #22301b;
+  }
+}
+
+.dark .lastDepartureWrapper {
+  background: #22301b;
+}
+
+.lastDepartureLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5f6770;
+}
+
+@media (prefers-color-scheme: dark) {
+  .lastDepartureLabel {
+    color: #9ca3af;
+  }
+}
+
+.dark .lastDepartureLabel {
+  color: #9ca3af;
+}
+
+.lastDepartureTime {
+  font-size: 24px;
+  font-weight: 800;
+  color: #111111;
+}
+
+@media (prefers-color-scheme: dark) {
+  .lastDepartureTime {
+    color: #f97316;
+  }
+}
+
+.dark .lastDepartureTime {
+  color: #f97316;
+}
+
+.lastDepartureSub {
+  font-size: 12px;
+  color: #5f6770;
+}
+.dark .lastDepartureSub {
+  color: #9ca3af;
+}
+
+.lastDeparturePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #111111;
+  background: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .lastDeparturePill {
+    color: #f97316;
+    background: transparent;
+    border-color: #f97316;
+  }
+}
+
+.dark .lastDeparturePill {
+  color: #f97316;
+  background: transparent;
+  border-color: #f97316;
+}
+
+/* ========== 미래 운행 정보 ========== */
+
 .futureCard {
   width: 100%;
-  margin-top: 10px;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
-  background: var(--background);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: var(--card);
 }
 
 .futureHeader {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  margin-bottom: 8px;
+  color: var(--text-primary, #171717);
+}
+
+.futureSub {
+  font-size: 11px;
+  color: var(--text-secondary, #6b7280);
 }
 
 .futureTable {
   display: grid;
-  grid-template-columns: 1fr auto auto;
   gap: 8px;
-  align-items: center;
-  padding: 8px 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  margin-top: 10px;
 }
 
 .futureRow {
-  display: contents;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
 }
 
 .futureCell {
   font-size: 13px;
+  color: var(--text-primary, #171717);
 }
 
-.futureNote {
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--muted);
+.futureMuted {
+  color: var(--text-secondary, #6b7280);
 }
 
-/* 다크모드 토글 */
-.themeToggle {
+/* ========== 닉네임 입력 ========== */
+
+.nameSaveCard {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 100%;
-  margin-bottom: 12px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
 }
 
-.themeToggleButton {
+.nameSaveField {
   display: flex;
+  gap: 8px;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--background);
-  color: var(--text-secondary);
-  font: inherit;
-  font-size: 13px;
+}
+
+.nameSaveField input {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 15px;
+  color: #171717;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 12px;
+  outline: none;
+}
+
+.nameSaveField input:focus {
+  border-color: #111111;
+}
+
+@media (prefers-color-scheme: dark) {
+  .nameSaveField input {
+    background: #1f261d;
+    border-color: #3a3a3a;
+    color: #ededed;
+  }
+  .nameSaveField input:focus {
+    border-color: #f97316;
+  }
+}
+
+.dark .nameSaveField input {
+  background: #1f261d;
+  border-color: #3a3a3a;
+  color: #ededed;
+}
+.dark .nameSaveField input:focus {
+  border-color: #f97316;
+}
+
+.readMoreLink {
+  color: #111111;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.themeToggleButton:hover {
-  color: var(--text-primary);
-}
-
-.themeToggleButton svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* 반응형 */
-@media (max-width: 600px) {
-  .main {
-    padding: 20px 12px;
-  }
-
-  .compareRow {
-    grid-template-columns: 1fr;
-  }
-
-  .departureTimeRow {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.readMoreLink:hover {
+  color: #333333;
 }

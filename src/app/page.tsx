@@ -18,7 +18,18 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './page.module.css';
-import { Button, Input, RadioGroup, Radio, Alert, Card, Chip, Checkbox, Badge } from '@heroui/react';
+import { cn } from '@heroui/styles';
+import {
+  Button,
+  Input,
+  RadioGroup,
+  Radio,
+  Alert,
+  Card,
+  Chip,
+  Checkbox,
+  Badge,
+} from '@heroui/react';
 import { useTheme } from 'next-themes';
 
 // ---------------------------------------------------------------------------
@@ -525,94 +536,150 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <div className={styles.themeToggle}>
-          <button
-            className={styles.themeToggleButton}
-            onClick={() => setTheme(activeTheme === 'dark' ? 'light' : 'dark')}
+          <Button
+            className={cn(
+              "h-11 w-11 rounded-full min-w-0",
+              activeTheme === "dark"
+                ? "bg-[var(--surface-secondary)] text-[var(--accent)]"
+                : "bg-[var(--surface-secondary)] text-[var(--foreground)]",
+            )}
+            variant="ghost"
+            onPress={() =>
+              setTheme(activeTheme === "dark" ? "light" : "dark")
+            }
             aria-label="다크모드 전환"
+            size="sm"
           >
-            {activeTheme === 'light' ? (
+            {activeTheme === "light" ? (
               <>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="5"/>
-                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-5"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
                 </svg>
-                다크 모드
+                <span>라이트</span>
               </>
             ) : (
               <>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-5"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
-                라이트 모드
+                <span>다크</span>
               </>
             )}
-          </button>
+          </Button>
         </div>
+
         <div className={styles.intro}>
-          <h1 style={{ fontSize: '28px', maxWidth: '100%', marginBottom: '8px' }}>
-            늦잠 잔 출근 아침의 5초 가치판단
-          </h1>
-          <p style={{ fontSize: '15px', maxWidth: '100%', marginBottom: '16px' }}>
+          <h1 className={styles.introTitle}>늦잠 잔 출근 아침의 5초 가치판단</h1>
+          <p className={styles.introSubtitle}>
             지금 출발하면 대중교통과 택시 중 뭐가 더 나을지, 준비 시간까지 반영해 비교해드려요.
           </p>
+        </div>
 
-          {/* 프로필 요약 */}
-          {profile && (
-            <div className={styles.profileSummary}>
-              <div>
-                <strong>{profile.homeName}</strong> → <strong>{profile.workName}</strong>
-                <br />
-                <span className={styles.muted}>{profile.homeAddress} → {profile.workAddress}</span>
+        {/* 프로필 요약 */}
+        {profile && (
+          <Card className={styles.profileCard}>
+            <Card.Header>
+              <Card.Title className={styles.profileCardTitle}>프로필</Card.Title>
+            </Card.Header>
+            <Card.Content className={styles.profileCardContent}>
+              <div className={styles.profileRow}>
+                <div>
+                  <span className={styles.profileStrong}>{profile.homeName}</span>
+                  <span className={styles.profileArrow}> → </span>
+                  <span className={styles.profileStrong}>{profile.workName}</span>
+                </div>
+                <Button
+                  className={styles.profileClear}
+                  variant="ghost"
+                  size="sm"
+                  onPress={clearProfileHandler}
+                >
+                  초기화
+                </Button>
               </div>
+              <p className={styles.profileAddress}>
+                {profile.homeAddress} → {profile.workAddress}
+              </p>
               <div className={styles.profileMeta}>
-                <span>목표 도착: {profile.targetArrival}</span>
-                <span className={styles.dot}>·</span>
-                <span>선호: {profile.preferredTransport}</span>
-                <Button className={styles.linkButton} onPress={clearProfileHandler}>초기화</Button>
+                <Chip size="sm" variant="soft" color="default">
+                  목표 도착: {profile.targetArrival}
+                </Chip>
+                <Chip size="sm" variant="soft" color="default">
+                  선호: {profile.preferredTransport}
+                </Chip>
               </div>
-            </div>
-          )}
+            </Card.Content>
+          </Card>
+        )}
 
           {/* 밤새 추천 미리 노출 */}
           {showNightBefore && nightBeforeResult && (
             <Card className={styles.nightBeforeCard}>
-              <div className={styles.nightBeforeHeader}>
-                <span>어제 밤 기준 내일 출발 추천</span>
+              <Card.Header>
+                <Card.Title className={styles.nightBeforeHeader}>
+                  어제 밤 기준 내일 출발 추천
+                </Card.Title>
                 {profile && (
-                  <Button className={styles.linkButton} onPress={() => refreshNightBefore(false)} isDisabled={recommendLoading}>
+                  <Button
+                    className={styles.linkButton}
+                    variant="ghost"
+                    onPress={() => refreshNightBefore(false)}
+                    isDisabled={recommendLoading}
+                  >
                     {recommendLoading ? '새로고침 중…' : '새로고침'}
                   </Button>
                 )}
-              </div>
-              <div>
+              </Card.Header>
+              <Card.Content>
                 <div>
-                  <span className={styles.nightBeforeLabel}>타이트:</span>{' '}
-                  <strong>{nightBeforeResult.tight.departureTime}</strong> 출발
+                  <div>
+                    <span className={styles.nightBeforeLabel}>타이트:</span>{' '}
+                    <strong>{nightBeforeResult.tight.departureTime}</strong> 출발
+                  </div>
                 </div>
-              </div>
-              <div className={styles.nightBeforeNote}>{nightBeforeResult.tight.transportNote}</div>
-              <div className={styles.nightBeforeNote}>{nightBeforeResult.tight.arrivalNote}</div>
-              <div className={styles.nightBeforeDivider}></div>
-              <div>
-                <span className={styles.nightBeforeLabel}>여유:</span>{' '}
-                <strong>{nightBeforeResult.loose.departureTime}</strong> 출발
-              </div>
-              <div className={styles.nightBeforeNote}>{nightBeforeResult.loose.transportNote}</div>
-              <div className={styles.nightBeforeNote}>{nightBeforeResult.loose.arrivalNote}</div>
-              <div className={styles.nightBeforeBottom}>{nightBeforeResult.note}</div>
+                <div className={styles.nightBeforeNote}>{nightBeforeResult.tight.transportNote}</div>
+                <div className={styles.nightBeforeNote}>{nightBeforeResult.tight.arrivalNote}</div>
+                <div className={styles.nightBeforeDivider}></div>
+                <div>
+                  <span className={styles.nightBeforeLabel}>여유:</span>{' '}
+                  <strong>{nightBeforeResult.loose.departureTime}</strong> 출발
+                </div>
+                <div className={styles.nightBeforeNote}>{nightBeforeResult.loose.transportNote}</div>
+                <div className={styles.nightBeforeNote}>{nightBeforeResult.loose.arrivalNote}</div>
+                <div className={styles.nightBeforeBottom}>{nightBeforeResult.note}</div>
+              </Card.Content>
             </Card>
           )}
 
           {/* 온보딩 환영 */}
           {!profile && onboardStep === 'welcome' && (
             <Card className={styles.welcomeCard}>
-            <p>처음 방문이신가요?</p>
-            <Button onClick={goToOnboarding}>
-              프로필 입력하기
-            </Button>
-            <p className={styles.muted} style={{ marginTop: '12px' }}>
-              집과 출근지 위치, 목표 도착 시각을 입력하면 바로 비교 추천을 받을 수 있어요.
-            </p>
+              <div className={styles.welcomeContent}>
+                <p className={styles.welcomeQuestion}>처음 방문이신가요?</p>
+                <Button variant="primary" onPress={goToOnboarding}>
+                  프로필 입력하기
+                </Button>
+                <p className={styles.welcomeDesc}>
+                  집과 출근지 위치, 목표 도착 시각을 입력하면 바로 비교 추천을 받을 수 있어요.
+                </p>
+              </div>
             </Card>
           )}
 
@@ -620,11 +687,24 @@ export default function Home() {
           {onboardStep !== 'welcome' && onboardStep !== 'done' && profile === null && (
             <Card className={styles.onboardingCard}>
               <div className={styles.onboardingSteps}>
-                {['집 위치', '출근지 위치', '목표 도착 시각', '선호 교통수단'].map((label, i) => (
-                  <div key={label} className={`${styles.onboardingStep} ${i <= ['home', 'work', 'time', 'prefs'].indexOf(onboardStep) ? styles.onboardingStepActive : ''}`}>
-                    {label}
-                  </div>
-                ))}
+                {['집 위치', '출근지 위치', '목표 도착 시각', '선호 교통수단'].map((label, i) => {
+                  const stepIndex = ['home', 'work', 'time', 'prefs'].indexOf(
+                    onboardStep,
+                  );
+                  return (
+                    <Chip
+                      key={label}
+                      variant={
+                        i <= stepIndex ? 'primary' : 'soft'
+                      }
+                      color="default"
+                      size="sm"
+                      className={styles.onboardingStep}
+                    >
+                      {label}
+                    </Chip>
+                  );
+                })}
               </div>
 
               {onboardStep === 'home' && (
@@ -657,7 +737,7 @@ export default function Home() {
                         <li key={i} className={styles.searchResultItem}>
                           <button className={styles.searchResultButton} onClick={() => {
                             setSelectedHome(r);
-                            setHomeCoords(null);
+                            if (r.x != null && r.y != null) setHomeCoords({ x: r.x, y: r.y });
                             setSearchResults([]);
                             setSearchError(null);
                           }}>
@@ -713,7 +793,7 @@ export default function Home() {
                             className={styles.searchResultButton}
                             onPress={() => {
                               setSelectedWork(r);
-                              setWorkCoords(null);
+                              if (r.x != null && r.y != null) setWorkCoords({ x: r.x, y: r.y });
                               setSearchResults([]);
                               setSearchError(null);
                             }}
@@ -866,7 +946,7 @@ export default function Home() {
                   {/* 날씨 정보 */}
                   {recommendResult.weather && (
                     <Alert
-                      color={recommendResult.weather.isRaining ? 'danger' : 'success'}
+                      status={recommendResult.weather.isRaining ? 'danger' : 'success'}
                       className={styles.weatherAlert}
                     >
                       <Alert.Description>
@@ -1051,7 +1131,7 @@ export default function Home() {
                   </p>
                   <Button variant="outline" className={styles.secondaryButton} onPress={() => {
                     saveProfile({ ...profile, prepMinutes, taxiCallAddOn, taxiCallAddMinutes });
-                    setProfile({ ...profile, prepMinutes, taxiCallAddOn, taxiCallAddMinutes });
+                    setProfile((prev) => prev ? { ...prev, prepMinutes, taxiCallAddOn, taxiCallAddMinutes } : null);
                     showMessage('고급 설정이 저장되었습니다.');
                   }}>
                     설정 저장
@@ -1065,7 +1145,6 @@ export default function Home() {
           {message && (
             <div className={styles.message}>{message}</div>
           )}
-        </div>
       </main>
     </div>
   );

@@ -1,31 +1,36 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
-/*
- * late-to-work 프로젝트 CSS 변수.
- * HeroUI 다크모드는 <html>에 class="dark"가 붙으면 컴포넌트 수준에서 자동으로
- * 다크 스타일을 적용한다. 여기서는 앱 캔버스(카드·버튼·텍스트)가 다크에서도
- * 자연스럽게 보이도록 :root / .dark 변수로 캔버스 색상을 정의한다.
- *
- * 색상 체계는 표면(surface) 중심으로 구성: 배경, 카드, 보조 표면, 테두리, muted.
- */
+/* HeroUI 기본 테마 변수를 프로젝트 색채로 덮어쓴다.
+   - HeroUI 컴포넌트는 --background, --foreground, --surface, --accent,
+     --border, --muted 같은 의미적 토큰을 쓰므로, 이 변수들만 맞추면
+     버튼·카드·입력·알럿이 전부 테마에 맞춰 반응한다.
+   - 커스텀 영역도 같은 토큰을 쓰도록 Tailwind 유틸리티(bg-background 등)로
+     통일한다. */
 
 :root {
   --background: #fafafa;
-  --foreground: #ffffff;
+  --foreground: #171717;
 
-  --card: #ffffff;
-  --card-foreground: #171717;
+  --surface: #ffffff;
+  --surface-foreground: #171717;
+  --surface-secondary: #f5f5f5;
+  --surface-secondary-foreground: #171717;
 
-  --border: #e5e5e5;
   --muted: #9aa0a6;
   --muted-foreground: #5f6770;
+
+  --default: #f0f0f0;
+  --default-foreground: #171717;
 
   --accent: #111111;
   --accent-foreground: #ffffff;
 
   --destructive: #b00020;
   --destructive-foreground: #ffffff;
+
+  --border: #e5e5e5;
+  --separator: #e5e5e5;
 
   --radius: 12px;
 }
@@ -34,18 +39,25 @@
   --background: #0a0a0a;
   --foreground: #ededed;
 
-  --card: #171717;
-  --card-foreground: #ededed;
+  --surface: #171717;
+  --surface-foreground: #ededed;
+  --surface-secondary: #252525;
+  --surface-secondary-foreground: #ededed;
 
-  --border: #2e2e2e;
   --muted: #6b7280;
   --muted-foreground: #9ca3af;
+
+  --default: #252525;
+  --default-foreground: #ededed;
 
   --accent: #f97316;
   --accent-foreground: #0a0a0a;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
+
+  --border: #2e2e2e;
+  --separator: #2e2e2e;
 }
 
 html {
