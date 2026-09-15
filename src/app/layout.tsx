@@ -21,6 +21,26 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function () {
+            try {
+              var stored = localStorage.getItem('theme');
+              var theme;
+              if (stored) {
+                theme = stored;
+              } else {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+              }
+              if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+              } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+              }
+            } catch (e) {}
+          })();`,
+        }}
+      />
       <body className="min-h-screen flex flex-col bg-background text-foreground">
         <ThemeProvider>
           {children}
