@@ -375,10 +375,10 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
     publicTotalMinutes = transitMinutes + sharedPrep;
     publicPrepMinutes = sharedPrep;
   } else {
-    // 대중교통 실패 시 기본값(가정값으로 계산 후 표시)
-    publicTransitMinutes = 31; // calc_trip.py 기본 가정값 예(보라매역↔여의도/국회의사당 방향)
+    // 대중교통 실시간 정보 없음 → 계산 없이 downstream에 null 전달
+    publicTransitMinutes = 0;
     publicDeparture = minutesToParsed(nowTotal);
-    publicTotalMinutes = publicTransitMinutes + sharedPrep;
+    publicTotalMinutes = sharedPrep;
     publicPrepMinutes = sharedPrep;
   }
 
@@ -401,10 +401,10 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
     taxiTotalMinutes = vehicleEta + taxiPrepTotal;
     taxiPrepMinutes = taxiPrepTotal;
   } else {
-    // 택시 실패 시 기본값(가정값)
-    taxiVehicleEtaMinutes = 16; // calc_trip.py 기본 가정값 예
+    // 택시 실시간 정보 없음 → 계산 없이 downstream에 null 전달
+    taxiVehicleEtaMinutes = 0;
     taxiDeparture = minutesToParsed(nowTotal);
-    taxiTotalMinutes = taxiVehicleEtaMinutes + taxiPrepTotal;
+    taxiTotalMinutes = taxiPrepTotal;
     taxiPrepMinutes = taxiPrepTotal;
   }
 
@@ -734,17 +734,17 @@ export function calcNightBefore(input: NightBeforeInput): NightBeforeOutput | nu
 
   const targetTotal = arrToTotalMinutes(target);
 
-  // 대중교통 소요시간: 사용자 기준값 우선, 없으면 기본값
+  // 대중교통 소요시간: 사용자 기준값 우선, 없으면 null (집에서 미리 입력해둔 값이 있을 때만 사용)
   const transitMinutes =
     input.transitDurationMinutes != null
       ? toMinutes(input.transitDurationMinutes)
-      : 31; // 기본 가정값
+      : null;
 
-  // 택시 소요시간: 사용자 기준값 우선, 없으면 기본값
+  // 택시 소요시간: 사용자 기준값 우선, 없으면 null
   const vehicleEta =
     input.taxiVehicleEtaMinutes != null
       ? toMinutes(input.taxiVehicleEtaMinutes)
-      : 16; // 기본 가정값
+      : null;
 
   const sharedPrep = toMinutes(input.sharedPrepMinutes);
   const taxiCallAdd = toMinutes(input.taxiCallAddOn ? input.taxiCallAddMinutes : 0);
@@ -753,6 +753,10 @@ export function calcNightBefore(input: NightBeforeInput): NightBeforeOutput | nu
   // 선호 시간대 A/B가 있으면 그걸 출발 시각 후보로 우선 사용한다.
   // 없으면 기존 타이트/여유(15~25분 차이)로 계산한다.
   const usePreferred = input.preferredTimeA != null;
+
+  // 전날 밤 추천은 사용자가 미리 입력해둔 이동시간 기준값이 있을 때만 계산한다.
+  // 둘 중 하나라도 없으면(typeof null) 계산이 성립하지 않으므로 여기서 종료한다.
+  if (transitMinutes == null || vehicleEta == null) return null;
 
   let tightDepartureTime: string;
   let looseDepartureTime: string;
@@ -805,6 +809,8 @@ export function calcNightBefore(input: NightBeforeInput): NightBeforeOutput | nu
       looseTaxiArrivalTime = formatTime(looseTaxiArrival);
     }
   } else {
+    // 759행에서 이미 null 체크 완료 — transitMinutes, vehicleEta는 number
+    if (transitMinutes == null || vehicleEta == null) return null;
     // 기존 방식: 타이트 + 여유(20분 차이)
     const tightTravelMinutes = transitMinutes + sharedPrep;
     const tightDeparture = minutesToParsed(targetTotal - tightTravelMinutes);
