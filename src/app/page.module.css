@@ -71,6 +71,20 @@
   color: var(--text-primary);
 }
 
+/* HeroUI Button + 링크 스타일 */
+.herouiLinkButton {
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-decoration: underline;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.herouiLinkButton:hover {
+  color: var(--text-primary);
+}
+
 /* 프로필 요약 */
 .profileSummary {
   border: 1px solid var(--border);

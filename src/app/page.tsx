@@ -534,20 +534,20 @@ export default function Home() {
                 <span>목표 도착: {profile.targetArrival}</span>
                 <span className={styles.dot}>·</span>
                 <span>선호: {profile.preferredTransport}</span>
-                <button className={styles.linkButton} onClick={clearProfileHandler}>초기화</button>
+                <Button className={styles.linkButton} onPress={clearProfileHandler}>초기화</Button>
               </div>
             </div>
           )}
 
           {/* 밤새 추천 미리 노출 */}
           {showNightBefore && nightBeforeResult && (
-            <div className={styles.nightBeforeCard}>
+            <Card className={styles.nightBeforeCard}>
               <div className={styles.nightBeforeHeader}>
                 <span>어제 밤 기준 내일 출발 추천</span>
                 {profile && (
-                  <button className={styles.linkButton} onClick={(e) => refreshNightBefore(false)} disabled={recommendLoading}>
+                  <Button className={styles.linkButton} onPress={() => refreshNightBefore(false)} isDisabled={recommendLoading}>
                     {recommendLoading ? '새로고침 중…' : '새로고침'}
-                  </button>
+                  </Button>
                 )}
               </div>
               <div>
@@ -566,25 +566,25 @@ export default function Home() {
               <div className={styles.nightBeforeNote}>{nightBeforeResult.loose.transportNote}</div>
               <div className={styles.nightBeforeNote}>{nightBeforeResult.loose.arrivalNote}</div>
               <div className={styles.nightBeforeBottom}>{nightBeforeResult.note}</div>
-            </div>
+            </Card>
           )}
 
           {/* 온보딩 환영 */}
           {!profile && onboardStep === 'welcome' && (
-            <div className={styles.welcomeCard}>
-              <p>처음 방문이신가요?</p>
-              <Button onClick={goToOnboarding}>
-                프로필 입력하기
-              </Button>
-              <p className={styles.muted} style={{ marginTop: '12px' }}>
-                집과 출근지 위치, 목표 도착 시각을 입력하면 바로 비교 추천을 받을 수 있어요.
-              </p>
-            </div>
+            <Card className={styles.welcomeCard}>
+            <p>처음 방문이신가요?</p>
+            <Button onClick={goToOnboarding}>
+              프로필 입력하기
+            </Button>
+            <p className={styles.muted} style={{ marginTop: '12px' }}>
+              집과 출근지 위치, 목표 도착 시각을 입력하면 바로 비교 추천을 받을 수 있어요.
+            </p>
+            </Card>
           )}
 
           {/* 온보딩 단계 */}
           {onboardStep !== 'welcome' && onboardStep !== 'done' && profile === null && (
-            <div className={styles.onboardingCard}>
+            <Card className={styles.onboardingCard}>
               <div className={styles.onboardingSteps}>
                 {['집 위치', '출근지 위치', '목표 도착 시각', '선호 교통수단'].map((label, i) => (
                   <div key={label} className={`${styles.onboardingStep} ${i <= ['home', 'work', 'time', 'prefs'].indexOf(onboardStep) ? styles.onboardingStepActive : ''}`}>
@@ -780,7 +780,7 @@ export default function Home() {
                   </div>
                 </div>
               )}
-            </div>
+            </Card>
           )}
 
           {/* 프로필 완료 후: 바로 추천 영역 */}
@@ -912,7 +912,7 @@ export default function Home() {
                   {recommendResult.taxiFuture && recommendResult.taxiFuture.departureTimes.length > 0 && (() => {
                     const tf = recommendResult.taxiFuture!;
                     return (
-                      <div className={styles.futureCard}>
+                      <Card className={styles.futureCard}>
                         <div className={styles.futureHeader}>
                           <span>후보 출발 시각별 차량 예상 소요시간</span>
                           <span className={styles.muted}>(미래 운행 정보 기준)</span>
@@ -944,7 +944,7 @@ export default function Home() {
                           출발 시각을 몇 가지로 나눠서 각각에 대해 차가 얼마나 걸릴지 미리 본 결과예요.
                           늦지 않는 마지막 출발 시각을 가늠하는 데 참고할 수 있어요.
                         </div>
-                      </div>
+                      </Card>
                     );
                   })()}
                 </div>
