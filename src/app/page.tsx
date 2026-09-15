@@ -533,9 +533,13 @@ export default function Home() {
     setProfile(p);
     setOnboardStep('done');
     if (homeCoords && workCoords) {
-      runRecommend();
+      showMessage('프로필이 저장되었습니다. 지금 출발 기준을 계산하고 있어요...');
+      requestAnimationFrame(() => {
+        runRecommend();
+      });
+    } else {
+      showMessage('프로필이 저장되었습니다.');
     }
-    showMessage('프로필이 저장되었습니다.');
   }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, homeCoords, workCoords, runRecommend]);
 
   const clearProfileHandler = useCallback(() => {
@@ -876,13 +880,23 @@ export default function Home() {
                       </div>
                     )}
                   </Fieldset>
-                  <Button
-                    className={styles.nextButton}
-                    onPress={() => setOnboardStep('work')}
-                    isDisabled={!selectedHome}
-                  >
-                    다음: 출근지 위치
-                  </Button>
+                  <div className={styles.onboardingNav}>
+                    <Button variant="ghost" className={styles.cancelButton} onPress={() => {
+                      setOnboardStep('welcome');
+                      setSearchResults([]);
+                      setSearchError(null);
+                      setSearchQuery('');
+                    }}>
+                      취소
+                    </Button>
+                    <Button
+                      className={styles.nextButton}
+                      onPress={() => setOnboardStep('work')}
+                      isDisabled={!selectedHome}
+                    >
+                      다음: 출근지 위치
+                    </Button>
+                  </div>
                 </div>
               )}
 
