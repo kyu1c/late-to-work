@@ -26,6 +26,23 @@
   min-height: 100vh;
 }
 
+.dark .page {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --text-primary: #ededed;
+  --text-secondary: #9ca3af;
+  --muted: #6b7280;
+  --border: #2e2e2e;
+  --card: #171717;
+  --card-border: #2e2e2e;
+  --button-primary: #f97316;
+  --button-primary-hover: #fb923c;
+  --button-secondary: #171717;
+  --button-secondary-border: #333;
+  --button-secondary-hover: #252525;
+  --accent: #f97316;
+}
+
 .main {
   display: flex;
   flex: 1;
@@ -37,6 +54,11 @@
   background-color: var(--foreground);
   border: 1px solid var(--border);
   border-radius: 0;
+}
+
+.dark .main {
+  background-color: var(--background);
+  border-color: var(--border);
 }
 
 .intro {
@@ -109,9 +131,13 @@
   border: 1px solid var(--border);
   padding: 14px;
   border-radius: 12px;
-  background: #f6f7f8;
+  background: var(--card);
   width: 100%;
   margin-top: 4px;
+}
+
+.dark .nightBeforeCard {
+  background: var(--card);
 }
 
 .nightBeforeHeader {
@@ -156,10 +182,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.welcomeCard p {
-  font-size: 15px;
 }
 
 /* 온보딩 */
@@ -518,10 +540,22 @@
   border: 1px solid #b3d4f0;
 }
 
+.dark .weatherAlertRain {
+  background: #0a2a40;
+  color: #88bbff;
+  border-color: #1a4a6a;
+}
+
 .weatherAlertClear {
   background: #fff8e6;
   color: #996600;
   border: 1px solid #ffecb3;
+}
+
+.dark .weatherAlertClear {
+  background: #2a2510;
+  color: #ffcc66;
+  border-color: #4a3a1a;
 }
 
 .weatherIcon {
@@ -554,6 +588,10 @@
   color: #fff;
   font-size: 15px;
   font-weight: 600;
+}
+
+.dark .conclusion {
+  color: #0a0a0a;
 }
 
 .actions {
@@ -635,6 +673,10 @@
   font-size: 13px;
 }
 
+.dark .message {
+  color: #0a0a0a;
+}
+
 /* 미래 운행 정보 카드 */
 .futureCard {
   width: 100%;
@@ -678,6 +720,39 @@
   color: var(--muted);
 }
 
+/* 다크모드 토글 */
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.themeToggleButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.themeToggleButton:hover {
+  color: var(--text-primary);
+}
+
+.themeToggleButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 반응형 */
 @media (max-width: 600px) {
   .main {
     padding: 20px 12px;

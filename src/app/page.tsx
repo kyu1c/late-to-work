@@ -19,6 +19,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import styles from './page.module.css';
 import { Button, Input, RadioGroup, Radio, Alert, Card, Chip, Checkbox, Badge } from '@heroui/react';
+import { useTheme } from 'next-themes';
 
 // ---------------------------------------------------------------------------
 // 타입 (lib/types와 동일 — 여기서는 화면 전용으로 재선언하지 않고 필요한 것만)
@@ -258,6 +259,15 @@ async function fetchNightBefore(body: Record<string, unknown>): Promise<{ ok: bo
 type OnboardStep = 'welcome' | 'home' | 'work' | 'time' | 'prefs' | 'done';
 
 export default function Home() {
+  const { theme, setTheme } = useTheme();
+  const [activeTheme, setActiveTheme] = useState<'dark' | 'light' | undefined>(undefined);
+
+  useEffect(() => {
+    if (theme !== undefined) {
+      setActiveTheme(theme === 'dark' ? 'dark' : 'light');
+    }
+  }, [theme]);
+
   const [profile, setProfile] = useState<Profile | null>(null);
   const [onboardStep, setOnboardStep] = useState<OnboardStep>('welcome');
   const [searchQuery, setSearchQuery] = useState('');
@@ -514,6 +524,30 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+        <div className={styles.themeToggle}>
+          <button
+            className={styles.themeToggleButton}
+            onClick={() => setTheme(activeTheme === 'dark' ? 'light' : 'dark')}
+            aria-label="다크모드 전환"
+          >
+            {activeTheme === 'light' ? (
+              <>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5"/>
+                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+                다크 모드
+              </>
+            ) : (
+              <>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+                라이트 모드
+              </>
+            )}
+          </button>
+        </div>
         <div className={styles.intro}>
           <h1 style={{ fontSize: '28px', maxWidth: '100%', marginBottom: '8px' }}>
             늦잠 잔 출근 아침의 5초 가치판단
