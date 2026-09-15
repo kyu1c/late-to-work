@@ -755,8 +755,9 @@ export function calcNightBefore(input: NightBeforeInput): NightBeforeOutput | nu
   const usePreferred = input.preferredTimeA != null;
 
   // 전날 밤 추천은 사용자가 미리 입력해둔 이동시간 기준값이 있을 때만 계산한다.
-  // 둘 중 하나라도 없으면(typeof null) 계산이 성립하지 않으므로 여기서 종료한다.
-  if (transitMinutes == null || vehicleEta == null) return null;
+  // 둘 중 하나라도 없으면 계산이 성립하지 않으므로 여기서 종료한다.
+  if (transitMinutes == null) return null;
+  if (vehicleEta == null) return null;
 
   let tightDepartureTime: string;
   let looseDepartureTime: string;
@@ -809,16 +810,14 @@ export function calcNightBefore(input: NightBeforeInput): NightBeforeOutput | nu
       looseTaxiArrivalTime = formatTime(looseTaxiArrival);
     }
   } else {
-    // 759행에서 이미 null 체크 완료 — transitMinutes, vehicleEta는 number
-    if (transitMinutes == null || vehicleEta == null) return null;
     // 기존 방식: 타이트 + 여유(20분 차이)
     const tightTravelMinutes = transitMinutes + sharedPrep;
     const tightDeparture = minutesToParsed(targetTotal - tightTravelMinutes);
     tightDepartureTime = formatTime(tightDeparture);
 
     const tightTaxiTotal = vehicleEta + taxiPrepTotal;
-    const tightTaxiArrival = minutesToParsed(targetTotal - tightTaxiTotal + vehicleEta + taxiPrepTotal - vehicleEta);
-    tightTaxiArrivalTime = formatTime(minutesToParsed(targetTotal - vehicleEta - taxiPrepTotal + vehicleEta));
+    const tightTaxiArrival = minutesToParsed(targetTotal - tightTaxiTotal);
+    tightTaxiArrivalTime = formatTime(tightTaxiArrival);
 
     const bufferMinutes = 20;
     const looseTravelMinutes = transitMinutes + sharedPrep + bufferMinutes;

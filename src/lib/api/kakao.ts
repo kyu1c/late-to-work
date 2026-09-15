@@ -159,8 +159,8 @@ export async function kakaoAddressSearchOutput(
         results: primaryResult.data!.results.map((item) => ({
           name: item.name,
           address: item.roadAddress ?? item.address,
-          x: item.x,
-          y: item.y,
+          x: Number(item.x),
+          y: Number(item.y),
         })),
         source: preferAddressSearch ? 'address' : 'keyword',
       },
@@ -179,8 +179,8 @@ export async function kakaoAddressSearchOutput(
         results: secondaryResult.data!.results.map((item) => ({
           name: item.name,
           address: item.roadAddress ?? item.address,
-          x: item.x,
-          y: item.y,
+          x: Number(item.x),
+          y: Number(item.y),
         })),
         source: preferAddressSearch ? 'keyword' : 'address',
       },

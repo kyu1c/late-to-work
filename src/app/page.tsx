@@ -22,8 +22,6 @@ import { cn } from '@heroui/styles';
 import {
   Button,
   Input,
-  RadioGroup,
-  Radio,
   Alert,
   Card,
   Chip,
@@ -42,6 +40,9 @@ import {
   SelectTrigger,
   SelectValue,
   SelectPopover,
+  Tabs,
+  NumberField,
+  Separator,
 } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { parseTime } from '@internationalized/date';
@@ -321,7 +322,7 @@ export default function Home() {
   const [workCoords, setWorkCoords] = useState<{ x: number; y: number } | null>(null);
   const [targetArrival, setTargetArrival] = useState('09:00');
   const [preferredTransport, setPreferredTransport] = useState<Transport>('any');
-  const [usualTransitMinutes, setUsualTransitMinutes] = useState<string>('');
+  const [usualTransitMinutes, setUsualTransitMinutes] = useState<number | ''>('');
   const [preferredTimeA, setPreferredTimeA] = useState<string>('');
   const [preferredTimeB, setPreferredTimeB] = useState<string>('');
   const [prepMinutes, setPrepMinutes] = useState(5);
@@ -345,7 +346,7 @@ export default function Home() {
     if (p) {
       setTargetArrival(p.targetArrival);
       setPreferredTransport(p.preferredTransport);
-      setUsualTransitMinutes(String(p.usualTransitMinutes ?? ''));
+      setUsualTransitMinutes(p.usualTransitMinutes ?? '');
       setPreferredTimeA(p.preferredTimeA ?? '');
       setPreferredTimeB(p.preferredTimeB ?? '');
       setPrepMinutes(p.prepMinutes);
@@ -522,7 +523,7 @@ export default function Home() {
       workY: workCoords?.y,
       targetArrival,
       preferredTransport,
-      usualTransitMinutes: usualTransitMinutes ? parseInt(usualTransitMinutes, 10) : undefined,
+      usualTransitMinutes: typeof usualTransitMinutes === 'number' ? usualTransitMinutes : undefined,
       preferredTimeA,
       preferredTimeB,
       prepMinutes,
@@ -577,7 +578,7 @@ export default function Home() {
     setSearchQuery('');
     setTargetArrival(profile?.targetArrival ?? '09:00');
     setPreferredTransport(profile?.preferredTransport ?? 'any');
-    setUsualTransitMinutes(String(profile?.usualTransitMinutes ?? ''));
+    setUsualTransitMinutes(profile?.usualTransitMinutes ?? '');
     setPreferredTimeA(profile?.preferredTimeA ?? '');
     setPreferredTimeB(profile?.preferredTimeB ?? '');
     setPrepMinutes(profile?.prepMinutes ?? 5);
@@ -596,7 +597,7 @@ export default function Home() {
     const arrivalMin = hhmmToMinutes(targetArrival);
     const transitMin = (() => {
       if (recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.transit.durationMinutes > 0) return recommendResult.transit.durationMinutes;
-      const u = usualTransitMinutes ? parseInt(usualTransitMinutes, 10) : null;
+      const u = typeof usualTransitMinutes === 'number' ? usualTransitMinutes : null;
       if (u != null && u > 0) return u;
       return 30;
     })();
@@ -783,26 +784,27 @@ export default function Home() {
           {onboardStep !== 'welcome' && onboardStep !== 'done' && (
             <Card className={styles.onboardingCard}>
               <div className={styles.onboardingSteps}>
-                {['집 위치', '출근지 위치', '목표 도착 시각', '선호 교통수단'].map((label, i) => {
-                  const stepIndex = ['home', 'work', 'time', 'prefs'].indexOf(
-                    onboardStep,
-                  );
-                  return (
-                    <Chip
-                      key={label}
-                      variant="soft"
-                      color="default"
-                      size="sm"
-                      className={cn(
-                        styles.onboardingStep,
-                        i < stepIndex && styles.stepDone,
-                        i === stepIndex && styles.stepCurrent,
-                      )}
-                    >
-                      {label}
-                    </Chip>
-                  );
-                })}
+                <Tabs orientation="horizontal" className={styles.onboardingTabs}>
+                  <Tabs.List className={styles.onboardingTabList}>
+                    {['집 위치', '출근지 위치', '목표 도착 시각', '선호 교통수단'].map((label, i) => {
+                      const stepKey = ['home', 'work', 'time', 'prefs'][i] as OnboardStep;
+                      const isActive = onboardStep === stepKey;
+                      const isDone = ['home', 'work', 'time', 'prefs'].indexOf(onboardStep) > i;
+                      return (
+                        <Tabs.Tab
+                          key={label}
+                          className={cn(
+                            styles.onboardingTab,
+                            isActive && styles.onboardingTabActive,
+                            isDone && styles.onboardingTabDone,
+                          )}
+                        >
+                          {label}
+                        </Tabs.Tab>
+                      );
+                    })}
+                  </Tabs.List>
+                </Tabs>
               </div>
 
               {onboardStep === 'home' && (
@@ -823,6 +825,7 @@ export default function Home() {
                         }}
                       />
                       <Button
+                        variant="primary"
                         className={styles.searchButton}
                         onPress={() => doSearch(searchQuery, false, setSelectedHome, setHomeCoords)}
                         isDisabled={searching || !searchQuery.trim()}
@@ -882,7 +885,7 @@ export default function Home() {
                   </Fieldset>
                   <div className={styles.onboardingNav}>
                     <Button variant="ghost" className={styles.cancelButton} onPress={() => {
-                      setOnboardStep('welcome');
+                      setOnboardStep('done');
                       setSearchResults([]);
                       setSearchError(null);
                       setSearchQuery('');
@@ -891,7 +894,8 @@ export default function Home() {
                     </Button>
                     <Button
                       className={styles.nextButton}
-                      onPress={() => setOnboardStep('work')}
+                      variant="primary"
+                      onPress={() => { setSearchQuery(''); setOnboardStep('work'); }}
                       isDisabled={!selectedHome}
                     >
                       다음: 출근지 위치
@@ -925,8 +929,9 @@ export default function Home() {
                         }}
                       />
                       <Button
+                        variant="primary"
                         className={styles.searchButton}
-                        onPress={() => doSearch(searchQuery, false, setSelectedWork, setWorkCoords)}
+                        onPress={() => doSearch(searchQuery, false, setSelectedHome, setHomeCoords)}
                         isDisabled={searching || !searchQuery.trim()}
                       >
                         {searching ? '검색 중…' : '검색'}
@@ -1042,22 +1047,25 @@ export default function Home() {
                     {recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.transit.durationMinutes > 0 ? (
                       <span className={styles.moveEstimateValue}>약 {recommendResult.transit.durationMinutes}분 (대중교통, {recommendResult.transit.source})</span>
                     ) : usualTransitMinutes ? (
-                      <span className={styles.moveEstimateValue}>약 {parseInt(usualTransitMinutes, 10)}분 (입력한 평소 소요 시간 기준)</span>
+                      <span className={styles.moveEstimateValue}>약 {typeof usualTransitMinutes === 'number' ? usualTransitMinutes : 0}분 (입력한 평소 소요 시간 기준)</span>
                     ) : (
                       <span className={styles.moveEstimateHelp}>입력한 평소 소요 시간이 있으면 여기에 반영돼요.</span>
                     )}
                   </div>
                   <label className={styles.fieldLabel}>
                     평소 평균 이동 소요 시간 (분, 선택)
-                    <Input
+                    <NumberField
                       className={styles.numberInput}
-                      type="number"
-                      min="1"
-                      max="300"
-                      value={usualTransitMinutes}
-                      onBlur={(e) => setUsualTransitMinutes(e.target.value)}
-                      placeholder="예: 30"
-                    />
+                      name="usualTransitMinutes"
+                      value={usualTransitMinutes === '' ? undefined : usualTransitMinutes}
+                      onChange={(value) => setUsualTransitMinutes(value ?? '')}
+                      minValue={1}
+                      maxValue={300}
+                    >
+                      <NumberField.Input placeholder="예: 30" />
+                      <NumberField.IncrementButton>+</NumberField.IncrementButton>
+                      <NumberField.DecrementButton>−</NumberField.DecrementButton>
+                    </NumberField>
                   </label>
                   <label className={styles.fieldLabel}>
                     전날 밤 선호 출발 시각 A (타이트, HH:MM, 선택)
@@ -1101,6 +1109,9 @@ export default function Home() {
                   <div className={styles.compareHeader}>
                     <span>현재 시각 기준: {recommendResult.nowTime}</span>
                     <span className={styles.muted}>목표 도착: {recommendResult.targetArrival}</span>
+                  </div>
+                  <div className={styles.dataDisclaimer}>
+                    실시간 교통·날씨 정보가 없으면 평균·패턴 기반 추정치로 안내해요.
                   </div>
 
                   {/* 날씨 정보 */}
@@ -1181,6 +1192,9 @@ export default function Home() {
 
                   {/* 참고 */}
                   <div className={styles.note}>{recommendResult.note}</div>
+                  <p className={styles.muted} style={{ marginTop: '6px' }}>
+                    준비 시간은 개인 준비와 택시 호출 대기를 함께 고려한 초기 추정치예요. 고급 설정에서 조정할 수 있어요.
+                  </p>
 
                   {/* 미래 운행 정보: 3개 후보 출발 시각 기준 차량 ETA (P1-6) */}
                   {recommendResult.taxiFuture && recommendResult.taxiFuture.departureTimes.length > 0 && (() => {
@@ -1228,7 +1242,19 @@ export default function Home() {
               )}
 
               {recommendError && (
-                <div className={styles.errorText}>{recommendError}</div>
+                <div className={styles.errorText}>
+                  {recommendError}
+                  {recommendError.includes('위치') || recommendError.includes('출발') || recommendError.includes('수정') ? (
+                    <Button
+                      className={styles.errorEditButton}
+                      variant="outline"
+                      size="sm"
+                      onPress={editProfileHandler}
+                    >
+                      프로필 수정하기
+                    </Button>
+                  ) : null}
+                </div>
               )}
 
               {!recommendResult && !recommendLoading && !recommendError && (
@@ -1426,15 +1452,14 @@ export default function Home() {
           <div className={styles.apiInfo}>
             <p className={styles.apiInfoTitle}>현재 서비스에서 사용 중인 API</p>
             <ul className={styles.apiInfoList}>
-              <li>주소/장소 검색 — Kakao REST API</li>
-              <li>차량 경로·택시 ETA·요금 — Tmap</li>
-              <li>대중교통 통합 길찾기 — ODsay</li>
-              <li>버스 정류소·노선 — TAGO (버스)</li>
-              <li>지하철 역·노선 — TAGO (지하철)</li>
-              <li>현재 날씨(강수 여부) — KMA 초단기예보</li>
+              <li>주소/장소 검색 — Kakao REST API (카카오맵 주소검색·키워드검색)</li>
+              <li>차량 경로·택시 ETA·요금 — 카카오모빌리티 Navi API (`/v1/directions`, `/v1/future/directions`)</li>
+              <li>대중교통 소요시간 — ODsay 대중교통 길찾기 (1차) · 카카오맵 REST 대중교통 경로 존재 확인(최후단)</li>
+              <li>현재 날씨(강수 여부) — KMA 초단기예보 (기상청, nx=61 ny=126)</li>
             </ul>
             <p className={styles.apiInfoNote}>
-              각 서비스는 개별 이용약관·라이선스를 따르며, 무료로 제공되는 범위 내에서 사용합니다.
+              각 서비스는 개별 이용약관·라이선스를 따르며, 무료로 제공되는 범위 내에서 사용합니다.<br />
+              Tmap·TAGO(버스·지하철)는 코드상 준비되어 있으나, 현재 추천 흐름에선 직접 사용하지 않습니다.
             </p>
           </div>
         </main>

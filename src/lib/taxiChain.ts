@@ -37,11 +37,12 @@ export async function taxiChain(params: NaviDirectionsParams): Promise<TaxiResul
     };
   }
 
+  // 3) 모두 실패 → 실시간 정보 없음 (추정치 금지)
   return {
-    vehicleEtaMinutes: 16,
+    vehicleEtaMinutes: null,
     taxiFare: null,
     distanceMeters: null,
-    source: 'estimate',
-    note: '평균/패턴 기반 추정치(택시 기본 가정값)',
+    source: 'none',
+    note: '실시간 택시 정보를 가져올 수 없습니다.',
   };
 }

@@ -134,7 +134,6 @@ function extractCarSummary(raw: unknown): NaviCarTripSummary {
   if (!summary || typeof summary !== 'object') {
     return { durationMinutes: null, distanceMeters: null, taxiFare: null };
   }
-
   const s = summary as Record<string, unknown>;
 
   const durationSeconds = typeof s.duration === 'number' ? s.duration : null;

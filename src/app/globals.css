@@ -27,12 +27,43 @@
   --accent-foreground: #ffffff;
 
   --destructive: #b00020;
-  --destructive-foreground: #ffffff;
+  --destructive-foreground: #fca5a5;
+  --destructive-subtle: #fef2f2;
+  --accent-hover: #333333;
 
   --border: #e5e5e5;
   --separator: #e5e5e5;
 
   --radius: 12px;
+
+  /* ============ 간격 스케일 (4px 배수) ============ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* ============ 타이포그래피 스케일 ============ */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 22px;
+
+  /* ============ 글자 무게 ============ */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ============ 컴포넌트 높이 ============ */
+  --input-height: 52px;
+  --btn-height: 50px;
+  --chip-height: 28px;
 }
 
 .dark {
@@ -55,9 +86,40 @@
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
+  --destructive-subtle: #2a1414;
+  --accent-hover: #fb923c;
 
   --border: #2e2e2e;
   --separator: #2e2e2e;
+
+  /* ============ 간격 스케일 (다크 동일) ============ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* ============ 타이포그래피 스케일 (다크 동일) ============ */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 22px;
+
+  /* ============ 글자 무게 (다크 동일) ============ */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ============ 컴포넌트 높이 (다크 동일) ============ */
+  --input-height: 52px;
+  --btn-height: 50px;
+  --chip-height: 28px;
 }
 
 html {

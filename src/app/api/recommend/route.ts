@@ -19,6 +19,19 @@ function nowHHmm(): string {
   return `${h}:${m}`;
 }
 
+/**
+ * HH:MM 문자열을 KST 기준 YYYYMMDDHHMM 형식으로 변환한다.
+ * Navi /v1/future/directions의 departure_time 파라미터 형식에 맞춘다.
+ */
+function yyyymmddhhmm(hhmm: string): string {
+  const d = new Date();
+  const y = String(d.getFullYear());
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const [h, min] = hhmm.split(':').map((s) => s.padStart(2, '0'));
+  return `${y}${m}${day}${h}${min}`;
+}
+
 function localDayOfWeek(): number {
   // 0=Sunday, 1=Monday, ..., 6=Saturday
   return new Date().getDay();
@@ -147,7 +160,7 @@ export async function POST(req: NextRequest) {
     originLat: startY,
     destLon: endX,
     destLat: endY,
-    departureTime: departureTime ? departureTime.replace(/:/g, '') + '00' : undefined,
+    departureTime: departureTime ? yyyymmddhhmm(departureTime) : undefined,
   };
   const taxiResult = await taxiChain(taxiParams);
 
@@ -168,7 +181,7 @@ export async function POST(req: NextRequest) {
       originLat: startY,
       destLon: endX,
       destLat: endY,
-      departureTime: departureHHmm.replace(/:/g, '') + '00',
+      departureTime: yyyymmddhhmm(departureHHmm),
     };
     const res = await naviCarTrip(params);
     if (res.ok && res.data) {

@@ -75,36 +75,9 @@ export async function kmaUltraShortSnapshot(
   const kstDate = kstNow.toISOString().slice(0, 10).replace(/-/g, '');
   const kstHour = kstNow.getHours();
   const kstMinute = kstNow.getMinutes();
-
-  // 30분 단위 floor (00분/30분 모두 고려)
-  const floorMinute = kstMinute >= 30 ? 30 : 0;
-  const floorHour = kstHour;
-  const floorTotal = floorHour * 60 + floorMinute;
-  const currentTotal = kstHour * 60 + kstMinute;
-
-  let baseHour: number;
-  let baseMinute: number;
-  let base_date = kstDate;
-
-  if (currentTotal >= floorTotal + 45) {
-    // 현재 시각이 floor 시각 + 45분 이후 → floor 시각 사용
-    baseHour = floorHour;
-    baseMinute = floorMinute;
-  } else {
-    // 한 단계 이전 (30분 전)
-    if (floorMinute === 30) {
-      baseHour = floorHour;
-      baseMinute = 0;
-    } else {
-      // floorMinute === 0 → 30분 전은 이전 시간의 30분, 자정 넘어가면 date도 어제
-      baseHour = (floorHour - 1 + 24) % 24;
-      baseMinute = 30;
-      if (floorHour === 0) {
-        const yesterday = new Date(kstNow.getTime() - 24 * 60 * 60 * 1000);
-        base_date = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
-      }
-    }
-  }
+  const baseHour = kstHour;
+  const baseMinute = kstMinute >= 30 ? 30 : 0;
+  const base_date = kstDate;
 
   // KMA 초단기예보는 당일 특정 시각 이후 발표부터 데이터가 채워질 수 있으므로,
   // 요청 결과가 NO_DATA이면 base_time을 한 단계 이전(30분 전)으로 최대 24회 재시도한다.
