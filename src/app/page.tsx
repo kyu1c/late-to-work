@@ -329,6 +329,7 @@ export default function Home() {
   const [taxiCallAddMinutes, setTaxiCallAddMinutes] = useState(0);
   const [departureTime, setDepartureTime] = useState<string | null>(null);
   const [departureInput, setDepartureInput] = useState('');
+  const [departureAdjusted, setDepartureAdjusted] = useState(false);
   const [recommendResult, setRecommendResult] = useState<RecommendResult | null>(null);
   const [recommendError, setRecommendError] = useState<string | null>(null);
   const [recommendLoading, setRecommendLoading] = useState(false);
@@ -410,6 +411,10 @@ export default function Home() {
   const runRecommend = useCallback(async () => {
     if (!profile || !homeCoords || !workCoords) {
       setRecommendError('집과 출근지 위치가 필요합니다. 프로필을 먼저 완료해주세요.');
+      return;
+    }
+    if (!targetArrival || !targetArrival.trim()) {
+      setRecommendError('목표 도착 시각이 필요합니다. 프로필을 수정해주세요.');
       return;
     }
     setRecommendLoading(true);
@@ -708,9 +713,12 @@ export default function Home() {
         )}
 
         {profile && (!homeCoords || !workCoords) && (
-        <div className={styles.coordsWarning}>
-          위치 정보가 불완전해요. 프로필을 수정해 집과 출근지 주소를 다시 검색해주세요.
-        </div>
+          <div className={styles.coordsWarning}>
+            <span>위치 정보가 불완전해요.</span>
+            <Button variant="ghost" size="sm" className={styles.coordsWarningEditBtn} onPress={editProfileHandler}>
+              프로필 수정하기
+            </Button>
+          </div>
         )}
 
           {/* 밤새 추천 미리 노출 */}
@@ -962,7 +970,7 @@ export default function Home() {
                   </Fieldset>
                   <div className={styles.onboardingNav}>
                     <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('home')}>뒤로</Button>
-                    <Button className={styles.nextButton} onPress={() => { setSearchQuery(''); setOnboardStep('time'); }} isDisabled={!selectedWork}>
+                    <Button variant="primary" className={styles.nextButton} onPress={() => { setSearchQuery(''); setOnboardStep('time'); }} isDisabled={!selectedWork}>
                       다음: 목표 도착 시각
                     </Button>
                   </div>
@@ -990,7 +998,7 @@ export default function Home() {
                   </TimeField>
                   <div className={styles.onboardingNav}>
                     <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('work')}>뒤로</Button>
-                    <Button className={styles.nextButton} onPress={() => setOnboardStep('prefs')}>
+                    <Button variant="primary" className={styles.nextButton} onPress={() => setOnboardStep('prefs')}>
                       다음: 선호 교통수단
                     </Button>
                   </div>
@@ -1063,7 +1071,7 @@ export default function Home() {
                   </label>
                   <div className={styles.onboardingNav}>
                     <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('time')}>뒤로</Button>
-                    <Button className={styles.primaryButton} onPress={saveProfileHandler}>프로필 저장</Button>
+                    <Button variant="primary" className={styles.primaryButton} onPress={saveProfileHandler}>프로필 저장</Button>
                   </div>
                 </div>
               )}
@@ -1297,9 +1305,11 @@ export default function Home() {
             >
               {recommendLoading
                 ? '계산 중…'
-                : profile
-                  ? '지금 출발 계산'
-                  : '프로필을 먼저 입력해주세요'}
+                : departureAdjusted
+                  ? '출발 시각 조정됨 — 계산'
+                  : profile
+                    ? '지금 출발 계산'
+                    : '프로필을 먼저 입력해주세요'}
             </Button>
 
             {profile && (
@@ -1312,7 +1322,10 @@ export default function Home() {
                   <Button
                     variant="ghost"
                     className={styles.chip}
-                    onPress={() => setDepartureInput((d) => '')}
+                    onPress={() => {
+                      setDepartureInput((d) => '');
+                      setDepartureAdjusted(false);
+                    }}
                     isDisabled={recommendLoading}
                   >
                     지금
@@ -1326,6 +1339,7 @@ export default function Home() {
                         setDepartureInput(
                           `${pad2(now.getHours())}:${pad2(now.getMinutes())}`,
                         );
+                        setDepartureAdjusted(true);
                       }
                     }}
                     isDisabled={recommendLoading}
@@ -1341,6 +1355,7 @@ export default function Home() {
                         ? hhmmToMinutes(departureInput)
                         : (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
                       setDepartureInput(minutesToHhmm(base + 5));
+                      setDepartureAdjusted(true);
                     }}
                     isDisabled={recommendLoading}
                   >
@@ -1354,6 +1369,7 @@ export default function Home() {
                         ? hhmmToMinutes(departureInput)
                         : (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
                       setDepartureInput(minutesToHhmm(base + 10));
+                      setDepartureAdjusted(true);
                     }}
                     isDisabled={recommendLoading}
                   >
@@ -1367,6 +1383,7 @@ export default function Home() {
                         ? hhmmToMinutes(departureInput)
                         : (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
                       setDepartureInput(minutesToHhmm(base - 5));
+                      setDepartureAdjusted(true);
                     }}
                     isDisabled={recommendLoading}
                   >
