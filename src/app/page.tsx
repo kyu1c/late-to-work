@@ -233,6 +233,22 @@ function pad2(n: number): string {
   return String(n).padStart(2, '0');
 }
 
+// HH:MM 문자열을 분 단위 숫자로 변환 (예: "08:30" → 510)
+function hhmmToMinutes(t: string): number {
+  if (!t) return 0;
+  const [h, m] = t.split(':').map(Number);
+  if (!Number.isFinite(h ?? 0) || !Number.isFinite(m ?? 0)) return 0;
+  return (h ?? 0) * 60 + (m ?? 0);
+}
+
+// 분 단위 숫자를 HH:MM 문자열로 변환
+function minutesToHhmm(m: number): string {
+  const total = Math.round(m) % (24 * 60);
+  const h = Math.floor(total / 60);
+  const min = total % 60;
+  return `${pad2(h)}:${pad2(min)}`;
+}
+
 // ---------------------------------------------------------------------------
 // API 호출
 // ---------------------------------------------------------------------------
@@ -541,6 +557,43 @@ export default function Home() {
     setWorkCoords(null);
   }, []);
 
+  const editProfileHandler = useCallback(() => {
+    setOnboardStep('home');
+    setSearchResults([]);
+    setSearchError(null);
+    setSearchQuery('');
+    setTargetArrival(profile?.targetArrival ?? '09:00');
+    setPreferredTransport(profile?.preferredTransport ?? 'any');
+    setUsualTransitMinutes(String(profile?.usualTransitMinutes ?? ''));
+    setPreferredTimeA(profile?.preferredTimeA ?? '');
+    setPreferredTimeB(profile?.preferredTimeB ?? '');
+    setPrepMinutes(profile?.prepMinutes ?? 5);
+    setTaxiCallAddOn(profile?.taxiCallAddOn ?? false);
+    setTaxiCallAddMinutes(profile?.taxiCallAddMinutes ?? 0);
+    setSelectedHome(profile ? { name: profile.homeName, address: profile.homeAddress } : null);
+    setSelectedWork(profile ? { name: profile.workName, address: profile.workAddress } : null);
+    if (profile?.homeX != null && profile?.homeY != null) setHomeCoords({ x: profile.homeX, y: profile.homeY });
+    if (profile?.workX != null && profile?.workY != null) setWorkCoords({ x: profile.workX, y: profile.workY });
+  }, [profile]);
+
+  // 전날 선호 출발 시각 A/B 자동 prefill
+  // 목표 도착 시각과 이동 소요 추정치(대략)를 기준으로 타이트/여유 출발 시각을 채운다.
+  useEffect(() => {
+    if (!targetArrival) return;
+    const arrivalMin = hhmmToMinutes(targetArrival);
+    const transitMin = (() => {
+      if (recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.transit.durationMinutes > 0) return recommendResult.transit.durationMinutes;
+      const u = usualTransitMinutes ? parseInt(usualTransitMinutes, 10) : null;
+      if (u != null && u > 0) return u;
+      return 30;
+    })();
+    const totalMin = transitMin + prepMinutes;
+    const tight = arrivalMin - totalMin;
+    const loose = arrivalMin - totalMin - 10;
+    if (!preferredTimeA) setPreferredTimeA(minutesToHhmm(tight));
+    if (!preferredTimeB) setPreferredTimeB(minutesToHhmm(loose));
+  }, [targetArrival, recommendResult?.transit.durationMinutes, usualTransitMinutes, prepMinutes]);
+
   // -----------------------------------------------------------------------
   // 렌더링
   // -----------------------------------------------------------------------
@@ -608,8 +661,16 @@ export default function Home() {
         {/* 프로필 요약 */}
         {profile && (
           <Card className={styles.profileCard}>
-            <Card.Header>
-              <Card.Title className={styles.profileCardTitle}>프로필</Card.Title>
+            <Card.Header className={styles.profileCardHeader}>
+              <Card.Title className={styles.profileCardTitle}>저장된 정보</Card.Title>
+              <Button
+                className={styles.profileEditButton}
+                variant="ghost"
+                size="sm"
+                onPress={editProfileHandler}
+              >
+                수정
+              </Button>
             </Card.Header>
             <Card.Content className={styles.profileCardContent}>
               <div className={styles.profileRow}>
@@ -687,8 +748,8 @@ export default function Home() {
               <div className={styles.welcomeContent}>
                 <p className={styles.welcomeQuestion}>처음 방문이신가요?</p>
                 <Button variant="primary" onPress={goToOnboarding}>
-                  프로필 입력하기
-                </Button>
+                    프로필 설정하기
+                  </Button>
                 <p className={styles.welcomeDesc}>
                   집과 출근지 위치, 목표 도착 시각을 입력하면 바로 비교 추천을 받을 수 있어요.
                 </p>
@@ -724,7 +785,10 @@ export default function Home() {
 
               {onboardStep === 'home' && (
                 <div className={styles.onboardingSection}>
-                  <label className={styles.fieldLabel}>집 위치 (검색 후 선택)</label>
+                  <div className={styles.fieldLabel}>
+                    집 위치 (검색 후 선택)
+                    <span className={styles.fieldHelp}>입력 후 검색을 누르면 결과가 아래에 떠요. 원하는 장소를 선택하세요.</span>
+                  </div>
                   <div className={styles.searchRow}>
                     <Input
                       className={styles.searchInput}
@@ -745,39 +809,64 @@ export default function Home() {
                       {searching ? '검색 중…' : '검색'}
                     </Button>
                   </div>
-                  {searchError && <div className={styles.errorText}>{searchError}</div>}
-                  {searchResults.length > 0 && (
-                    <ul className={styles.searchResults}>
-                      {searchResults.map((r, i) => (
-                        <li key={i} className={styles.searchResultItem}>
-                          <button className={styles.searchResultButton} onClick={() => {
+                  {searchError && <div className={styles.fieldErrorText}>{searchError}</div>}
+                  {searching ? (
+                    <div className={styles.searchSkeleton}>
+                      <div className={styles.skel} />
+                      <div className={cn(styles.skel, styles.result)} />
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <div className={styles.searchResultList}>
+                      {searchResults.map((r) => (
+                        <div
+                          key={r.name + '|' + r.address}
+                          className={cn(
+                            styles.searchResultRow,
+                            selectedHome && selectedHome.name === r.name && selectedHome.address === r.address && styles.selected,
+                          )}
+                          onClick={() => {
                             setSelectedHome(r);
                             if (r.x != null && r.y != null) setHomeCoords({ x: r.x, y: r.y });
                             setSearchResults([]);
                             setSearchError(null);
-                          }}>
-                            <strong>{r.name}</strong>
-                            <br />
-                            <span className={styles.muted}>{r.address}</span>
-                          </button>
-                        </li>
+                          }}
+                        >
+                          <span className={styles.searchResultName}>{r.name}</span>
+                          <span className={styles.searchResultAddr}>{r.address}</span>
+                        </div>
                       ))}
-                    </ul>
-                  )}
+                    </div>
+                  ) : null}
                   {selectedHome && (
-                    <div className={styles.selectedItem}>
-                      선택된 집: <strong>{selectedHome.name}</strong> ({selectedHome.address})
+                    <div className={styles.homeAddressDisplay}>
+                      <span>선택된 집</span>
+                      <strong>{selectedHome.name}</strong>
+                      <span className={styles.fieldHelp}>{selectedHome.address}</span>
                     </div>
                   )}
-                  <button className={styles.nextButton} onClick={() => setOnboardStep('work')} disabled={!selectedHome}>
+                  <Button
+                    className={styles.nextButton}
+                    onPress={() => setOnboardStep('work')}
+                    isDisabled={!selectedHome}
+                  >
                     다음: 출근지 위치
-                  </button>
+                  </Button>
                 </div>
               )}
 
               {onboardStep === 'work' && (
                 <div className={styles.onboardingSection}>
-                  <label className={styles.fieldLabel}>출근지 위치 (검색 후 선택)</label>
+                  {selectedHome && (
+                    <div className={styles.homeAddressDisplay}>
+                      <span>집 주소</span>
+                      <strong>{selectedHome.name}</strong>
+                      <span className={styles.fieldHelp}>{selectedHome.address}</span>
+                    </div>
+                  )}
+                  <div className={styles.fieldLabel}>
+                    출근지 위치 (검색 후 선택)
+                    <span className={styles.fieldHelp}>입력 후 검색을 누르면 결과가 아래에 떠요. 원하는 장소를 선택하세요.</span>
+                  </div>
                   <div className={styles.searchRow}>
                     <Input
                       className={styles.searchInput}
@@ -798,37 +887,44 @@ export default function Home() {
                       {searching ? '검색 중…' : '검색'}
                     </Button>
                   </div>
-                  {searchError && <div className={styles.errorText}>{searchError}</div>}
-                  {searchResults.length > 0 && (
-                    <ul className={styles.searchResults}>
-                      {searchResults.map((r, i) => (
-                        <li key={i} className={styles.searchResultItem}>
-                          <Button
-                            variant="ghost"
-                            className={styles.searchResultButton}
-                            onPress={() => {
-                              setSelectedWork(r);
-                              if (r.x != null && r.y != null) setWorkCoords({ x: r.x, y: r.y });
-                              setSearchResults([]);
-                              setSearchError(null);
-                            }}
-                          >
-                            <strong>{r.name}</strong>
-                            <br />
-                            <span className={styles.muted}>{r.address}</span>
-                          </Button>
-                        </li>
+                  {searchError && <div className={styles.fieldErrorText}>{searchError}</div>}
+                  {searching ? (
+                    <div className={styles.searchSkeleton}>
+                      <div className={styles.skel} />
+                      <div className={cn(styles.skel, styles.result)} />
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <div className={styles.searchResultList}>
+                      {searchResults.map((r) => (
+                        <div
+                          key={r.name + '|' + r.address}
+                          className={cn(
+                            styles.searchResultRow,
+                            selectedWork && selectedWork.name === r.name && selectedWork.address === r.address && styles.selected,
+                          )}
+                          onClick={() => {
+                            setSelectedWork(r);
+                            if (r.x != null && r.y != null) setWorkCoords({ x: r.x, y: r.y });
+                            setSearchResults([]);
+                            setSearchError(null);
+                          }}
+                        >
+                          <span className={styles.searchResultName}>{r.name}</span>
+                          <span className={styles.searchResultAddr}>{r.address}</span>
+                        </div>
                       ))}
-                    </ul>
-                  )}
+                    </div>
+                  ) : null}
                   {selectedWork && (
-                    <div className={styles.selectedItem}>
-                      선택된 출근지: <strong>{selectedWork.name}</strong> ({selectedWork.address})
+                    <div className={styles.homeAddressDisplay}>
+                      <span>선택된 출근지</span>
+                      <strong>{selectedWork.name}</strong>
+                      <span className={styles.fieldHelp}>{selectedWork.address}</span>
                     </div>
                   )}
                   <div className={styles.onboardingNav}>
                     <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('home')}>뒤로</Button>
-                    <Button className={styles.nextButton} onPress={() => setOnboardStep('time')} isDisabled={!selectedWork}>
+                    <Button className={styles.nextButton} onPress={() => { setSearchQuery(''); setOnboardStep('time'); }} isDisabled={!selectedWork}>
                       다음: 목표 도착 시각
                     </Button>
                   </div>
@@ -837,15 +933,18 @@ export default function Home() {
 
               {onboardStep === 'time' && (
                 <div className={styles.onboardingSection}>
-                  <label className={styles.fieldLabel}>목표 도착 시각 (HH:MM)</label>
-                  <Input
-                    className={styles.timeInput}
-                    type="time"
-                    value={targetArrival}
-                    onChange={(e) => setTargetArrival(e.target.value)}
-                    min="00:00"
-                    max="23:59"
-                  />
+                  <Fieldset>
+                    <Fieldset.Legend>목표 도착 시각</Fieldset.Legend>
+                    <Description>도착해야 하는 시각을 입력하면 그에 맞춰 출발 시간을 계산해요.</Description>
+                    <Input
+                      className={styles.timeInput}
+                      type="time"
+                      value={targetArrival}
+                      onChange={(e) => setTargetArrival(e.target.value)}
+                      min="00:00"
+                      max="23:59"
+                    />
+                  </Fieldset>
                   <div className={styles.onboardingNav}>
                     <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('work')}>뒤로</Button>
                     <Button className={styles.nextButton} onPress={() => setOnboardStep('prefs')}>
@@ -857,16 +956,32 @@ export default function Home() {
 
               {onboardStep === 'prefs' && (
                 <div className={styles.onboardingSection}>
-                  <label className={styles.fieldLabel}>평소 선호 교통수단</label>
-                  <RadioGroup
-                    value={preferredTransport}
-                    onChange={(val) => setPreferredTransport(val as Transport)}
-                    orientation="vertical"
-                  >
-                    <Radio value="subway">지하철 위주</Radio>
-                    <Radio value="bus">버스 위주</Radio>
-                    <Radio value="any">상관없음</Radio>
-                  </RadioGroup>
+                  <Fieldset>
+                    <Fieldset.Legend>평소 선호 교통수단</Fieldset.Legend>
+                    <Select
+                      value={preferredTransport}
+                      onChange={(val) => setPreferredTransport(val as Transport)}
+                    >
+                      <SelectTrigger className={styles.selectTrigger}>
+                        <SelectValue>{preferredTransport ? ({ subway: '지하철 위주', bus: '버스 위주', any: '상관없음' } as const)[preferredTransport] : '선택하세요'}</SelectValue>
+                      </SelectTrigger>
+                      <SelectPopover>
+                        <div className={styles.selectItem} data-value="subway">지하철 위주</div>
+                        <div className={styles.selectItem} data-value="bus">버스 위주</div>
+                        <div className={styles.selectItem} data-value="any">상관없음</div>
+                      </SelectPopover>
+                    </Select>
+                  </Fieldset>
+                  <div className={styles.moveEstimate}>
+                    <span className={styles.moveEstimateLabel}>이동 소요 예상</span>
+                    {recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.transit.durationMinutes > 0 ? (
+                      <span className={styles.moveEstimateValue}>약 {recommendResult.transit.durationMinutes}분 (대중교통, {recommendResult.transit.source})</span>
+                    ) : usualTransitMinutes ? (
+                      <span className={styles.moveEstimateValue}>약 {parseInt(usualTransitMinutes, 10)}분 (입력한 평소 소요 시간 기준)</span>
+                    ) : (
+                      <span className={styles.moveEstimateHelp}>입력한 평소 소요 시간이 있으면 여기에 반영돼요.</span>
+                    )}
+                  </div>
                   <label className={styles.fieldLabel}>
                     평소 평균 이동 소요 시간 (분, 선택)
                     <Input
@@ -912,44 +1027,9 @@ export default function Home() {
             </Card>
           )}
 
-          {/* 프로필 완료 후: 바로 추천 영역 */}
+          {/* 프로필 완료 후: 비교표 + 밤 추천 영역 */}
           {profile && onboardStep === 'done' && (
             <div className={styles.recommendArea}>
-              <div className={styles.recommendControls}>
-                <Button className={styles.primaryButton} onPress={runRecommend} isDisabled={recommendLoading}>
-                  {recommendLoading ? '계산 중…' : '지금 출발 계산'}
-                </Button>
-                <div className={styles.departureTimeRow}>
-                  <span className={styles.label}>출발 시각:</span>
-                  <div className={styles.chipRow}>
-                    <Button variant="ghost" className={styles.chip} onPress={() => setDepartureInput((d) => '')}>
-                      지금
-                    </Button>
-                    <Button variant="ghost" className={styles.chip} onPress={() => {
-                      if (!departureInput) {
-                        const now = new Date();
-                        setDepartureInput(`${pad2(now.getHours())}:${pad2(now.getMinutes())}`);
-                      }
-                    }}>
-                      현재 시각 입력
-                    </Button>
-                  </div>
-                  {departureInput && (
-                    <Input
-                      className={styles.timeInput}
-                      type="time"
-                      value={departureInput}
-                      onChange={(e) => setDepartureInput(e.target.value)}
-                      min="00:00"
-                      max="23:59"
-                    />
-                  )}
-                </div>
-                <div className={styles.departureTimeHint}>
-                  출발 시각을 바꾸면 비교표가 다시 계산돼요.
-                </div>
-              </div>
-
               {/* 비교표 */}
               {recommendResult && (
                 <div className={styles.compareCard}>
@@ -1160,7 +1240,84 @@ export default function Home() {
           {message && (
             <div className={styles.message}>{message}</div>
           )}
-      </main>
-    </div>
-  );
-}
+
+          {/* 바로 추천 영역 (항상 노출, 페이지 하단) */}
+          <div className={styles.recommendButtonArea}>
+            <Button
+              className={styles.recommendPrimaryButton}
+              variant="primary"
+              onPress={runRecommend}
+              isDisabled={!profile || recommendLoading}
+            >
+              {recommendLoading
+                ? '계산 중…'
+                : profile
+                  ? '지금 출발 계산'
+                  : '프로필을 먼저 입력해주세요'}
+            </Button>
+
+            {profile && (
+              <div className={styles.departureTimeRow}>
+                <span className={styles.label}>출발 시각:</span>
+                <div className={styles.chipRow}>
+                  <Button
+                    variant="ghost"
+                    className={styles.chip}
+                    onPress={() => setDepartureInput((d) => '')}
+                    isDisabled={recommendLoading}
+                  >
+                    지금
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className={styles.chip}
+                    onPress={() => {
+                      if (!departureInput) {
+                        const now = new Date();
+                        setDepartureInput(
+                          `${pad2(now.getHours())}:${pad2(now.getMinutes())}`,
+                        );
+                      }
+                    }}
+                    isDisabled={recommendLoading}
+                  >
+                    현재 시각 입력
+                  </Button>
+                </div>
+                {departureInput && (
+                  <Input
+                    className={styles.timeInput}
+                    type="time"
+                    value={departureInput}
+                    onChange={(e) => setDepartureInput(e.target.value)}
+                    min="00:00"
+                    max="23:59"
+                    disabled={recommendLoading}
+                  />
+                )}
+                <p className={styles.departureTimeHint}>
+                  출발 시각을 바꾸면 비교표가 다시 계산돼요.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* 사용 중인 API/라이선스 정보 */}
+          <div className={styles.apiInfo}>
+            <p className={styles.apiInfoTitle}>현재 서비스에서 사용 중인 API</p>
+            <ul className={styles.apiInfoList}>
+              <li>주소/장소 검색 — Kakao REST API</li>
+              <li>차량 경로·택시 ETA·요금 — Tmap</li>
+              <li>대중교통 통합 길찾기 — ODsay</li>
+              <li>버스 정류소·노선 — TAGO (버스)</li>
+              <li>지하철 역·노선 — TAGO (지하철)</li>
+              <li>현재 날씨(강수 여부) — KMA 초단기예보</li>
+            </ul>
+            <p className={styles.apiInfoNote}>
+              각 서비스는 개별 이용약관·라이선스를 따르며, 무료로 제공되는 범위 내에서 사용합니다.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
