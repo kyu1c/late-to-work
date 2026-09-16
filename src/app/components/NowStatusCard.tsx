@@ -83,17 +83,12 @@ export function NowStatusCard({
         <CardTitle>현재 시간 기준 안내</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        {/* ==== 디버그: recommendResult 상태 ==== */}
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground border border-border rounded-md p-2 bg-surface-secondary/30">
-          <span className="font-medium">디버그:</span>
-          <span>transit: {transit ? `있음(${transit.durationMinutes ?? 'null'}분, ${transit.source})` : '없음'}</span>
-          <span className="text-muted-foreground">|</span>
-          <span>taxi: {taxi ? `있음(${taxi.vehicleEtaMinutes ?? 'null'}분, ${taxi.source})` : '없음'}</span>
-          <span className="text-muted-foreground">|</span>
-          <span>comparison: {comparison ? '있음' : '없음'}</span>
-          <span className="text-muted-foreground">|</span>
-          <span>taxiFuture: {taxiFuture ? `있음(${taxiFuture.departureTimes.length}개 시각)` : '없음'}</span>
-        </div>
+        {/* ==== 데이터 상태 ==== */}
+        {!transit && !taxi && comparison && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="font-medium">참고:</span> 실시간 교통 정보가 없어 비교표는 출발 시각 기준으로만 표시돼요.
+          </div>
+        )}
 
         {/* ==== 1. 현재 시각 / 목표 도착 / 잔여 시간 ==== */}
         <div className="flex flex-col gap-2">

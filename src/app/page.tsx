@@ -604,19 +604,22 @@ export default function Home() {
     setProfile(p);
     setRecommendError(null);
     setOnboardStep('done');
-    if (homeCoords && workCoords) {
-      showMessage('프로필이 저장되었습니다. 지금 출발 기준을 계산하고 있어요...');
-      runRecommend();
-    } else {
-      showMessage('프로필이 저장되었습니다. 위치 정보를 다시 가져오는 중이에요...');
-      // coords가 null이면 프로필 이름으로 재검색 시도 (백그라운드)
-      resolveCoords(selectedHome.name, true).then((hc) => {
-        if (hc) setHomeCoords(hc);
-      });
-      resolveCoords(selectedWork.name, true).then((wc) => {
-        if (wc) setWorkCoords(wc);
-      });
-    }
+    // coords 유무와 관계없이 저장 완료 후 추천 실행
+    // coords가 없으면 resolveCoords로 재검색한 뒤 실행
+    (async () => {
+      let h = homeCoords;
+      let w = workCoords;
+      if (!h && p.homeName) h = await resolveCoords(p.homeName, true);
+      if (!w && p.workName) w = await resolveCoords(p.workName, true);
+      if (h) setHomeCoords(h);
+      if (w) setWorkCoords(w);
+      if (h && w) {
+        showMessage('프로필이 저장되었습니다. 지금 출발 기준을 계산하고 있어요...');
+        runRecommend();
+      } else {
+        showMessage('프로필이 저장되었습니다. 위치 정보를 다시 가져오는 중이에요...');
+      }
+    })();
   }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, homeCoords, workCoords, runRecommendAndRefresh, resolveCoords]);
 
   // 프로필 저장 완료 후 자동 추천 실행
