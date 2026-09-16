@@ -75,9 +75,42 @@ export async function kmaUltraShortSnapshot(
   const kstDate = kstNow.toISOString().slice(0, 10).replace(/-/g, '');
   const kstHour = kstNow.getHours();
   const kstMinute = kstNow.getMinutes();
-  const baseHour = kstHour;
-  const baseMinute = kstMinute >= 30 ? 30 : 0;
-  const base_date = kstDate;
+
+  // KMA 초단기예보 base_time 결정 (KMA 가이드 기반)
+  // - base_time은 매시 30분 단위 발표 (0000, 0030, 0100, 0130, ...)
+  // - 현재시각이 발표시각+45분 이후여야 해당 발표시각 데이터 사용 가능
+  //   그보다 이르면 이전 30분 발표시각을 사용
+  // - 날짜가 바뀌는 경우(00:xx → 23:30)도 base_date를 함께 갱신한다.
+
+  // 현재 시각으로 가장 가까운 30분 단위 발표시각 계산 (floor)
+  const floorMinute = kstMinute >= 30 ? 30 : 0;
+  const floorHour = kstHour;
+
+  // floor 발표시각 + 45분이 현재보다 이후면, 한 단계 이전 발표시각 사용
+  const floorTotalMinutes = floorHour * 60 + floorMinute;
+  const nowTotalMinutes = kstHour * 60 + kstMinute;
+
+  let baseHour = floorHour;
+  let baseMinute = floorMinute;
+
+  if (nowTotalMinutes < floorTotalMinutes + 45) {
+    if (floorMinute === 30) {
+      // floor가 30분이면 이전은 00분 (같은 시각의 00분, 혹은 이전 시각의 00분)
+      baseHour = floorHour;
+      baseMinute = 0;
+    } else {
+      // floor가 00분이면 30분 전으로 (이전 시각의 30분)
+      baseHour = (floorHour - 1 + 24) % 24;
+      baseMinute = 30;
+    }
+  }
+
+  // base_date 결정: baseHour이 00~05시이고 floorHour가 23시(전날 30분)였으면 전날 날짜
+  let base_date = kstDate;
+  if (baseHour < 6 && floorHour === 23 && floorMinute === 30) {
+    const d = new Date(kstNow.getTime() - 24 * 60 * 60 * 1000);
+    base_date = d.toISOString().slice(0, 10).replace(/-/g, '');
+  }
 
   // KMA 초단기예보는 당일 특정 시각 이후 발표부터 데이터가 채워질 수 있으므로,
   // 요청 결과가 NO_DATA이면 base_time을 한 단계 이전(30분 전)으로 최대 24회 재시도한다.

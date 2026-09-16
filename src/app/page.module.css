@@ -1,37 +1,5 @@
 /* ========== 미정의 키 보강 (1단계 상단/하단 + 결과 + 밤새추천 + 온보딩 카드) ========== */
 
-/* ---- 상단 intro ---- */
-.intro {
-  padding: 14px 4px 6px;
-}
-.introTitle {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--foreground, var(--foreground));
-  margin: 0 0 6px;
-  line-height: 1.3;
-}
-.introSubtitle {
-  font-size: 14px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin: 0;
-  line-height: 1.5;
-}
-@media (prefers-color-scheme: dark) {
-  .introTitle {
-    color: var(--foreground);
-  }
-  .introSubtitle {
-    color: var(--muted-foreground);
-  }
-}
-.dark .introTitle {
-  color: var(--foreground);
-}
-.dark .introSubtitle {
-  color: var(--muted-foreground);
-}
-
 /* ---- 다크모드 토글 ---- */
 .themeToggle {
   position: absolute;
@@ -180,14 +148,6 @@
   gap: 8px;
   flex-wrap: wrap;
 }
-.linkButton {
-  color: var(--accent, var(--accent));
-  font-size: 13px;
-  font-weight: 500;
-}
-.linkButton:hover {
-  color: var(--accent-foreground, var(--surface));
-}
 @media (prefers-color-scheme: dark) {
   .nightBeforeLabel {
     color: var(--muted-foreground);
@@ -201,12 +161,6 @@
   .nightBeforeBottom {
     color: var(--muted-foreground);
   }
-  .linkButton {
-    color: var(--accent);
-  }
-  .linkButton:hover {
-    color: var(--accent-foreground);
-  }
 }
 .dark .nightBeforeLabel {
   color: var(--muted-foreground);
@@ -219,12 +173,6 @@
 }
 .dark .nightBeforeBottom {
   color: var(--muted-foreground);
-}
-.dark .linkButton {
-  color: var(--accent);
-}
-.dark .linkButton:hover {
-  color: var(--accent-foreground);
 }
 
 /* ---- 환영 카드 ---- */
@@ -266,151 +214,7 @@
   color: var(--muted-foreground);
 }
 
-/* ---- 하단 출발 시각 조절 ---- */
-.departureTimeRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 0;
-}
-.label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--foreground, var(--foreground));
-}
-.departureNowTime {
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.chipRow {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.chip {
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 500;
-}
-.chipDivider {
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin: 0 4px;
-}
-.timeInput {
-  width: 100%;
-  max-width: 140px;
-  height: 44px;
-}
-.departureTimeHint {
-  font-size: 11px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin: 6px 0 0;
-}
-@media (prefers-color-scheme: dark) {
-  .label {
-    color: var(--foreground);
-  }
-  .departureNowTime {
-    color: var(--muted-foreground);
-  }
-  .chipDivider {
-    color: var(--muted-foreground);
-  }
-  .departureTimeHint {
-    color: var(--muted-foreground);
-  }
-}
-.dark .label {
-  color: var(--foreground);
-}
-.dark .departureNowTime {
-  color: var(--muted-foreground);
-}
-.dark .chipDivider {
-  color: var(--muted-foreground);
-}
-.dark .departureTimeHint {
-  color: var(--muted-foreground);
-}
-
 /* ---- 메시지 / 힌트 / 에러 ---- */
-.message {
-  padding: 10px 14px;
-  margin-top: 10px;
-  background: var(--surface-secondary, var(--surface-secondary));
-  border: 1px solid var(--border, var(--border));
-  border-radius: 10px;
-  font-size: 13px;
-  color: var(--foreground, var(--foreground));
-}
-.muted {
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.hint {
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-top: 8px;
-}
-.errorText {
-  padding: 8px 10px;
-  margin-top: 10px;
-  background: var(--destructive-subtle, var(--destructive-subtle));
-  border: 1px solid var(--destructive, var(--destructive-foreground));
-  border-radius: 8px;
-  color: var(--destructive-foreground, var(--destructive-foreground));
-  font-size: 13px;
-}
-
-.errorEditButton {
-  margin-top: 8px;
-  margin-left: 8px;
-  height: 30px;
-  font-size: 12px;
-}
-@media (prefers-color-scheme: dark) {
-  .message {
-    background: var(--surface-secondary);
-    border-color: var(--border);
-    color: var(--foreground);
-  }
-  .muted {
-    color: var(--muted-foreground);
-  }
-  .hint {
-    color: var(--muted-foreground);
-  }
-  .errorText {
-    background: var(--destructive-subtle);
-    border-color: var(--destructive);
-    color: var(--destructive-foreground);
-  }
-  .errorEditButton {
-    margin-top: 8px;
-    margin-left: 8px;
-    height: 30px;
-    font-size: 12px;
-  }
-}
-.dark .message {
-  background: var(--surface-secondary);
-  border-color: var(--border);
-  color: var(--foreground);
-}
-.dark .muted {
-  color: var(--muted-foreground);
-}
-.dark .hint {
-  color: var(--muted-foreground);
-}
-.dark .errorText {
-  background: var(--destructive-subtle);
-  border-color: var(--destructive);
-  color: var(--destructive-foreground);
-}
 
 /* ---- 고급 설정 ---- */
 .advancedCard {
@@ -586,107 +390,6 @@
 }
 
 /* ---- 기타 ---- */
-.numberInput {
-  width: 100%;
-  height: 44px;
-}
-.skel {
-  height: 18px;
-  width: 100%;
-  border-radius: 8px;
-}
-.result {
-  height: 54px;
-}
-
-.timeField {
-  width: 100%;
-  margin-top: 4px;
-}
-.timeField input[type="time"] {
-  width: 100%;
-  height: 52px;
-  padding: 0 16px;
-  font-size: 16px;
-  color: var(--foreground);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  transition: border-color 140ms ease, box-shadow 140ms ease;
-}
-.timeField input[type="time"]:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
-}
-.timeField input[type="time"]::-webkit-calendar-picker-indicator {
-  opacity: 0.45;
-  cursor: pointer;
-  padding: 4px 0;
-}
-.timeField input[type="time"]::-webkit-datetime-edit {
-  color: var(--foreground);
-  font-size: 16px;
-}
-.timeField input[type="time"]::-webkit-datetime-edit-fields-wrapper {
-  padding: 0;
-}
-.timeField input[type="time"]::-webkit-datetime-edit-text {
-  color: var(--muted-foreground);
-  padding: 0 2px;
-}
-.timeField input[type="time"]::-webkit-datetime-edit-hour-field,
-.timeField input[type="time"]::-webkit-datetime-edit-minute-field {
-  padding: 0 2px;
-  border-radius: 4px;
-}
-.timeField input[type="time"]::-webkit-datetime-edit-hour-field:focus,
-.timeField input[type="time"]::-webkit-datetime-edit-minute-field:focus {
-  background: rgba(17, 17, 17, 0.06);
-  outline: none;
-}
-@media (prefers-color-scheme: dark) {
-  .timeField input[type="time"] {
-    background: var(--surface-secondary);
-    border-color: var(--border);
-    color: var(--foreground);
-  }
-  .timeField input[type="time"]:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
-  }
-  .timeField input[type="time"]::-webkit-datetime-edit {
-    color: var(--foreground);
-  }
-  .timeField input[type="time"]::-webkit-datetime-edit-text {
-    color: var(--muted-foreground);
-  }
-  .timeField input[type="time"]::-webkit-datetime-edit-hour-field,
-  .timeField input[type="time"]::-webkit-datetime-edit-minute-field {
-    color: var(--foreground);
-  }
-}
-.dark .timeField input[type="time"] {
-  background: var(--surface-secondary);
-  border-color: var(--border);
-  color: var(--foreground);
-}
-.dark .timeField input[type="time"]:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
-}
-.dark .timeField input[type="time"]::-webkit-datetime-edit {
-  color: var(--foreground);
-}
-.dark .timeField input[type="time"]::-webkit-datetime-edit-text {
-  color: var(--muted-foreground);
-}
-.dark .timeField input[type="time"]::-webkit-datetime-edit-hour-field,
-.dark .timeField input[type="time"]::-webkit-datetime-edit-minute-field {
-  color: var(--foreground);
-}
 
 /* ========== 미정의 키 보강 (온보딩 + 하단 + 결과 + API 정보) ========== */
 
@@ -694,6 +397,59 @@
 .page {
   min-height: 100vh;
   background: var(--background);
+}
+.serviceInfoBar {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 10px 14px;
+  background: var(--surface-secondary, var(--surface-secondary));
+  border: 1px solid var(--border, var(--border));
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 12px;
+}
+.serviceInfoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+  flex: 1 1 120px;
+}
+.serviceInfoLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground, var(--muted-foreground));
+}
+.serviceInfoValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground, var(--foreground));
+}
+@media (prefers-color-scheme: dark) {
+  .serviceInfoBar {
+    background: var(--surface-secondary);
+    border-color: var(--border);
+  }
+  .serviceInfoLabel {
+    color: var(--muted-foreground);
+  }
+  .serviceInfoValue {
+    color: var(--foreground);
+  }
+}
+.dark .serviceInfoBar {
+  background: var(--surface-secondary);
+  border-color: var(--border);
+}
+.dark .serviceInfoLabel {
+  color: var(--muted-foreground);
+}
+.dark .serviceInfoValue {
+  color: var(--foreground);
 }
 .main {
   min-height: 100vh;
@@ -721,8 +477,25 @@
 .onboardingSection {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 4px 0;
+  gap: 16px;
+  padding: 10px 0;
+  margin-bottom: 8px;
+}
+
+/* ---- 온보딩 2단 그리드 (집/출근지) ---- */
+.onboardingGrid2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+/* ---- 온보딩 필드 (공통) ---- */
+.onboardingField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
 /* ---- 검색 행 ---- */
@@ -731,93 +504,18 @@
   gap: var(--space-3);
   width: 100%;
   align-items: stretch;
+  margin-top: 6px;
 }
 .searchInput {
   flex: 1 1 auto;
   min-width: 0;
+  width: 100%;
 }
-.searchInput input {
-  height: 52px;
-  border-radius: 12px 0 0 12px;
-  border-right: none;
-}
-.searchInput input::placeholder {
-  color: var(--muted);
-}
-.searchInput input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
-}
+
 .searchButton {
   flex: 0 0 auto;
-  height: 52px;
-  padding: 0 20px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--surface);
-  background: var(--accent);
-  border: none;
-  border-radius: 0 12px 12px 0;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 140ms ease, opacity 140ms ease;
-}
-.searchButton:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
-.searchButton:disabled {
-  background: var(--muted-foreground);
-  color: var(--surface-secondary);
-  cursor: not-allowed;
-  opacity: 1;
-}
-@media (prefers-color-scheme: dark) {
-  .searchInput input {
-    background: var(--surface-secondary);
-    border-color: var(--border);
-    color: var(--foreground);
-    border-right: none;
-  }
-  .searchInput input::placeholder {
-    color: var(--muted-foreground);
-  }
-  .searchInput input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
-  }
-  .searchButton {
-    background: var(--accent);
-  }
-  .searchButton:hover:not(:disabled) {
-    background: var(--accent-hover);
-  }
-  .searchButton:disabled {
-    background: var(--muted);
-    color: var(--muted-foreground);
-  }
-}
-.dark .searchInput input {
-  background: var(--surface-secondary);
-  border-color: var(--border);
-  color: var(--foreground);
-  border-right: none;
-}
-.dark .searchInput input::placeholder {
-  color: var(--muted-foreground);
-}
-.dark .searchInput input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
-}
-.dark .searchButton {
-  background: var(--accent);
-}
-.dark .searchButton:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
-.dark .searchButton:disabled {
-  background: var(--muted);
-  color: var(--muted-foreground);
+  min-width: 80px;
+  width: auto;
 }
 
 /* ---- 검색 중 스켈레톤 ---- */
@@ -837,6 +535,7 @@
   border-radius: 10px;
   background: var(--surface-secondary, var(--surface-secondary));
   border: 1px dashed var(--border, var(--border));
+  margin-bottom: 8px;
 }
 .moveEstimateLabel {
   font-size: 11px;
@@ -884,28 +583,14 @@
 }
 
 /* ---- 필드 ---- */
-.fieldLabel {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--foreground, var(--foreground));
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
 .fieldHelp {
   font-size: 12px;
   color: var(--muted-foreground, var(--muted-foreground));
 }
 @media (prefers-color-scheme: dark) {
-  .fieldLabel {
-    color: var(--foreground, var(--foreground));
-  }
   .fieldHelp {
     color: var(--muted-foreground, var(--muted-foreground));
   }
-}
-.dark .fieldLabel {
-  color: var(--foreground, var(--foreground));
 }
 .dark .fieldHelp {
   color: var(--muted-foreground, var(--muted-foreground));
@@ -938,8 +623,15 @@
 }
 .onboardingNav {
   display: flex;
-  gap: 10px;
-  margin-top: 8px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+.onboardingNav button {
+  flex: 1 1 0;
+  min-width: 0;
 }
 @media (prefers-color-scheme: dark) {
   .nextButton,
@@ -959,48 +651,27 @@
 }
 
 /* ---- 선호 교통수단 Select ---- */
-.selectTrigger {
-  width: 100%;
-  height: 50px;
-  font-size: 16px;
-  font-weight: 500;
-}
-.selectItem {
-  padding: 14px 16px;
-  font-size: 16px;
-  font-weight: 500;
-  border-radius: 10px;
-}
-.selectItem:hover {
-  background: rgba(17, 17, 17, 0.06);
-}
-@media (prefers-color-scheme: dark) {
-  .selectTrigger {
-    height: 50px;
-    font-size: 16px;
-  }
-  .selectItem {
-    padding: 14px 16px;
-    font-size: 16px;
-  }
-  .selectItem:hover {
-    background: rgba(255, 255, 255, 0.06);
-  }
-}
-.dark .selectTrigger {
-  height: 50px;
-  font-size: 16px;
-}
-.dark .selectItem {
-  padding: 14px 16px;
-  font-size: 16px;
-}
-.dark .selectItem:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
 
 /* ---- 집 주소 표시 ---- */
 .homeAddressDisplay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-secondary, var(--surface-secondary));
+  border: 1px solid var(--border, var(--border));
+  font-size: 13px;
+  color: var(--muted-foreground, var(--muted-foreground));
+  margin-bottom: 12px;
+}
+.homeAddressDisplay strong {
+  color: var(--foreground, var(--foreground));
+  font-weight: 600;
+}
+.homeAddressDisplayDefault {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1010,10 +681,7 @@
   border: 1px dashed var(--border, var(--border));
   font-size: 13px;
   color: var(--muted-foreground, var(--muted-foreground));
-}
-.homeAddressDisplay strong {
-  color: var(--foreground, var(--foreground));
-  font-weight: 600;
+  margin-bottom: 12px;
 }
 @media (prefers-color-scheme: dark) {
   .homeAddressDisplay {
@@ -1042,11 +710,45 @@
   gap: 12px;
   margin-top: 14px;
 }
+.profileSetupButton {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
 .recommendPrimaryButton {
   width: 100%;
 }
 .recommendArea {
   width: 100%;
+}
+
+/* ---- 빠른 검색 영역 (프로필 없을 때) ---- */
+.quickSearchArea {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 16px;
+}
+.quickSearchButton {
+  width: 100%;
+  max-width: 280px;
+}
+.quickSearchHint {
+  font-size: 13px;
+  color: var(--muted-foreground, var(--muted-foreground));
+  margin: 0;
+  text-align: center;
+}
+@media (prefers-color-scheme: dark) {
+  .quickSearchHint {
+    color: var(--muted-foreground);
+  }
+}
+.dark .quickSearchHint {
+  color: var(--muted-foreground);
 }
 
 /* ---- API 정보 ---- */
@@ -1174,29 +876,6 @@
   color: var(--foreground);
 }
 
-/* ---- 취소 버튼 ---- */
-.cancelButton {
-  color: var(--destructive, var(--destructive));
-  font-size: 13px;
-}
-.cancelButton:hover {
-  color: var(--destructive-foreground, var(--destructive-foreground));
-}
-@media (prefers-color-scheme: dark) {
-  .cancelButton {
-    color: var(--destructive-foreground);
-  }
-  .cancelButton:hover {
-    color: var(--destructive-foreground);
-  }
-}
-.dark .cancelButton {
-  color: var(--destructive-foreground);
-}
-.dark .cancelButton:hover {
-  color: var(--destructive);
-}
-
 /* ---- coordsWarning 편집 버튼 ---- */
 .coordsWarningEditBtn {
   margin-left: auto;
@@ -1235,79 +914,58 @@
   flex-wrap: wrap;
 }
 
-.onboardingTab {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  background: var(--surface-secondary);
-  color: var(--surface-secondary-foreground);
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 140ms ease;
-}
-
-.onboardingTab:hover {
-  background: var(--default);
-}
-
-.onboardingTabActive {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-foreground);
-  font-weight: 600;
-}
-
-.onboardingTabDone {
-  opacity: 0.55;
-}
-
-@media (prefers-color-scheme: dark) {
-  .onboardingTab {
-    background: var(--surface-secondary);
-    color: var(--surface-secondary-foreground);
-    border-color: var(--border);
-  }
-  .onboardingTab:hover {
-    background: var(--default);
-  }
-  .onboardingTabActive {
-    border-color: var(--accent);
-    background: var(--accent);
-    color: var(--accent-foreground);
-  }
-  .onboardingTabDone {
-    opacity: 0.55;
-  }
-}
-
-.dark .onboardingTab {
-  background: var(--surface-secondary);
-  color: var(--surface-secondary-foreground);
-  border-color: var(--border);
-}
-
-.dark .onboardingTab:hover {
-  background: var(--default);
-}
-
-.dark .onboardingTabActive {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-foreground);
-}
-
-.dark .onboardingTabDone {
-  opacity: 0.55;
-}
-
 .onboardingNav {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 12px;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  width: 100%;
+}
+.onboardingNav button {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.cancelButton {
+  flex: 0 1 auto;
+  min-width: 100px;
 }
 
-.cancelButton {
-  margin-left: 0;
+
+/* ---- 선택된 주소 표시 (입력창 위, 기본 상태 포함) ---- */
+.selectedAddressBox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-secondary, var(--surface-secondary));
+  border: 1px solid var(--border, var(--border));
+  margin: 8px 0 12px;
+  width: 100%;
+}
+.selectedAddressBoxDefault {
+  font-size: 13px;
+  color: var(--muted-foreground, var(--muted-foreground));
+}
+.selectedAddressBoxName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground, var(--foreground));
+}
+.selectedAddressBoxAddr {
+  font-size: 12px;
+  color: var(--muted-foreground, var(--muted-foreground));
+}
+
+.dark .cancelButtonMain {
+  color: var(--foreground);
+  background: var(--surface-secondary);
+  border-color: var(--border);
+}
+.dark .cancelButtonMain:hover {
+  background: var(--default);
 }
