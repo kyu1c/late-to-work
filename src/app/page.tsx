@@ -197,6 +197,7 @@ export default function Home() {
   const [nightBeforeResult, setNightBeforeResult] = useState<NightBeforeResponse | null>(null);
   const [showNightBefore, setShowNightBefore] = useState(false);
   const [transitPreview, setTransitPreview] = useState<{ durationMinutes: number | null; source: string } | null>(null);
+  const [transitPreviewLoading, setTransitPreviewLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -272,14 +273,17 @@ export default function Home() {
   useEffect(() => {
     if (!homeCoords || !workCoords) {
       setTransitPreview(null);
+      setTransitPreviewLoading(false);
       return;
     }
+    setTransitPreviewLoading(true);
     (async () => {
       const result = await transitChain(homeCoords.x, homeCoords.y, workCoords.x, workCoords.y);
       setTransitPreview({
         durationMinutes: result.durationMinutes,
         source: result.source,
       });
+      setTransitPreviewLoading(false);
     })();
   }, [homeCoords, workCoords]);
 
@@ -585,12 +589,14 @@ export default function Home() {
     if (onboardStep !== 'prefs') return;
     if (!homeCoords || !workCoords) return;
     if (transitPreview != null) return;
+    setTransitPreviewLoading(true);
     (async () => {
       const result = await transitChain(homeCoords.x, homeCoords.y, workCoords.x, workCoords.y);
       setTransitPreview({
         durationMinutes: result.durationMinutes,
         source: result.source,
       });
+      setTransitPreviewLoading(false);
     })();
   }, [onboardStep, homeCoords, workCoords, transitPreview]);
 
@@ -845,6 +851,7 @@ export default function Home() {
             saveProfileHandler={saveProfileHandler}
             recommendResult={recommendResult}
             transitPreview={transitPreview}
+            transitPreviewLoading={transitPreviewLoading}
           />
         )}
 

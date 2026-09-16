@@ -61,6 +61,7 @@ interface OnboardingCardProps {
   usualTransitMinutes: number | '';
   setUsualTransitMinutes: (v: number | '') => void;
   transitPreview: { durationMinutes: number | null; source: string } | null;
+  transitPreviewLoading: boolean;
   doSearch: (query: string, preferAddress?: boolean, setter?: (r: AddressSearchResult | null) => void, coordSetter?: (c: { x: number; y: number } | null) => void) => void;
   cancelOnboarding: () => void;
   saveProfileHandler: () => void;
@@ -93,6 +94,7 @@ export function OnboardingCard({
   usualTransitMinutes,
   setUsualTransitMinutes,
   transitPreview,
+  transitPreviewLoading,
   doSearch,
   cancelOnboarding,
   saveProfileHandler,
@@ -408,7 +410,12 @@ export function OnboardingCard({
               <Description>이동 소요 예상은 대중교통 검색 결과 기준이에요. 보통 소요 시간은 분 단위로 직접 입력할 수 있어요.</Description>
               <div className="flex flex-col gap-1 p-3 bg-surface-secondary rounded-md mt-2">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">이동 소요 예상</span>
-                {transitEstimate ? (
+                {transitPreviewLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-5 w-8 rounded-full" />
+                    <Skeleton className="h-5 w-24 rounded-md" />
+                  </div>
+                ) : transitEstimate ? (
                   <span className="text-lg font-semibold text-foreground">
                     약 {transitEstimate.value}분 (대중교통, {transitEstimate.source})
                   </span>
