@@ -151,7 +151,7 @@ export function DepartureControl({
       </div>
 
       <p className={styles.departureTimeHint}>
-        출발 시각을 바꾸면 비교표가 다시 계산돼요.
+        출발 시각 조정은 위 버튼으로만 해요. 계산은 아래 '새로운 출발 시간으로 계산' 버튼을 눌러주세요.
       </p>
 
       {/* 바로 계산 버튼 */}
