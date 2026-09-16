@@ -604,30 +604,15 @@ export default function Home() {
     setProfile(p);
     setRecommendError(null);
     setOnboardStep('done');
-    // coords 유무와 관계없이 저장 완료 후 추천 실행
-    // coords가 없으면 resolveCoords로 재검색한 뒤 실행
-    (async () => {
-      let h = homeCoords;
-      let w = workCoords;
-      if (!h && p.homeName) h = await resolveCoords(p.homeName, true);
-      if (!w && p.workName) w = await resolveCoords(p.workName, true);
-      if (h) setHomeCoords(h);
-      if (w) setWorkCoords(w);
-      if (h && w) {
-        showMessage('프로필이 저장되었습니다. 지금 출발 기준을 계산하고 있어요...');
-        runRecommend();
-      } else {
-        showMessage('프로필이 저장되었습니다. 위치 정보를 다시 가져오는 중이에요...');
-      }
-    })();
-  }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, homeCoords, workCoords, resolveCoords]);
+    showMessage('프로필이 저장되었습니다.');
+  }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage]);
 
   // 프로필 저장 완료 후 자동 추천 실행
   useEffect(() => {
-    if (onboardStep === 'done' && profile && homeCoords && workCoords) {
+    if (onboardStep === 'done' && profile) {
       runRecommend();
     }
-  }, [onboardStep, profile, homeCoords, workCoords, runRecommend]);
+  }, [onboardStep, profile, runRecommend]);
 
   // 'prefs' 단계에서 transitPreview가 없으면 대중교통 소요시간 재계산 (OnboardingCard 이동소요예상 표시용)
   useEffect(() => {
