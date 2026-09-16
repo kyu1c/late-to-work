@@ -26,7 +26,7 @@ body {
 }
 
 /* 다크모드 전역 적용 — next-themes와 HeroUI 테마 연동 */
-:global(.dark) {
+.dark {
   color-scheme: dark;
 }
 
@@ -217,30 +217,30 @@ body {
    다크모드 대응 (HeroUI 토큰이 이미 .dark 컨텍스트에서 적용되므로
    최소한의 추가만. HeroUI가 처리하지 않는 커스텀 클래스만 대상)
    ---------------------------------------------------------- */
-:global(.dark) .selected-address-box-default {
+.dark .selected-address-box-default {
   color: var(--muted-foreground);
 }
 
-:global(.dark) .selected-address-box-name {
+.dark .selected-address-box-name {
   color: var(--foreground);
 }
 
-:global(.dark) .selected-address-box-addr {
+.dark .selected-address-box-addr {
   color: var(--muted-foreground);
 }
 
-:global(.dark) .move-estimate-help {
+.dark .move-estimate-help {
   color: var(--muted-foreground);
 }
 
-:global(.dark) .move-estimate-value {
+.dark .move-estimate-value {
   color: var(--foreground);
 }
 
-:global(.dark) .profile-actions {
+.dark .profile-actions {
   border-top-color: var(--border);
 }
 
-:global(.dark) .onboarding-nav {
+.dark .onboarding-nav {
   border-top-color: var(--border);
 }
