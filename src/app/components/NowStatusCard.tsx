@@ -2,9 +2,18 @@
 
 import { Card, CardHeader, CardTitle, CardContent, Button, Label, Description, Alert } from '@heroui/react';
 import { cn } from '@heroui/styles';
-import { parseTime } from '@internationalized/date';
 
 type NowStatus = 'normal' | 'late-should-adjust' | 'after-workhours';
+
+function parseAmPmToMinutes(ampmStr: string): number {
+  const m = ampmStr.match(/^(오전|오후)\s*(\d{1,2}):(\d{2})$/);
+  if (!m) return 0;
+  const hour = parseInt(m[2], 10);
+  const minute = parseInt(m[3], 10);
+  const isPm = m[1] === '오후';
+  const totalHour = isPm ? (hour === 12 ? 12 : hour + 12) : (hour === 12 ? 0 : hour);
+  return totalHour * 60 + minute;
+}
 
 interface NowStatusCardProps {
   nowTimeString: string;
@@ -25,10 +34,8 @@ export function NowStatusCard({
   onEditProfile,
   className,
 }: NowStatusCardProps) {
-  const nowParsed = parseTime(nowTimeString);
-  const targetParsed = parseTime(targetArrival);
-  const nowMinutes = nowParsed ? arrToTotalMinutes(nowParsed) : 0;
-  const targetMinutes = targetParsed ? arrToTotalMinutes(targetParsed) : 0;
+  const nowMinutes = parseAmPmToMinutes(nowTimeString);
+  const targetMinutes = parseAmPmToMinutes(targetArrival);
   const diffMinutes = targetMinutes - nowMinutes;
 
   let status: NowStatus;
@@ -139,8 +146,4 @@ export function NowStatusCard({
       </CardContent>
     </Card>
   );
-}
-
-function arrToTotalMinutes(arr: { hour: number; minute: number; second: number }): number {
-  return arr.hour * 60 + arr.minute;
 }
