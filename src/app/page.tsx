@@ -573,7 +573,7 @@ export default function Home() {
         if (wc) setWorkCoords(wc);
       });
     }
-  }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, homeCoords, workCoords, runRecommend, resolveCoords]);
+  }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, homeCoords, workCoords, runRecommendAndRefresh, resolveCoords]);
 
   const clearProfileHandler = useCallback(() => {
     clearProfile();
