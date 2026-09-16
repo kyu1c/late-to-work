@@ -273,8 +273,11 @@ export function RecommendResultCard({
                   const eta = r.taxiFuture!.vehicleEtaMinutes[i];
                   const fare = r.taxiFuture!.taxiFare[i];
                   const depMinutes = hhmmToMinutes(dep);
-                  const targetMinutes = hhmmToMinutes(r.targetArrival) ?? 0;
-                  const nowMinutes = hhmmToMinutes(r.nowTime) ?? 0;
+                  const _targetMinutes = hhmmToMinutes(r.targetArrival);
+                  const _nowMinutes = hhmmToMinutes(r.nowTime);
+                  if (_targetMinutes == null || _nowMinutes == null) return null;
+                  const targetMinutes = _targetMinutes;
+                  const nowMinutes = _nowMinutes;
                   const totalNeeded = (eta ?? 0) + r.taxiPrepTotalMinutes;
                   const leaveBy = targetMinutes - totalNeeded - 5;
                   const slack = leaveBy - nowMinutes;
