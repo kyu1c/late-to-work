@@ -1,16 +1,16 @@
-/* OnboardingCard.module.css */
+/* OnboardingCard.module.css — HeroUI Card 스타일 존중, 레이아웃 배치만 */
 
 .onboardingCard {
   width: 100%;
   margin-top: var(--space-4);
 }
 
-.onboardingSteps {
-  padding: var(--space-4) var(--space-4) 0 var(--space-4);
+.stepTitle {
+  margin-bottom: var(--space-2);
 }
 
 .onboardingTabs {
-  /* Tabs 커스텀 필요 시 */
+  margin-top: var(--space-2);
 }
 
 .onboardingTabList {
@@ -18,24 +18,21 @@
   padding-bottom: var(--space-2);
 }
 
-.onboardingGrid2col {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-5);
-  padding: var(--space-4);
-}
-
-@media (min-width: 640px) {
-  .onboardingGrid2col {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.onboardingField {
+.cardContent {
   display: flex;
   flex-direction: column;
+  gap: var(--space-4);
 }
 
+/* 이전 단계 값 표시용 (비활성화 느낌) */
+.readonlyField {
+  opacity: 0.7;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px dashed var(--border);
+  margin-bottom: var(--space-2);
+}
+
+/* 주소 선택 박스 — HeroUI Fieldset 위에 최소한의 레이아웃 */
 .selectedAddressBox {
   display: flex;
   flex-direction: column;
@@ -64,6 +61,7 @@
   font-style: italic;
 }
 
+/* 검색 행 (Input + Button 가로 배치) */
 .searchRow {
   display: flex;
   gap: var(--space-2);
@@ -72,10 +70,10 @@
 
 .searchInput {
   flex: 1;
+  min-width: 0;
 }
 
 .searchButton {
-  min-width: 80px;
   flex-shrink: 0;
 }
 
@@ -99,13 +97,14 @@
   margin-top: var(--space-2);
 }
 
+/* 내비게이션 (취소 / 다음 버튼 한 줄) */
 .onboardingNav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-3);
-  margin-top: var(--space-5);
-  padding-top: var(--space-4);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
   border-top: 1px solid var(--border);
 }
 
@@ -133,6 +132,7 @@
   width: 100%;
 }
 
+/* 이동 소요 예상 박스 */
 .moveEstimate {
   display: flex;
   flex-direction: column;
@@ -169,4 +169,9 @@
   color: var(--foreground);
   margin-top: var(--space-3);
   margin-bottom: var(--space-1);
+}
+
+/* 구분선 */
+.separator {
+  margin: var(--space-3) 0;
 }

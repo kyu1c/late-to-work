@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   Tabs,
   ListBox,
@@ -117,16 +116,20 @@ export function OnboardingCard({
     return null;
   })();
 
+  const stepLabels = ['집 위치', '출근지 위치', '목표 도착 시각', '선호 교통수단'] as const;
+  const stepKeys = ['home', 'work', 'time', 'prefs'] as const;
+
   return (
-    <Card className={className ?? styles.onboardingCard}>
-      <div className={styles.onboardingSteps}>
+    <Card className={cn(className ?? styles.onboardingCard, 'w-full')}>
+      <Card.Header>
+        <Card.Title className={styles.stepTitle}>{stepLabels[stepKeys.indexOf(onboardStep)]}</Card.Title>
         <Tabs orientation="horizontal" className={styles.onboardingTabs}>
           <Tabs.ListContainer>
             <Tabs.List className={styles.onboardingTabList}>
-              {(['집 위치', '출근지 위치', '목표 도착 시각', '선호 교통수단'] as const).map((label, i) => {
-                const stepKey = ['home', 'work', 'time', 'prefs'][i] as OnboardStep;
+              {stepLabels.map((label, i) => {
+                const stepKey = stepKeys[i] as OnboardStep;
                 const isActive = onboardStep === stepKey;
-                const isDone = ['home', 'work', 'time', 'prefs'].indexOf(onboardStep) > i;
+                const isDone = stepKeys.indexOf(onboardStep) > i;
                 return (
                   <Tabs.Tab
                     key={label}
@@ -142,12 +145,12 @@ export function OnboardingCard({
             </Tabs.List>
           </Tabs.ListContainer>
         </Tabs>
-      </div>
+      </Card.Header>
 
-      {/* ============ Step 1: 집 위치 ============ */}
-      {onboardStep === 'home' && (
-        <div className={styles.onboardingGrid2col}>
-          <div className={styles.onboardingField}>
+      <Card.Content className={styles.cardContent}>
+        {/* ============ Step 1: 집 위치 ============ */}
+        {onboardStep === 'home' && (
+          <div>
             <Fieldset>
               <Fieldset.Legend>집 위치 (검색 후 선택)</Fieldset.Legend>
               <Description>입력 후 검색을 누르면 결과가 아래에 떠요. 원하는 장소를 선택하세요.</Description>
@@ -229,68 +232,48 @@ export function OnboardingCard({
                 </ListBox>
               ) : null}
             </Fieldset>
-          </div>
 
-          {/* 출근지 위치 필드는 Step 1에서는 비활성화 상태로만 표시 (실제로는 Step 2에서 편집) */}
-          <div className={styles.onboardingField}>
-            <Fieldset>
-              <Fieldset.Legend>출근지 위치 (다음 단계에서 설정)</Fieldset.Legend>
-              <Description>다음 단계에서 출근지 위치를 검색·선택할 수 있어요.</Description>
-              <div className={styles.selectedAddressBox}>
-                {selectedWork ? (
-                  <>
-                    <span className={styles.selectedAddressBoxName}>{selectedWork.name}</span>
-                    <span className={styles.selectedAddressBoxAddr}>{selectedWork.address}</span>
-                  </>
-                ) : (
-                  <span className={styles.selectedAddressBoxDefault}>(아직 선택되지 않음)</span>
-                )}
-              </div>
-            </Fieldset>
+            <div className={styles.onboardingNav}>
+              <Button
+                variant="ghost"
+                className={styles.cancelButtonMain}
+                onPress={cancelOnboarding}
+              >
+                메인 화면으로
+              </Button>
+              <Button
+                className={styles.nextButton}
+                variant="primary"
+                onPress={() => { setSearchQuery(''); setOnboardStep('work'); }}
+                isDisabled={!selectedHome}
+              >
+                다음: 출근지 위치
+              </Button>
+            </div>
           </div>
+        )}
 
-          <div className={styles.onboardingNav}>
-            <Button
-              variant="ghost"
-              className={styles.cancelButtonMain}
-              onPress={cancelOnboarding}
-            >
-              메인 화면으로
-            </Button>
-            <Button
-              className={styles.nextButton}
-              variant="primary"
-              onPress={() => { setSearchQuery(''); setOnboardStep('work'); }}
-              isDisabled={!selectedHome}
-            >
-              다음: 출근지 위치
-            </Button>
-          </div>
-        </div>
-      )}
+        {/* ============ Step 2: 출근지 위치 ============ */}
+        {onboardStep === 'work' && (
+          <div>
+            {/* 집 위치 — 읽기 전용으로 표시 */}
+            <div className={styles.readonlyField}>
+              <Fieldset>
+                <Fieldset.Legend>집 위치 (설정 완료)</Fieldset.Legend>
+                <Description>집 위치가 설정되었어요. 수정하려면 이전 단계로 돌아가세요.</Description>
+                <div className={styles.selectedAddressBox}>
+                  {selectedHome ? (
+                    <>
+                      <span className={styles.selectedAddressBoxName}>{selectedHome.name}</span>
+                      <span className={styles.selectedAddressBoxAddr}>{selectedHome.address}</span>
+                    </>
+                  ) : (
+                    <span className={styles.selectedAddressBoxDefault}>(선택되지 않음)</span>
+                  )}
+                </div>
+              </Fieldset>
+            </div>
 
-      {/* ============ Step 2: 출근지 위치 ============ */}
-      {onboardStep === 'work' && (
-        <div className={styles.onboardingGrid2col}>
-          {/* 집 위치 — 읽기 전용으로 표시 */}
-          <div className={styles.onboardingField}>
-            <Fieldset>
-              <Fieldset.Legend>집 위치 (설정 완료)</Fieldset.Legend>
-              <Description>집 위치가 설정되었어요. 수정하려면 이전 단계로 돌아가세요.</Description>
-              <div className={styles.selectedAddressBox}>
-                {selectedHome ? (
-                  <>
-                    <span className={styles.selectedAddressBoxName}>{selectedHome.name}</span>
-                    <span className={styles.selectedAddressBoxAddr}>{selectedHome.address}</span>
-                  </>
-                ) : (
-                  <span className={styles.selectedAddressBoxDefault}>(선택되지 않음)</span>
-                )}
-              </div>
-            </Fieldset>
-          </div>
-
-          <div className={styles.onboardingField}>
             <Fieldset>
               <Fieldset.Legend>출근지 위치 (검색 후 선택)</Fieldset.Legend>
               <Description>입력 후 검색을 누르면 결과가 아래에 떠요. 원하는 장소를 선택하세요.</Description>
@@ -371,32 +354,30 @@ export function OnboardingCard({
                 </ListBox>
               ) : null}
             </Fieldset>
-          </div>
 
-          <div className={styles.onboardingNav}>
-            <Button
-              variant="ghost"
-              className={styles.cancelButtonMain}
-              onPress={cancelOnboarding}
-            >
-              메인 화면으로
-            </Button>
-            <Button
-              className={styles.nextButton}
-              variant="primary"
-              onPress={() => { setSearchQuery(''); setOnboardStep('time'); }}
-              isDisabled={!selectedHome || !selectedWork}
-            >
-              다음: 목표 도착 시각
-            </Button>
+            <div className={styles.onboardingNav}>
+              <Button
+                variant="ghost"
+                className={styles.cancelButtonMain}
+                onPress={cancelOnboarding}
+              >
+                메인 화면으로
+              </Button>
+              <Button
+                className={styles.nextButton}
+                variant="primary"
+                onPress={() => { setSearchQuery(''); setOnboardStep('time'); }}
+                isDisabled={!selectedHome || !selectedWork}
+              >
+                다음: 목표 도착 시각
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ============ Step 3: 목표 도착 시각 + 선호 교통수단 ============ */}
-      {onboardStep === 'time' && (
-        <div className={styles.onboardingGrid2col}>
-          <div className={styles.onboardingField}>
+        {/* ============ Step 3: 목표 도착 시각 ============ */}
+        {onboardStep === 'time' && (
+          <div>
             <Fieldset>
               <Fieldset.Legend>목표 도착 시각</Fieldset.Legend>
               <Description>도착해야 하는 시각을 입력하면 그에 맞춰 출발 시간을 계산해요.</Description>
@@ -416,8 +397,19 @@ export function OnboardingCard({
                 </TimeField.Group>
               </TimeField>
             </Fieldset>
+
+            <div className={styles.onboardingNav}>
+              <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('work')}>뒤로</Button>
+              <Button variant="primary" className={styles.nextButton} onPress={() => setOnboardStep('prefs')}>
+                다음: 선호 교통수단
+              </Button>
+            </div>
           </div>
-          <div className={styles.onboardingField}>
+        )}
+
+        {/* ============ Step 4: 선호 교통수단 ============ */}
+        {onboardStep === 'prefs' && (
+          <div>
             <Fieldset>
               <Fieldset.Legend>선호 교통수단</Fieldset.Legend>
               <Description>평소 주로 이용하는 교통수단을 선택하세요.</Description>
@@ -439,43 +431,10 @@ export function OnboardingCard({
                 </SelectPopover>
               </Select>
             </Fieldset>
-          </div>
-          <div className={styles.onboardingNav}>
-            <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('work')}>뒤로</Button>
-            <Button variant="primary" className={styles.nextButton} onPress={() => setOnboardStep('prefs')}>
-              다음: 이동 소요 예상
-            </Button>
-          </div>
-        </div>
-      )}
 
-      {/* ============ Step 4: 이동 소요 예상 + 평소 평균 소요 시간 ============ */}
-      {onboardStep === 'prefs' && (
-        <div className={styles.onboardingGrid2col}>
-          <div className={styles.onboardingField}>
-            <Fieldset>
-              <Fieldset.Legend>평소 선호 교통수단</Fieldset.Legend>
-              <Description>평소 주로 이용하는 교통수단을 선택하세요.</Description>
-              <Select
-                value={preferredTransport}
-                onChange={(val) => setPreferredTransport(val as Transport)}
-              >
-                <SelectTrigger className={styles.selectTrigger}>
-                  <SelectValue>{preferredTransport ? ({ subway: '지하철 위주', bus: '버스 위주', any: '상관없음' } as const)[preferredTransport] : '선택하세요'}</SelectValue>
-                  <SelectIndicator />
-                </SelectTrigger>
-                <SelectPopover>
-                  <ListBox selectionMode="single" aria-label="선호 교통수단 선택"
-                    selectedKeys={preferredTransport ? [preferredTransport] : []}>
-                    <ListBox.Item id="subway">지하철 위주</ListBox.Item>
-                    <ListBox.Item id="bus">버스 위주</ListBox.Item>
-                    <ListBox.Item id="any">상관없음</ListBox.Item>
-                  </ListBox>
-                </SelectPopover>
-              </Select>
-            </Fieldset>
-          </div>
-          <div className={styles.onboardingField}>
+            {/* 이동 소요 예상 + 평소 평균 소요 시간 */}
+            <Separator className={styles.separator} />
+
             <Fieldset>
               <Fieldset.Legend>이동 소요 예상 / 평소 평균 소요 시간</Fieldset.Legend>
               <Description>이동 소요 예상은 대중교통 검색 결과 기준이에요. 평소 평균 소요 시간은 시·분 따로 입력할 수 있어요.</Description>
@@ -516,13 +475,14 @@ export function OnboardingCard({
                 </NumberField.Group>
               </NumberField>
             </Fieldset>
+
+            <div className={styles.onboardingNav}>
+              <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('time')}>뒤로</Button>
+              <Button variant="primary" className={styles.primaryButton} onPress={saveProfileHandler}>프로필 저장</Button>
+            </div>
           </div>
-          <div className={styles.onboardingNav}>
-            <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('time')}>뒤로</Button>
-            <Button variant="primary" className={styles.primaryButton} onPress={saveProfileHandler}>프로필 저장</Button>
-          </div>
-        </div>
-      )}
+        )}
+      </Card.Content>
     </Card>
   );
 }
