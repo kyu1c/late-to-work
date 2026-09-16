@@ -121,10 +121,10 @@ export function OnboardingCard({
   return (
     <Card className={cn(className ?? undefined, 'w-full mt-4')}>
       <Card.Header>
-        <Card.Title className="mb-2 text-lg font-semibold">{stepLabels[stepKeys.indexOf(onboardStep)]}</Card.Title>
+        <Card.Title>{stepLabels[stepKeys.indexOf(onboardStep)]}</Card.Title>
         <Tabs orientation="horizontal" className="mt-2">
           <Tabs.ListContainer>
-            <Tabs.List className="border-b border-border pb-2">
+            <Tabs.List>
               {stepLabels.map((label, i) => {
                 const stepKey = stepKeys[i] as OnboardStep;
                 const isActive = onboardStep === stepKey;

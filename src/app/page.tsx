@@ -8,6 +8,7 @@ import {
  Card,
  Checkbox,
  Label,
+ Table,
 } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { parseTime } from '@internationalized/date';
@@ -323,12 +324,91 @@ export default function Home() {
 
  // runRecommend 성공 후 밤 추천도 함께 생성
  const runRecommendAndRefresh = useCallback(async () => {
-   await runRecommend();
-   // recommendResult가 성공적으로 생성되었으면 밤 추천도 시도
-   if (recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.taxi.vehicleEtaMinutes != null) {
-     await refreshNightBefore(false);
+   // 1. 실시간 추천 실행
+   if (!profile) {
+     setRecommendError('프로필이 없습니다. 프로필을 먼저 완료해주세요.');
+     return;
    }
- }, [runRecommend, recommendResult, refreshNightBefore]);
+   let effectiveHomeCoords = homeCoords;
+   let effectiveWorkCoords = workCoords;
+   if (!homeCoords && profile.homeName) {
+     const coords = await resolveCoords(profile.homeName, true);
+     if (coords) effectiveHomeCoords = coords;
+   }
+   if (!workCoords && profile.workName) {
+     const coords = await resolveCoords(profile.workName, true);
+     if (coords) effectiveWorkCoords = coords;
+   }
+   if (!effectiveHomeCoords || !effectiveWorkCoords) {
+     setRecommendError('집과 출근지 위치가 필요합니다. 프로필 수정에서 위치를 다시 선택해주세요.');
+     return;
+   }
+   if (!targetArrival || !targetArrival.trim()) {
+     setRecommendError('목표 도착 시각이 필요합니다. 프로필을 수정해주세요.');
+     return;
+   }
+   setRecommendLoading(true);
+   setRecommendError(null);
+   setRecommendResult(null);
+
+   const body: Record<string, unknown> = {
+     startX: effectiveHomeCoords.x,
+     startY: effectiveHomeCoords.y,
+     endX: effectiveWorkCoords.x,
+     endY: effectiveWorkCoords.y,
+     targetArrival,
+     sharedPrepMinutes: prepMinutes,
+     taxiCallAddOn,
+     taxiCallAddMinutes,
+   };
+   if (departureInput.trim()) {
+     body.departureTime = departureInput.trim();
+   }
+
+   const res = await fetchRecommend(body);
+   setRecommendLoading(false);
+   if (!res.ok) {
+     setRecommendError(res.error ?? '추천을 계산할 수 없습니다.');
+     return;
+   }
+   setRecommendResult(res.result!);
+
+   // 2. 실시간 추천 성공 시 밤 추천도 함께 생성
+   if (res.result && res.result.transit.durationMinutes != null && res.result.taxi.vehicleEtaMinutes != null) {
+     // coords 재사용 (이미 위에서 가져옴)
+     setRecommendLoading(true);
+     const nbBody: Record<string, unknown> = {
+       startX: effectiveHomeCoords.x,
+       startY: effectiveHomeCoords.y,
+       endX: effectiveWorkCoords.x,
+       endY: effectiveWorkCoords.y,
+       targetArrival,
+       sharedPrepMinutes: prepMinutes,
+       taxiCallAddOn,
+       taxiCallAddMinutes,
+       transitDurationMinutes: res.result.transit.durationMinutes,
+       transitTransfers: res.result.transit.transfers,
+       transitDistanceMeters: res.result.transit.distanceMeters,
+       taxiVehicleEtaMinutes: res.result.taxi.vehicleEtaMinutes,
+       taxiFare: res.result.taxi.taxiFare,
+       isRaining: res.result.weather?.isRaining ?? false,
+       weekday: new Date().getDay(),
+       preferTransport: profile.preferredTransport,
+     };
+     const nbRes = await fetchNightBefore(nbBody);
+     setRecommendLoading(false);
+     if (nbRes.ok) {
+       const nb = nbRes.result!;
+       const today = new Date();
+       const yyyy = today.getFullYear();
+       const mm = String(today.getMonth() + 1).padStart(2, '0');
+       const dd = String(today.getDate()).padStart(2, '0');
+       saveNightBefore(nb, `${yyyy}-${mm}-${dd}`);
+       setNightBeforeResult(nb);
+       setShowNightBefore(true);
+     }
+   }
+ }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, departureInput, resolveCoords, setRecommendResult, setNightBeforeResult, setShowNightBefore, setRecommendError, setRecommendLoading]);
 
  // 전날 밤 추천 새로고침
  const refreshNightBefore = useCallback(async (silent = false) => {
@@ -757,47 +837,54 @@ export default function Home() {
  API 정보 박스 — 표 형태 (하단 고정, 다크모드 대응)
  ================================================================ */}
  <div className="mt-6 border-t border-border pt-4">
- <h2 className="text-lg font-semibold mb-3">현재 서비스에서 사용 중인 API</h2>
- <table className="w-full text-sm border-collapse">
- <thead>
- <tr>
- <th>API</th>
- <th>용도</th>
- <th>출처</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td className="font-medium">Kakao REST API</td>
- <td>주소·장소 검색 (주소검색, 키워드검색)</td>
- <td className="text-muted-foreground">카카오맵 REST API</td>
- </tr>
- <tr>
- <td className="font-medium">카카오모빌리티 Navi API</td>
- <td>차량 경로·택시 ETA·요금 (`/v1/directions`, `/v1/future/directions`)</td>
- <td className="text-muted-foreground">카카오모빌리티</td>
- </tr>
- <tr>
- <td className="font-medium">ODsay 대중교통 길찾기</td>
- <td>대중교통 소요시간 (1차)</td>
- <td className="text-muted-foreground">ODsay API</td>
- </tr>
- <tr>
-   <td className="font-medium">Tmap</td>
-   <td>차량 경로(택시 ETA 보조) 및 대중교통 경로 백업</td>
-   <td className="text-muted-foreground">Tmap/티맵 REST API</td>
- </tr>
- <tr>
-   <td className="font-medium">TAGO 버스·지하철</td>
-   <td>대중교통 버스·지하철 정보 백업 (버스정류소·지하철역 조회)</td>
-   <td className="text-muted-foreground">TAGO (한국대중교통정보)</td>
- </tr>
- </tbody>
- </table>
- <p className="text-xs text-muted-foreground mt-2">
- 각 서비스는 개별 이용약관·라이선스를 따르며, 무료로 제공되는 범위 내에서 사용합니다.<br />
- 현재 추천 흐름에서는 카카오맵·Navi·ODsay를 우선 사용하고, 필요 시 Tmap·TAGO가 백업으로 작동하도록 체인이 구성되어 있습니다.
- </p>
+   <h2 className="text-lg font-semibold mb-3">현재 서비스에서 사용 중인 API</h2>
+   <Table aria-label="사용 중인 API" className="w-full">
+     <Table.ScrollContainer>
+       <Table.Content className="min-w-[480px]">
+         <Table.Header>
+           <Table.Column isRowHeader>API</Table.Column>
+           <Table.Column>용도</Table.Column>
+           <Table.Column>출처</Table.Column>
+         </Table.Header>
+         <Table.Body>
+           <Table.Row>
+             <Table.Cell className="font-medium">카카오맵 REST API</Table.Cell>
+             <Table.Cell>집·회사 주소/장소 검색</Table.Cell>
+             <Table.Cell>카카오</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell className="font-medium">카카오모빌리티 Navi API</Table.Cell>
+             <Table.Cell>차량(택시) 경로·ETA·요금</Table.Cell>
+             <Table.Cell>카카오모빌리티</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell className="font-medium">ODsay 대중교통 길찾기</Table.Cell>
+             <Table.Cell>대중교통 소요시간·환승·거리</Table.Cell>
+             <Table.Cell>ODsay</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell className="font-medium">Tmap REST API</Table.Cell>
+             <Table.Cell>차량 경로 보조·대중교통 경로 백업</Table.Cell>
+             <Table.Cell>SK텔레콤 티맵</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell className="font-medium">TAGO</Table.Cell>
+             <Table.Cell>버스·지하철 정보 백업</Table.Cell>
+             <Table.Cell>한국대중교통정보(TAGO)</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell className="font-medium">기상청 초단기예보(KMA)</Table.Cell>
+             <Table.Cell>현재 날씨·강수 여부</Table.Cell>
+             <Table.Cell>기상청</Table.Cell>
+           </Table.Row>
+         </Table.Body>
+       </Table.Content>
+     </Table.ScrollContainer>
+   </Table>
+   <p className="text-xs text-muted-foreground mt-2">
+     각 서비스는 개별 이용약관·라이선스를 따르며, 무료로 제공되는 범위 내에서 사용합니다.<br />
+     기본 추천은 카카오맵·Navi·ODsay로 계산하고, 실패하거나 결과가 없을 때 Tmap·TAGO가 순서대로 백업으로 동작합니다.
+   </p>
  </div>
  </main>
  </div>

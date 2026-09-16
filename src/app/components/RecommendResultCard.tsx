@@ -70,7 +70,7 @@ export function RecommendResultCard({
               <div >
                 <span className={ cn('text-sm', 'text-muted-foreground', 'font-medium', 'block', 'mb-1') }>대중교통</span>
                 <span className={ cn('text-xs', 'text-muted-foreground') }>
-                  {formatSource(formatSource(recommendResult.transit.source))}
+                  {formatSource(recommendResult.transit.source, recommendResult.transit.note)?.label ?? recommendResult.transit.source}
                 </span>
               </div>
               <div >
@@ -102,7 +102,7 @@ export function RecommendResultCard({
               <div >
                 <span className={ cn('text-sm', 'text-muted-foreground', 'font-medium', 'block', 'mb-1') }>택시</span>
                 <span className={ cn('text-xs', 'text-muted-foreground') }>
-                  {formatSource(formatSource(recommendResult.taxi.source))}
+                  {formatSource(recommendResult.taxi.source, recommendResult.taxi.note)?.label ?? recommendResult.taxi.source}
                 </span>
               </div>
               <div >

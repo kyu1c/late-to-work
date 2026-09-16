@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@heroui/react';
+import { Button, Table } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import styles from './Header.module.css';
 
@@ -39,24 +39,34 @@ export function Header() {
         </Button>
       </div>
 
-      <div className={styles.serviceInfoBar}>
-        <div className={styles.serviceInfoItem}>
-          <span className={styles.serviceInfoLabel}>대회</span>
-          <span className={styles.serviceInfoValue}>MABC Final</span>
-        </div>
-        <div className={styles.serviceInfoItem}>
-          <span className={styles.serviceInfoLabel}>스킬명</span>
-          <span className={styles.serviceInfoValue}>late-to-work</span>
-        </div>
-        <div className={styles.serviceInfoItem}>
-          <span className={styles.serviceInfoLabel}>제작자</span>
-          <span className={styles.serviceInfoValue}>조규원</span>
-        </div>
-        <div className={styles.serviceInfoItem}>
-          <span className={styles.serviceInfoLabel}>개발 스펙</span>
-          <span className={styles.serviceInfoValue}>실시간 교통·날씨 API 기반 출퇴근 비교 추천</span>
-        </div>
-      </div>
+      <Table aria-label="서비스 정보" className="w-full">
+        <Table.ScrollContainer>
+          <Table.Content>
+            <Table.Header>
+              <Table.Column isRowHeader>항목</Table.Column>
+              <Table.Column>내용</Table.Column>
+            </Table.Header>
+            <Table.Body>
+              <Table.Row>
+                <Table.Cell className={styles.serviceInfoLabel}>대회</Table.Cell>
+                <Table.Cell>MABC Final</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell className={styles.serviceInfoLabel}>스킬명</Table.Cell>
+                <Table.Cell>late-to-work</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell className={styles.serviceInfoLabel}>제작자</Table.Cell>
+                <Table.Cell>조규원</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell className={styles.serviceInfoLabel}>개발 스펙</Table.Cell>
+                <Table.Cell>실시간 교통·날씨 API 기반 출퇴근 비교 추천</Table.Cell>
+              </Table.Row>
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
+      </Table>
     </>
   );
 }
