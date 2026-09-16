@@ -9,6 +9,7 @@ import {
   Checkbox,
   Label,
   Table,
+  Alert,
 } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { parseTime } from '@internationalized/date';
@@ -604,8 +605,9 @@ export default function Home() {
     setProfile(p);
     setRecommendError(null);
     setOnboardStep('done');
-    showMessage('프로필이 저장되었습니다.');
-  }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage]);
+    showMessage('프로필이 저장되었습니다. 추천 결과를 계산하고 있어요...');
+    runRecommend();
+  }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, runRecommend]);
 
   // 프로필 저장 완료 후 자동 추천 실행
   useEffect(() => {
@@ -774,6 +776,20 @@ export default function Home() {
   const now = new Date();
   const nowTimeString = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
 
+  // 현재 시각 기준 상태 판단 (아침 재추천 영역 상단 안내용)
+  const nowMinutesForStatus = parseAmPmToMinutes(nowTimeString);
+  const targetMinutesForStatus = parseAmPmToMinutes(targetArrival);
+  const statusDiffMinutes = targetMinutesForStatus - nowMinutesForStatus;
+
+  let morningStatus: 'normal' | 'late-should-adjust' | 'after-workhours';
+  if (statusDiffMinutes < 0) {
+    morningStatus = 'after-workhours';
+  } else if (statusDiffMinutes <= 60) {
+    morningStatus = 'late-should-adjust';
+  } else {
+    morningStatus = 'normal';
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <main className={cn('container', 'mx-auto', 'max-w-md', 'px-4', 'py-6')}>
@@ -928,20 +944,81 @@ export default function Home() {
 
             {/* 아침 재추천 영역 */}
             <div className="mb-5">
-              <div className={cn('flex', 'justify-between', 'items-center', 'mb-3')}>
-                <h2 className={cn('text-lg', 'font-semibold')}>내일 출발 추천</h2>
-                {recommendLoading && (
-                  <span className={cn('text-sm', 'text-muted-foreground')}>계산 중…</span>
-                )}
+              {/* ── 상단: 현재 시각 / 목표 도착 / 잔여 시간 (공통) ── */}
+              <div className="p-4 bg-surface-secondary rounded-lg mb-4">
+                <div className="flex flex-col gap-1 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Label className="font-medium">현재 시각</Label>
+                    <span className="text-foreground">{nowTimeString}</span>
+                    <span className="text-muted-foreground">→</span>
+                    <Label className="font-medium">목표 도착</Label>
+                    <span className="text-foreground">{targetArrival}</span>
+                    <span className="text-muted-foreground">(잔여 {statusDiffMinutes}분)</span>
+                  </div>
+                </div>
               </div>
-              <Card className="w-full">
-                <Card.Content className="flex flex-col gap-4">
-                  {recommendLoading ? (
-                    <div className="p-4 text-center text-sm text-muted-foreground">
-                      지금 출발 기준을 계산하고 있어요…
-                    </div>
-                  ) : (
-                    <>
+
+              {/* ── 상태별 안내 ── */}
+              {morningStatus === 'after-workhours' && (
+                <Card className="w-full">
+                  <Card.Content className="flex flex-col gap-3 p-4 text-center">
+                    <div className="text-lg font-semibold text-destructive">출근 시간을 조정해 주세요</div>
+                    <p className="text-sm text-muted-foreground">
+                      현재 시각({nowTimeString})은 목표 도착({targetArrival})보다 {Math.abs(statusDiffMinutes)}분 지났어요.
+                      출근 시간을 늦추거나 일정을 조정해주세요.
+                    </p>
+                  </Card.Content>
+                </Card>
+              )}
+
+              {morningStatus === 'late-should-adjust' && (
+                <>
+                  {/* 출근 시간 이후 안내 */}
+                  <Card className="w-full">
+                    <Card.Content className="flex flex-col gap-3 p-4">
+                      <div className="flex items-center gap-2">
+                        <Alert status="warning" className="flex-1">
+                          <Alert.Indicator />
+                          <Alert.Content>
+                            <Alert.Title>출근 시간 이후입니다</Alert.Title>
+                            <Alert.Description>
+                              현재 시각({nowTimeString}) 기준 목표 도착({targetArrival})까지 약 {statusDiffMinutes}분 남았어요.
+                              출근 시간 이후라 평소처럼 출발하기엔 촉박할 수 있어요.
+                              그래도 출근이 필요하다면 아래 택시 정보를 참고하세요.
+                            </Alert.Description>
+                          </Alert.Content>
+                        </Alert>
+                      </div>
+                      {/* 택시 비교 요약 */}
+                      {recommendResult?.taxi && recommendResult.taxi.vehicleEtaMinutes != null && (
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="p-3 bg-surface-secondary rounded-md">
+                            <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 총 소요 시간</span>
+                            <p className="text-lg font-semibold mt-1">약 {recommendResult.comparison.taxi.totalMinutes}분</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              (이동 {recommendResult.taxi.vehicleEtaMinutes}분 + 준비 {recommendResult.comparison.taxi.prepMinutes}분)
+                            </p>
+                          </div>
+                          <div className="p-3 bg-surface-secondary rounded-md">
+                            <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 이용 시 도착 예상</span>
+                            <p className="text-lg font-semibold mt-1">{recommendResult.comparison.taxi.arrivalTime}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              목표 도착 {targetArrival} 대비 {parseAmPmToMinutes(targetArrival) - parseAmPmToMinutes(recommendResult.comparison.taxi.arrivalTime) > 0 ? '더 일찍' : '늦게'} 도착
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {recommendResult?.taxi?.taxiFare != null && (
+                        <div className="p-3 bg-surface-secondary rounded-md text-sm">
+                          <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 예상 요금</span>
+                          <p className="text-lg font-semibold mt-1">약 {recommendResult.taxi.taxiFare.toLocaleString('ko-KR')}원</p>
+                        </div>
+                      )}
+                    </Card.Content>
+                  </Card>
+                  {/* 출발 시각 조정용 DepartureControl */}
+                  <Card className="w-full mt-4">
+                    <Card.Content className="flex flex-col gap-4">
                       <DepartureControl
                         nowTime={now}
                         departureInput={departureInput}
@@ -952,24 +1029,54 @@ export default function Home() {
                         onSetDepartureAdjusted={setDepartureAdjusted}
                         onRunRecommend={runRecommend}
                       />
-                      <div>
-                        <RecommendResultCard
-                          recommendResult={recommendResult}
-                          recommendError={recommendError}
-                          recommendLoading={recommendLoading}
-                          resultEmpty={!recommendResult && !recommendError && !recommendLoading}
-                          onEditProfile={editProfileHandler}
-                        />
-                      </div>
-                      {!recommendResult && !recommendError && !recommendLoading && (
-                        <p className="text-sm text-muted-foreground text-center">
-                          출발 시각을 입력한 뒤 '새로운 출발 시간으로 계산' 버튼을 눌러주세요.
-                        </p>
+                      {recommendResult && (
+                        <div className="text-sm text-muted-foreground text-center">
+                          출발 시각을 바꾸셨다면 '새로운 출발 시간으로 계산' 버튼을 눌러 다시 확인하세요.
+                        </div>
                       )}
-                    </>
-                  )}
-                </Card.Content>
-              </Card>
+                    </Card.Content>
+                  </Card>
+                </>
+              )}
+
+              {morningStatus === 'normal' && (
+                <Card className="w-full">
+                  <Card.Content className="flex flex-col gap-4">
+                    {recommendLoading ? (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        지금 출발 기준을 계산하고 있어요…
+                      </div>
+                    ) : (
+                      <>
+                        <DepartureControl
+                          nowTime={now}
+                          departureInput={departureInput}
+                          departureAdjusted={departureAdjusted}
+                          recommendLoading={recommendLoading}
+                          canRun={!profile || !homeCoords || !workCoords ? false : true}
+                          onSetDepartureInput={setDepartureInput}
+                          onSetDepartureAdjusted={setDepartureAdjusted}
+                          onRunRecommend={runRecommend}
+                        />
+                        <div>
+                          <RecommendResultCard
+                            recommendResult={recommendResult}
+                            recommendError={recommendError}
+                            recommendLoading={recommendLoading}
+                            resultEmpty={!recommendResult && !recommendError && !recommendLoading}
+                            onEditProfile={editProfileHandler}
+                          />
+                        </div>
+                        {!recommendResult && !recommendError && !recommendLoading && (
+                          <p className="text-sm text-muted-foreground text-center">
+                            출발 시각을 입력한 뒤 '지금 출발 계산' 버튼을 눌러주세요.
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </Card.Content>
+                </Card>
+              )}
             </div>
 
             {/* 고급 설정 */}

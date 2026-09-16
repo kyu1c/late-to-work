@@ -87,8 +87,8 @@ function validateRecommendBody(body: unknown): {
     return { ok: false, error: 'startX, startY, endX, endY(좌표)가 필요합니다.' };
   }
 
-  if (typeof b.targetArrival !== 'string' || !/^\d{1,2}:\d{2}$/.test(b.targetArrival)) {
-    return { ok: false, error: 'targetArrival(목표 도착 시각, HH:MM)이 필요합니다.' };
+  if (typeof b.targetArrival !== 'string' || !/^\d{1,2}:\d{2}(?::\d{2})?$/.test(b.targetArrival)) {
+    return { ok: false, error: 'targetArrival(목표 도착 시각, HH:MM 또는 HH:MM:SS)이 필요합니다.' };
   }
 
   const departureTime = typeof b.departureTime === 'string' && /^\d{1,2}:\d{2}$/.test(b.departureTime)
