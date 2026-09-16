@@ -893,13 +893,15 @@ export default function Home() {
                     {/* 비교표 카드 — HeroUI Card.Content 안에 구성 */}
                     <Card className={styles.cardFull}>
                       <Card.Header className={styles.compareHeader}>
-                        <span>현재 시각 기준: {recommendResult.nowTime}</span>
-                        <span className={styles.muted}>목표 도착: {recommendResult.targetArrival}</span>
+                        <Card.Title>
+                          현재 시각 기준: {recommendResult.nowTime}
+                          <span className={styles.compareHeaderSub}>목표 도착: {recommendResult.targetArrival}</span>
+                        </Card.Title>
                       </Card.Header>
                       <Card.Content>
-                        <div className={styles.dataDisclaimer}>
+                        <p className={styles.dataDisclaimer}>
                           실시간 교통·날씨 정보가 없으면 평균·패턴 기반 추정치로 안내해요.
-                        </div>
+                        </p>
 
                         {/* 날씨 정보 */}
                         {recommendResult.weather && (

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   Tabs,
   ListBox,
+  ListBoxItemIndicator,
   Label,
   Description,
   Input,
@@ -15,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
   SelectPopover,
+  SelectIndicator,
   TimeField,
   NumberField,
   Separator,
@@ -221,6 +223,7 @@ export function OnboardingCard({
                     >
                       <Label>{r.name}</Label>
                       <Description>{r.address}</Description>
+                      <ListBoxItemIndicator />
                     </ListBox.Item>
                   ))}
                 </ListBox>
@@ -362,6 +365,7 @@ export function OnboardingCard({
                     >
                       <Label>{r.name}</Label>
                       <Description>{r.address}</Description>
+                      <ListBoxItemIndicator />
                     </ListBox.Item>
                   ))}
                 </ListBox>
@@ -423,6 +427,7 @@ export function OnboardingCard({
               >
                 <SelectTrigger className={styles.selectTrigger}>
                   <SelectValue>{preferredTransport ? ({ subway: '지하철 위주', bus: '버스 위주', any: '상관없음' } as const)[preferredTransport] : '선택하세요'}</SelectValue>
+                  <SelectIndicator />
                 </SelectTrigger>
                 <SelectPopover>
                   <ListBox selectionMode="single" aria-label="선호 교통수단 선택"
@@ -457,6 +462,7 @@ export function OnboardingCard({
               >
                 <SelectTrigger className={styles.selectTrigger}>
                   <SelectValue>{preferredTransport ? ({ subway: '지하철 위주', bus: '버스 위주', any: '상관없음' } as const)[preferredTransport] : '선택하세요'}</SelectValue>
+                  <SelectIndicator />
                 </SelectTrigger>
                 <SelectPopover>
                   <ListBox selectionMode="single" aria-label="선호 교통수단 선택"
