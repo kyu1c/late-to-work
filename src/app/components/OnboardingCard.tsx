@@ -20,6 +20,7 @@ import {
   NumberField,
   Separator,
   Card,
+  Breadcrumbs,
 } from '@heroui/react';
 import { cn } from '@heroui/styles';
 import { parseTime } from '@internationalized/date';
@@ -59,10 +60,8 @@ interface OnboardingCardProps {
   setPreferredTransport: (v: Transport) => void;
   usualTransitMinutes: number | '';
   setUsualTransitMinutes: (v: number | '') => void;
-  usualHours: number | '';
-  setUsualHours: (v: number | '') => void;
-  usualMinutes: number | '';
-  setUsualMinutes: (v: number | '') => void;
+  transitPreview: { durationMinutes: number | null; source: string } | null;
+
   doSearch: (query: string, preferAddress?: boolean, setter?: (r: AddressSearchResult | null) => void, coordSetter?: (c: { x: number; y: number } | null) => void) => void;
   cancelOnboarding: () => void;
   saveProfileHandler: () => void;
@@ -94,10 +93,7 @@ export function OnboardingCard({
   setPreferredTransport,
   usualTransitMinutes,
   setUsualTransitMinutes,
-  usualHours,
-  setUsualHours,
-  usualMinutes,
-  setUsualMinutes,
+  transitPreview,
   doSearch,
   cancelOnboarding,
   saveProfileHandler,
@@ -108,6 +104,9 @@ export function OnboardingCard({
   const transitEstimate = (() => {
     if (recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.transit.durationMinutes > 0) {
       return { value: recommendResult.transit.durationMinutes, source: recommendResult.transit.source };
+    }
+    if (transitPreview && transitPreview.durationMinutes != null && transitPreview.durationMinutes > 0) {
+      return { value: transitPreview.durationMinutes, source: transitPreview.source };
     }
     if (typeof usualTransitMinutes === 'number' && usualTransitMinutes > 0) {
       return { value: usualTransitMinutes, source: '입력한 평소 소요 시간' };
@@ -121,29 +120,16 @@ export function OnboardingCard({
   return (
     <Card className={cn(className ?? undefined, 'w-full mt-4')}>
       <Card.Header>
-        <Card.Title>{stepLabels[stepKeys.indexOf(onboardStep)]}</Card.Title>
-        <Tabs orientation="horizontal" className="mt-2">
-          <Tabs.ListContainer>
-            <Tabs.List>
-              {stepLabels.map((label, i) => {
-                const stepKey = stepKeys[i] as OnboardStep;
-                const isActive = onboardStep === stepKey;
-                const isDone = stepKeys.indexOf(onboardStep) > i;
-                return (
-                  <Tabs.Tab
-                    key={label}
-                    className={cn(
-                      isActive && undefined,
-                      isDone && 'opacity-55',
-                    )}
-                  >
-                    {label}
-                  </Tabs.Tab>
-                );
-              })}
-            </Tabs.List>
-          </Tabs.ListContainer>
-        </Tabs>
+        <Breadcrumbs>
+          {stepLabels.slice(0, stepKeys.indexOf(onboardStep) + 1).map((label, i) => {
+            const isLast = i === stepKeys.indexOf(onboardStep);
+            return (
+              <Breadcrumbs.Item key={label} {...(isLast ? {} : { href: '#' })}>
+                {label}
+              </Breadcrumbs.Item>
+            );
+          })}
+        </Breadcrumbs>
       </Card.Header>
 
       <Card.Content className="flex flex-col gap-4">
@@ -153,17 +139,12 @@ export function OnboardingCard({
             <Fieldset>
               <Fieldset.Legend>집 위치 (검색 후 선택)</Fieldset.Legend>
               <Description>입력 후 검색을 누르면 결과가 아래에 떠요. 원하는 장소를 선택하세요.</Description>
-              {/* 선택된 집 표시 영역 — 항상 노출, 기본 "(선택되지 않음)" */}
-              <div className="flex flex-col gap-1 p-3 border border-border border-dashed rounded-md bg-surface-secondary min-h-[60px] mb-3">
-                {selectedHome ? (
-                  <>
-                    <span className="font-semibold text-foreground">{selectedHome.name}</span>
-                    <span className="text-sm text-muted-foreground">{selectedHome.address}</span>
-                  </>
-                ) : (
-                  <span className="text-sm text-muted-foreground italic">(선택되지 않음)</span>
-                )}
-              </div>
+              {selectedHome && (
+                <div className="flex flex-col gap-1 p-3 border border-border border-dashed rounded-md bg-surface-secondary min-h-[60px] mb-3">
+                  <span className="font-semibold text-foreground">{selectedHome.name}</span>
+                  <span className="text-sm text-muted-foreground">{selectedHome.address}</span>
+                </div>
+              )}
               <div className="flex gap-2 mt-2">
                 <Input
                   className="flex-1 min-w-0"
@@ -260,32 +241,24 @@ export function OnboardingCard({
               <Fieldset>
                 <Fieldset.Legend>집 위치 (설정 완료)</Fieldset.Legend>
                 <Description>집 위치가 설정되었어요. 수정하려면 이전 단계로 돌아가세요.</Description>
-                <div className="flex flex-col gap-1 p-3 border border-border border-dashed rounded-md bg-surface-secondary min-h-[60px] mb-3">
-                  {selectedHome ? (
-                    <>
-                      <span className="font-semibold text-foreground">{selectedHome.name}</span>
-                      <span className="text-sm text-muted-foreground">{selectedHome.address}</span>
-                    </>
-                  ) : (
-                    <span className="text-sm text-muted-foreground italic">(선택되지 않음)</span>
-                  )}
-                </div>
+                {selectedHome && (
+                  <div className="flex flex-col gap-1 p-3 border border-border border-dashed rounded-md bg-surface-secondary min-h-[60px] mb-3">
+                    <span className="font-semibold text-foreground">{selectedHome.name}</span>
+                    <span className="text-sm text-muted-foreground">{selectedHome.address}</span>
+                  </div>
+                )}
               </Fieldset>
             </div>
 
             <Fieldset>
               <Fieldset.Legend>출근지 위치 (검색 후 선택)</Fieldset.Legend>
               <Description>입력 후 검색을 누르면 결과가 아래에 떠요. 원하는 장소를 선택하세요.</Description>
-              <div className="flex flex-col gap-1 p-3 border border-border border-dashed rounded-md bg-surface-secondary min-h-[60px] mb-3">
-                {selectedWork ? (
-                  <>
-                    <span className="font-semibold text-foreground">{selectedWork.name}</span>
-                    <span className="text-sm text-muted-foreground">{selectedWork.address}</span>
-                  </>
-                ) : (
-                  <span className="text-sm text-muted-foreground italic">(선택되지 않음)</span>
-                )}
-              </div>
+              {selectedWork && (
+                <div className="flex flex-col gap-1 p-3 border border-border border-dashed rounded-md bg-surface-secondary min-h-[60px] mb-3">
+                  <span className="font-semibold text-foreground">{selectedWork.name}</span>
+                  <span className="text-sm text-muted-foreground">{selectedWork.address}</span>
+                </div>
+              )}
               <div className="flex gap-2 mt-2">
                 <Input
                   className="flex-1 min-w-0"
@@ -449,28 +422,17 @@ export function OnboardingCard({
                   </span>
                 )}
               </div>
-              <Label className="block text-sm font-medium text-foreground mt-3 mb-1">평소 평균 이동 소요 시간 — 시 (선택)</Label>
+              <Label className="block text-sm font-medium text-foreground mt-3 mb-1">평소 평균 이동 소요 시간 (분, 선택)</Label>
               <NumberField
-                name="usualHours"
-                value={usualHours === '' ? undefined : usualHours}
-                onChange={(value) => setUsualHours(value ?? '')}
+                name="usualTransitMinutes"
+                value={usualTransitMinutes === '' ? undefined : usualTransitMinutes}
+                onChange={(value) => setUsualTransitMinutes(value ?? '')}
                 minValue={0}
-                maxValue={23}
+                maxValue={999}
+                description="이 구간을 평소 이동하는 데 걸리는 평균 시간이에요. 예: 40분"
               >
                 <NumberField.Group>
-                  <NumberField.Input placeholder="예: 0" />
-                </NumberField.Group>
-              </NumberField>
-              <Label className="block text-sm font-medium text-foreground mt-3 mb-1">평소 평균 이동 소요 시간 — 분 (선택)</Label>
-              <NumberField
-                name="usualMinutes"
-                value={usualMinutes === '' ? undefined : usualMinutes}
-                onChange={(value) => setUsualMinutes(value ?? '')}
-                minValue={0}
-                maxValue={59}
-              >
-                <NumberField.Group>
-                  <NumberField.Input placeholder="예: 30" />
+                  <NumberField.Input placeholder="예: 40" />
                 </NumberField.Group>
               </NumberField>
             </Fieldset>
