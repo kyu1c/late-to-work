@@ -557,12 +557,10 @@ export default function Home() {
     };
     saveProfile(p);
     setProfile(p);
+    setRecommendError(null);
     setOnboardStep('done');
     if (homeCoords && workCoords) {
       showMessage('프로필이 저장되었습니다. 지금 출발 기준을 계산하고 있어요...');
-      requestAnimationFrame(() => {
-        runRecommendAndRefresh();
-      });
     } else {
       showMessage('프로필이 저장되었습니다. 위치 정보를 다시 가져오는 중이에요...');
       // coords가 null이면 프로필 이름으로 재검색 시도 (백그라운드)
@@ -574,6 +572,13 @@ export default function Home() {
       });
     }
   }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, homeCoords, workCoords, runRecommendAndRefresh, resolveCoords]);
+
+  // 프로필 저장 완료 후 자동 추천 실행
+  useEffect(() => {
+  if (onboardStep === 'done' && profile && homeCoords && workCoords) {
+    runRecommendAndRefresh();
+  }
+  }, [onboardStep, profile, homeCoords, workCoords, runRecommendAndRefresh]);
 
   const clearProfileHandler = useCallback(() => {
     clearProfile();
