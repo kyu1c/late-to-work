@@ -185,6 +185,17 @@ export function RecommendResultCard({
           {recommendResult.taxiFuture &&
             recommendResult.taxiFuture.departureTimes.length > 0 && (() => {
               const tf = recommendResult.taxiFuture!;
+              const rows = tf.departureTimes.map((dep, i) => ({
+                dep,
+                eta: tf.vehicleEtaMinutes[i],
+                fare: tf.taxiFare[i],
+              }));
+              const seen = new Set<string>();
+              const deduped = rows.filter((r) => {
+                if (seen.has(r.dep)) return false;
+                seen.add(r.dep);
+                return true;
+              });
               return (
                 <div className={ cn('mt-4', 'p-4', 'bg-surface-secondary', 'rounded-lg') }>
                   <div className={ cn('flex', 'justify-between', 'items-center', 'mb-3', 'pb-2', 'border-b', 'border-border', 'text-md', 'font-semibold', 'text-foreground') }>
@@ -192,22 +203,22 @@ export function RecommendResultCard({
                     <span className={ cn('text-sm', 'text-muted-foreground') }>(미래 운행 정보 기준)</span>
                   </div>
                   <div className={ cn('flex', 'flex-col', 'gap-2') }>
-                    {tf.departureTimes.map((dep, i) => (
-                      <div key={i} className={ cn('grid', 'grid-cols-3', 'gap-3', 'py-2', 'border-b', 'border-border', 'last:border-none') }>
+                    {deduped.map((row) => (
+                      <div key={row.dep} className={ cn('grid', 'grid-cols-3', 'gap-3', 'py-2', 'border-b', 'border-border', 'last:border-none') }>
                         <div className={ cn('text-sm', 'text-foreground') }>
-                          <strong>{dep}</strong> 출발
+                          <strong>{row.dep}</strong> 출발
                         </div>
                         <div className={ cn('text-sm', 'text-foreground') }>
-                          {tf.vehicleEtaMinutes[i] != null ? (
-                            <span>약 {tf.vehicleEtaMinutes[i]}분</span>
+                          {row.eta != null ? (
+                            <span>약 {row.eta}분</span>
                           ) : (
                             <span>확인 불가</span>
                           )}
                         </div>
                         <div className={ cn('text-sm', 'text-foreground') }>
-                          {tf.taxiFare[i] != null ? (
+                          {row.fare != null ? (
                             <span>
-                              {formatMoney(tf.taxiFare[i])}원
+                              {formatMoney(row.fare)}원
                             </span>
                           ) : (
                             <span>확인 불가</span>
@@ -215,16 +226,16 @@ export function RecommendResultCard({
                         </div>
                       </div>
                     ))}
+                  </div>
+                  <div className={ cn('text-sm', 'text-muted-foreground', 'mt-3', 'pt-2', 'border-t', 'border-border') }>
+                    출발 시각을 몇 가지로 나눠서 각각에 대해 차가 얼마나 걸릴지 미리 본
+                    결과예요. 늦지 않는 마지막 출발 시각을 가늠하는 데 참고할 수 있어요.
+                  </div>
+                  <p className={ cn('text-sm', 'text-muted-foreground', 'mb-3', 'pb-3', 'border-b', 'border-border') }>
+                    실시간 교통·날씨 정보가 없으면 평균·패턴 기반 추정치로 안내해요.
+                  </p>
                 </div>
-                <div className={ cn('text-sm', 'text-muted-foreground', 'mt-3', 'pt-2', 'border-t', 'border-border') }>
-                  출발 시각을 몇 가지로 나눠서 각각에 대해 차가 얼마나 걸릴지 미리 본
-                  결과예요. 늦지 않는 마지막 출발 시각을 가늠하는 데 참고할 수 있어요.
-                </div>
-                <p className={ cn('text-sm', 'text-muted-foreground', 'mb-3', 'pb-3', 'border-b', 'border-border') }>
-                  실시간 교통·날씨 정보가 없으면 평균·패턴 기반 추정치로 안내해요.
-                </p>
-              </div>
-            );
+              );
             })()}
         </Card.Content>
       </Card>
