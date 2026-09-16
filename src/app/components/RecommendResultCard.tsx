@@ -1,20 +1,21 @@
 'use client';
 
 import { Button, Alert, Card } from '@heroui/react';
+import { cn } from '@heroui/styles';
 import type { RecommendResponse } from '@/lib/types';
 
-function formatSource(source: string): string {
-  switch (source) {
-    case 'navi': return '카카오내비';
-    case 'tmap': return 'Tmap';
-    case 'odsay': return 'ODsay';
-    case 'kakao': return '카카오맵';
-    case 'none': return '실시간 정보 없음';
-    default: return source;
-  }
-}
+function formatSource(source: string, note: string): { label: string; detail: string | null } {
+  const label = source === 'navi' ? '카카오내비'
+    : source === 'tmap' ? 'Tmap'
+    : source === 'odsay' ? 'ODsay'
+    : source === 'kakao' ? '카카오맵'
+    : source === 'none' ? '실시간 정보 없음'
+    : source;
 
-import { cn } from '@heroui/styles';
+  // Tmap은 카카오내비 실패 후 대체 경로임을 알림
+  const detail = source === 'tmap' ? '카카오내비 연결 실패 후 Tmap으로 대체 조회' : null;
+  return { label, detail };
+}
 
 interface RecommendResultCardProps {
   recommendResult: RecommendResponse | null;
@@ -69,7 +70,7 @@ export function RecommendResultCard({
               <div >
                 <span className={ cn('text-sm', 'text-muted-foreground', 'font-medium', 'block', 'mb-1') }>대중교통</span>
                 <span className={ cn('text-xs', 'text-muted-foreground') }>
-                  {formatSource(recommendResult.transit.source)}
+                  {formatSource(formatSource(recommendResult.transit.source))}
                 </span>
               </div>
               <div >
@@ -101,7 +102,7 @@ export function RecommendResultCard({
               <div >
                 <span className={ cn('text-sm', 'text-muted-foreground', 'font-medium', 'block', 'mb-1') }>택시</span>
                 <span className={ cn('text-xs', 'text-muted-foreground') }>
-                  {formatSource(recommendResult.taxi.source)}
+                  {formatSource(formatSource(recommendResult.taxi.source))}
                 </span>
               </div>
               <div >
