@@ -18,6 +18,7 @@ import { OnboardingCard } from './components/OnboardingCard';
 import { NightBeforeCard } from './components/NightBeforeCard';
 import { DepartureControl } from './components/DepartureControl';
 import { RecommendResultCard } from './components/RecommendResultCard';
+import { NowStatusCard } from './components/NowStatusCard';
 import { transitChain } from '@/lib/transitChain';
 import { taxiChain } from '@/lib/taxiChain';
 import { kmaUltraShortSnapshot } from '@/lib/api/kma';
@@ -742,7 +743,7 @@ export default function Home() {
   // -----------------------------------------------------------------------
 
   const now = new Date();
-  const nowTimeString = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+  const nowTimeString = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
 
   return (
     <div className="min-h-screen bg-background">
@@ -860,6 +861,18 @@ export default function Home() {
  ================================================================ */}
         {profile && onboardStep === 'done' && (
           <>
+            {/* 현재 시간 기준 안내 — 목표 도착 시각 대비 현재 시각 상태 */}
+            <div className="mb-5">
+              <NowStatusCard
+                nowTimeString={nowTimeString}
+                targetArrival={targetArrival}
+                transitResult={recommendResult?.transit ?? null}
+                taxiEta={recommendResult?.taxi.vehicleEtaMinutes ?? null}
+                taxiFare={recommendResult?.taxi.taxiFare ?? null}
+                onEditProfile={editProfileHandler}
+              />
+            </div>
+
             {/* 전날 밤 추천 영역 */}
             {showNightBefore && nightBeforeResult && (
               <div className="mb-5">
@@ -871,34 +884,48 @@ export default function Home() {
               </div>
             )}
 
-            {/* 아침 재추천 영역 — 당신이 요구한 구조 */}
+            {/* 아침 재추천 영역 */}
             <div className="mb-5">
-              <DepartureControl
-                nowTimeString={nowTimeString}
-                departureInput={departureInput}
-                departureAdjusted={departureAdjusted}
-                recommendLoading={recommendLoading}
-                canRun={!profile || !homeCoords || !workCoords ? false : true}
-                onSetDepartureInput={setDepartureInput}
-                onSetDepartureAdjusted={setDepartureAdjusted}
-                onRunRecommend={runRecommend}
-              />
-              <div >
-                <RecommendResultCard
-                  recommendResult={recommendResult}
-                  recommendError={recommendError}
-                  recommendLoading={recommendLoading}
-                  resultEmpty={!recommendResult && !recommendError && !recommendLoading}
-                  onEditProfile={editProfileHandler}
-                />
+              <div className={cn('flex', 'justify-between', 'items-center', 'mb-3')}>
+                <h2 className={cn('text-lg', 'font-semibold')}>내일 출발 추천</h2>
+                {recommendLoading && (
+                  <span className={cn('text-sm', 'text-muted-foreground')}>계산 중…</span>
+                )}
               </div>
-              {/* 전날 밤 추천 새로고침 (아직 표시 안 된 경우) */}
-              {!showNightBefore && profile && (
-                <div className="flex items-center gap-2 mt-3">
-                  <Button variant="outline" className="flex-1" onPress={() => refreshNightBefore(false)} isDisabled={recommendLoading}>
-                    {recommendLoading ? '새로고침 중…' : '전날 밤 추천 새로고침'}
-                  </Button>
-                  <span className="text-sm text-muted-foreground">오후 4시 이후 접속 시 자동으로 전날 밤 추천이 표시돼요.</span>
+              {recommendLoading ? (
+                <div className={cn('p-4', 'bg-surface-secondary', 'rounded-lg', 'text-center', 'text-sm', 'text-muted-foreground')}>
+                  지금 출발 기준을 계산하고 있어요…
+                </div>
+              ) : (
+                <div className={cn('flex', 'flex-col', 'gap-4')}>
+                  <DepartureControl
+                    nowTime={now}
+                    departureInput={departureInput}
+                    departureAdjusted={departureAdjusted}
+                    recommendLoading={recommendLoading}
+                    canRun={!profile || !homeCoords || !workCoords ? false : true}
+                    onSetDepartureInput={setDepartureInput}
+                    onSetDepartureAdjusted={setDepartureAdjusted}
+                    onRunRecommend={runRecommend}
+                  />
+                  <div>
+                    <RecommendResultCard
+                      recommendResult={recommendResult}
+                      recommendError={recommendError}
+                      recommendLoading={recommendLoading}
+                      resultEmpty={!recommendResult && !recommendError && !recommendLoading}
+                      onEditProfile={editProfileHandler}
+                    />
+                  </div>
+                  {/* 전날 밤 추천 새로고침 (아직 표시 안 된 경우) */}
+                  {!showNightBefore && profile && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <Button variant="outline" className="flex-1" onPress={() => refreshNightBefore(false)} isDisabled={recommendLoading}>
+                        {recommendLoading ? '새로고침 중…' : '전날 밤 추천 새로고침'}
+                      </Button>
+                      <span className="text-sm text-muted-foreground">오후 4시 이후 접속 시 자동으로 전날 밤 추천이 표시돼요.</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

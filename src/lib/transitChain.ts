@@ -30,6 +30,9 @@ export async function transitChain(
     };
   }
 
+  // ODsay 실패 — 실패 사유를 기록(운영 확인용)
+  logTransitFailure('odsay', odsay);
+
   // 2) ODsay 실패 시 카카오맵 REST 대중교통 존재 확인 + 길찾기 링크 확보
   const kakao = await kakaoTransitTrip(startX, startY, endX, endY);
   if (kakao.ok && kakao.data?.exists) {
@@ -43,6 +46,9 @@ export async function transitChain(
     };
   }
 
+  // 카카오맵 실패 — 실패 사유를 기록(운영 확인용)
+  logTransitFailure('kakao', kakao);
+
   // 3) 모두 실패 → 실시간 정보 없음 (추정치 금지)
   return {
     durationMinutes: null,
@@ -51,4 +57,10 @@ export async function transitChain(
     source: 'none',
     note: '실시간 대중교통 정보를 가져올 수 없습니다.',
   };
+}
+
+function logTransitFailure(step: 'odsay' | 'kakao', result: { ok: boolean; error?: string; fallback?: boolean }) {
+  if (result.ok) return;
+  // 운영 확인용 기록: 브라우저 콘솔에 남기되, 민감 정보(키 값 등)는 포함하지 않음
+  console.warn(`[transitChain] ${step} 단계 실패: ${result.error ?? '알 수 없는 실패'} (fallback=${result.fallback})`);
 }

@@ -2,10 +2,15 @@
 
 .departureControlArea {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
+}
+
+.departureNowRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
 }
 
 .departureNowLabel {
@@ -17,6 +22,33 @@
   font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.departureRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.departureTimeField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 auto;
+  min-width: 220px;
+}
+
+.departureTimeLabel {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.departureTimeValue {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
   font-variant-numeric: tabular-nums;
 }
 
@@ -32,18 +64,6 @@
   font-size: var(--font-size-sm);
 }
 
-.departureTimeField {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-
-.departureTimeLabel {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-}
-
 .departureTimeHint {
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
@@ -52,10 +72,16 @@
 }
 
 .calcButtonRow {
-  margin-top: var(--space-4);
   width: 100%;
 }
 
 .recommendPrimaryButton {
+  width: 100%;
+}
+
+.departureAdjustedHint {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-1);
   width: 100%;
 }

@@ -4,8 +4,30 @@ import { Button, TimeField } from '@heroui/react';
 import { parseTime } from '@internationalized/date';
 import styles from './DepartureControl.module.css';
 
+function pad2(n: number): string {
+  return String(n).padStart(2, '0');
+}
+
+function hhmmToMinutes(t: string): number {
+  if (!t) return 0;
+  const [h, m] = t.split(':').map(Number);
+  if (!Number.isFinite(h ?? 0) || !Number.isFinite(m ?? 0)) return 0;
+  return (h ?? 0) * 60 + (m ?? 0);
+}
+
+function minutesToHhmm(m: number): string {
+  const total = Math.round(m) % (24 * 60);
+  const h = Math.floor(total / 60);
+  const min = total % 60;
+  return `${pad2(h)}:${pad2(min)}`;
+}
+
+function formatNowForDisplay(date: Date): string {
+  return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
 interface DepartureControlProps {
-  nowTimeString: string;
+  nowTime: Date;
   departureInput: string;
   departureAdjusted: boolean;
   recommendLoading: boolean;
@@ -16,7 +38,7 @@ interface DepartureControlProps {
 }
 
 export function DepartureControl({
-  nowTimeString,
+  nowTime,
   departureInput,
   departureAdjusted,
   recommendLoading,
@@ -25,83 +47,23 @@ export function DepartureControl({
   onSetDepartureAdjusted,
   onRunRecommend,
 }: DepartureControlProps) {
+  const nowDisplay = formatNowForDisplay(nowTime);
+  const departureDisplay = departureInput
+    ? formatDepartureDisplay(departureInput)
+    : '';
+
   return (
     <div className={styles.departureControlArea}>
       {/* 현재 시각 */}
-      <span className={styles.departureNowLabel}>현재 시각:</span>
-      <span className={styles.departureNowTime}>{nowTimeString}</span>
-
-      {/* 시간 조정 버튼들 */}
-      <div className={styles.departureChipRow}>
-        <Button
-          variant="ghost"
-          onPress={() => {
-            onSetDepartureInput('');
-            onSetDepartureAdjusted(false);
-          }}
-          isDisabled={recommendLoading}
-        >
-          지금
-        </Button>
-        <Button
-          variant="ghost"
-          onPress={() => {
-            if (!departureInput) {
-              const now = new Date();
-              onSetDepartureInput(`${pad2(now.getHours())}:${pad2(now.getMinutes())}`);
-              onSetDepartureAdjusted(true);
-            }
-          }}
-          isDisabled={recommendLoading}
-        >
-          현재 시각 입력
-        </Button>
-        <span className={styles.departureChipSeparator}>|</span>
-        <Button
-          variant="ghost"
-          onPress={() => {
-            const base = departureInput
-              ? hhmmToMinutes(departureInput)
-              : new Date().getHours() * 60 + new Date().getMinutes();
-            onSetDepartureInput(minutesToHhmm(base + 5));
-            onSetDepartureAdjusted(true);
-          }}
-          isDisabled={recommendLoading}
-        >
-          +5분
-        </Button>
-        <Button
-          variant="ghost"
-          onPress={() => {
-            const base = departureInput
-              ? hhmmToMinutes(departureInput)
-              : new Date().getHours() * 60 + new Date().getMinutes();
-            onSetDepartureInput(minutesToHhmm(base + 10));
-            onSetDepartureAdjusted(true);
-          }}
-          isDisabled={recommendLoading}
-        >
-          +10분
-        </Button>
-        <Button
-          variant="ghost"
-          onPress={() => {
-            const base = departureInput
-              ? hhmmToMinutes(departureInput)
-              : new Date().getHours() * 60 + new Date().getMinutes();
-            onSetDepartureInput(minutesToHhmm(base - 5));
-            onSetDepartureAdjusted(true);
-          }}
-          isDisabled={recommendLoading}
-        >
-          -5분
-        </Button>
+      <div className={styles.departureNowRow}>
+        <span className={styles.departureNowLabel}>현재 시각</span>
+        <span className={styles.departureNowTime}>{nowDisplay}</span>
       </div>
 
-      {/* 출발 시각 TimeField */}
-      {departureInput && (
+      {/* 출발 시각 + 시간 조절 버튼 */}
+      <div className={styles.departureRow}>
         <div className={styles.departureTimeField}>
-          <span className={styles.departureTimeLabel}>출발 시각:</span>
+          <span className={styles.departureTimeLabel}>출발 시각</span>
           <TimeField
             value={departureInput ? parseTime(departureInput) : null}
             onChange={(timeValue) =>
@@ -119,8 +81,75 @@ export function DepartureControl({
               </TimeField.Input>
             </TimeField.Group>
           </TimeField>
+          <span className={styles.departureTimeValue}>{departureDisplay}</span>
         </div>
-      )}
+
+        <div className={styles.departureChipRow}>
+          <Button
+            variant="ghost"
+            onPress={() => {
+              onSetDepartureInput('');
+              onSetDepartureAdjusted(false);
+            }}
+            isDisabled={recommendLoading}
+          >
+            지금
+          </Button>
+          <Button
+            variant="ghost"
+            onPress={() => {
+              if (!departureInput) {
+                onSetDepartureInput(minutesToHhmm(nowToMinutes(nowTime)));
+                onSetDepartureAdjusted(true);
+              }
+            }}
+            isDisabled={recommendLoading}
+          >
+            현재 시각 입력
+          </Button>
+          <span className={styles.departureChipSeparator}>|</span>
+          <Button
+            variant="ghost"
+            onPress={() => {
+              const base = departureInput
+                ? hhmmToMinutes(departureInput)
+                : nowToMinutes(nowTime);
+              onSetDepartureInput(minutesToHhmm(base + 5));
+              onSetDepartureAdjusted(true);
+            }}
+            isDisabled={recommendLoading}
+          >
+            +5분
+          </Button>
+          <Button
+            variant="ghost"
+            onPress={() => {
+              const base = departureInput
+                ? hhmmToMinutes(departureInput)
+                : nowToMinutes(nowTime);
+              onSetDepartureInput(minutesToHhmm(base + 10));
+              onSetDepartureAdjusted(true);
+            }}
+            isDisabled={recommendLoading}
+          >
+            +10분
+          </Button>
+          <Button
+            variant="ghost"
+            onPress={() => {
+              const base = departureInput
+                ? hhmmToMinutes(departureInput)
+                : nowToMinutes(nowTime);
+              onSetDepartureInput(minutesToHhmm(base - 5));
+              onSetDepartureAdjusted(true);
+            }}
+            isDisabled={recommendLoading}
+          >
+            -5분
+          </Button>
+        </div>
+      </div>
+
       <p className={styles.departureTimeHint}>
         출발 시각을 바꾸면 비교표가 다시 계산돼요.
       </p>
@@ -136,28 +165,28 @@ export function DepartureControl({
           {recommendLoading
             ? '계산 중…'
             : departureAdjusted
-              ? '출발 시각 조정됨 — 계산'
+              ? '새로운 출발 시각으로 계산'
               : '지금 출발 계산'}
         </Button>
       </div>
+
+      <p className={styles.departureAdjustedHint}>
+        {departureAdjusted && !recommendLoading
+          ? '출발 시각을 바꾸셨다면 위 버튼으로 다시 계산해주세요.'
+          : '출발 시각을 바꾸면 비교표가 다시 계산돼요.'}
+      </p>
     </div>
   );
 }
 
-function pad2(n: number): string {
-  return String(n).padStart(2, '0');
+function nowToMinutes(now: Date): number {
+  return now.getHours() * 60 + now.getMinutes();
 }
 
-function hhmmToMinutes(t: string): number {
-  if (!t) return 0;
-  const [h, m] = t.split(':').map(Number);
-  if (!Number.isFinite(h ?? 0) || !Number.isFinite(m ?? 0)) return 0;
-  return (h ?? 0) * 60 + (m ?? 0);
-}
-
-function minutesToHhmm(m: number): string {
-  const total = Math.round(m) % (24 * 60);
-  const h = Math.floor(total / 60);
-  const min = total % 60;
-  return `${pad2(h)}:${pad2(min)}`;
+function formatDepartureDisplay(input: string): string {
+  const d = new Date();
+  const [h, m] = input.split(':').map((s) => parseInt(s, 10));
+  if (!Number.isFinite(h ?? 0) || !Number.isFinite(m ?? 0)) return input;
+  d.setHours(h ?? 0, m ?? 0, 0, 0);
+  return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
 }
