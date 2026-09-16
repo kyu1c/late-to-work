@@ -137,16 +137,23 @@ async function searchAddress(query: string, preferAddress = false): Promise<{ ok
 }
 
 async function fetchRecommend(body: Record<string, unknown>): Promise<{ ok: boolean; result?: RecommendResponse; error?: string }> {
-  const res = await fetch('/api/recommend', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!data.ok) {
-    return { ok: false, error: data.error };
+  try {
+    const res = await fetch('/api/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      return { ok: false, error: data.error };
+    }
+    return { ok: true, result: data.result };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : '추천 API 호출 중 오류가 발생했습니다.',
+    };
   }
-  return { ok: true, result: data.result };
 }
 
 async function fetchNightBefore(body: Record<string, unknown>): Promise<{ ok: boolean; result?: NightBeforeResponse; error?: string }> {
