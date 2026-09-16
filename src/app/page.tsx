@@ -177,16 +177,23 @@ async function fetchRecommend(body: Record<string, unknown>): Promise<{ ok: bool
 }
 
 async function fetchNightBefore(body: Record<string, unknown>): Promise<{ ok: boolean; result?: NightBeforeResponse; error?: string }> {
-  const res = await fetch('/api/night-before', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!data.ok) {
-    return { ok: false, error: data.error };
+  try {
+    const res = await fetch('/api/night-before', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      return { ok: false, error: data.error };
+    }
+    return { ok: true, result: data.result };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : '밤 추천 API 호출 중 오류가 발생했습니다.',
+    };
   }
-  return { ok: true, result: data.result };
 }
 
 // ---------------------------------------------------------------------------
@@ -373,7 +380,6 @@ export default function Home() {
       return;
     }
     setRecommendResult(res.result!);
-    console.log('[runRecommend] 성공:', res.result ? 'result 있음' : 'result null');
   }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, departureInput, resolveCoords]);
 
   // 프로필 완료(done) 상태 진입 시 자동 추천 실행
@@ -944,7 +950,7 @@ export default function Home() {
 
             {/* 아침 재추천 영역 */}
             <div className="mb-5">
-              {/* ── 상단: 현재 시각 / 목표 도착 / 잔여 시간 (공통) ── */}
+              {/* ── 상단: 현재 시각 / 목표 도착 / 잔여 시간 (공통, 항상 표시) ── */}
               <div className="p-4 bg-surface-secondary rounded-lg mb-4">
                 <div className="flex flex-col gap-1 text-sm">
                   <div className="flex items-center gap-2">
@@ -958,7 +964,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* ── 상태별 안내 ── */}
+              {/* ── 상태별 안내 + 내용 ── */}
               {morningStatus === 'after-workhours' && (
                 <Card className="w-full">
                   <Card.Content className="flex flex-col gap-3 p-4 text-center">
@@ -973,49 +979,120 @@ export default function Home() {
 
               {morningStatus === 'late-should-adjust' && (
                 <>
-                  {/* 출근 시간 이후 안내 */}
+                  {/* 출근 시간 이후 안내 + 택시 vs 대중교통 비교 */}
                   <Card className="w-full">
-                    <Card.Content className="flex flex-col gap-3 p-4">
-                      <div className="flex items-center gap-2">
-                        <Alert status="warning" className="flex-1">
-                          <Alert.Indicator />
-                          <Alert.Content>
-                            <Alert.Title>출근 시간 이후입니다</Alert.Title>
-                            <Alert.Description>
-                              현재 시각({nowTimeString}) 기준 목표 도착({targetArrival})까지 약 {statusDiffMinutes}분 남았어요.
-                              출근 시간 이후라 평소처럼 출발하기엔 촉박할 수 있어요.
-                              그래도 출근이 필요하다면 아래 택시 정보를 참고하세요.
-                            </Alert.Description>
-                          </Alert.Content>
-                        </Alert>
-                      </div>
-                      {/* 택시 비교 요약 */}
-                      {recommendResult?.taxi && recommendResult.taxi.vehicleEtaMinutes != null && (
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div className="p-3 bg-surface-secondary rounded-md">
-                            <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 총 소요 시간</span>
-                            <p className="text-lg font-semibold mt-1">약 {recommendResult.comparison.taxi.totalMinutes}분</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              (이동 {recommendResult.taxi.vehicleEtaMinutes}분 + 준비 {recommendResult.comparison.taxi.prepMinutes}분)
-                            </p>
+                    <Card.Content className="flex flex-col gap-4 p-4">
+                      <Alert status="warning" className="w-full">
+                        <Alert.Indicator />
+                        <Alert.Content>
+                          <Alert.Title>출근 시간 이후입니다</Alert.Title>
+                          <Alert.Description>
+                            현재 시각({nowTimeString}) 기준 목표 도착({targetArrival})까지 약 {statusDiffMinutes}분 남았어요.
+                            출근 시간 이후라 평소처럼 출발하기엔 촉박할 수 있어요.
+                            그래도 출근이 필요하다면 아래 정보를 참고하세요.
+                          </Alert.Description>
+                        </Alert.Content>
+                      </Alert>
+
+                      {/* 택시 vs 대중교통 비교 (recommendResult 있을 때만) */}
+                      {recommendResult && (
+                        <>
+                          {/* 택시가 대중교통보다 빠른 시간 */}
+                          {recommendResult.comparison.faster === 'taxi' && recommendResult.comparison.fasterMinutes > 0 && (
+                            <div className="p-3 bg-surface-secondary rounded-md">
+                              <span className="text-xs text-muted-foreground uppercase tracking-wider">택시가 더 빠른 시간</span>
+                              <p className="text-lg font-semibold mt-1">약 {recommendResult.comparison.fasterMinutes}분</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                택시 {recommendResult.comparison.taxi.totalMinutes}분 vs 대중교통 {recommendResult.comparison.public.totalMinutes}분
+                              </p>
+                            </div>
+                          )}
+
+                          {/* 택시 총 소요 시간 + 도착 예상 */}
+                          {recommendResult.taxi && recommendResult.taxi.vehicleEtaMinutes != null && (
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                              <div className="p-3 bg-surface-secondary rounded-md">
+                                <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 총 소요 시간</span>
+                                <p className="text-lg font-semibold mt-1">약 {recommendResult.comparison.taxi.totalMinutes}분</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  (이동 {recommendResult.taxi.vehicleEtaMinutes}분 + 준비 {recommendResult.comparison.taxi.prepMinutes}분)
+                                </p>
+                              </div>
+                              <div className="p-3 bg-surface-secondary rounded-md">
+                                <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 이용 시 도착 예상</span>
+                                <p className="text-lg font-semibold mt-1">{recommendResult.comparison.taxi.arrivalTime}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  목표 도착 {targetArrival} 대비 {parseAmPmToMinutes(targetArrival) - parseAmPmToMinutes(recommendResult.comparison.taxi.arrivalTime) > 0 ? '더 일찍' : '늦게'} 도착
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 택시 예상 요금 */}
+                          {recommendResult.taxi?.taxiFare != null && (
+                            <div className="p-3 bg-surface-secondary rounded-md text-sm">
+                              <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 예상 요금</span>
+                              <p className="text-lg font-semibold mt-1">약 {recommendResult.taxi.taxiFare.toLocaleString('ko-KR')}원</p>
+                            </div>
+                          )}
+
+                          {/* 대중교통 vs 택시 비교 표 */}
+                          <div className="border-t border-border pt-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Label className="font-medium text-sm">대중교통 vs 택시 비교</Label>
+                            </div>
+                            <div className="text-sm">
+                              <div className="flex justify-between py-1 border-b border-border">
+                                <span>교통편</span>
+                                <span>출발 시각</span>
+                                <span>총 소요</span>
+                                <span>도착 예상</span>
+                                <span>출처</span>
+                              </div>
+                              <div className="flex justify-between py-1">
+                                <span>대중교통</span>
+                                <span>{toAmPm(recommendResult.comparison.public.departureTime)}</span>
+                                <span>약 {recommendResult.comparison.public.totalMinutes}분</span>
+                                <span>{toAmPm(recommendResult.comparison.public.arrivalTime)}</span>
+                                <span>{formatSource(recommendResult.transit.source, recommendResult.transit.note).label}</span>
+                              </div>
+                              <div className="flex justify-between py-1">
+                                <span>택시</span>
+                                <span>{toAmPm(recommendResult.comparison.taxi.departureTime)}</span>
+                                <span>약 {recommendResult.comparison.taxi.totalMinutes}분</span>
+                                <span>{toAmPm(recommendResult.comparison.taxi.arrivalTime)}</span>
+                                <span>{formatSource(recommendResult.taxi.source, recommendResult.taxi.note).label}</span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="p-3 bg-surface-secondary rounded-md">
-                            <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 이용 시 도착 예상</span>
-                            <p className="text-lg font-semibold mt-1">{recommendResult.comparison.taxi.arrivalTime}</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              목표 도착 {targetArrival} 대비 {parseAmPmToMinutes(targetArrival) - parseAmPmToMinutes(recommendResult.comparison.taxi.arrivalTime) > 0 ? '더 일찍' : '늦게'} 도착
-                            </p>
+
+                          {/* 출발 시한 안내 */}
+                          <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t border-border">
+                            <div className="p-3 bg-surface-secondary rounded-md">
+                              <span className="text-xs text-muted-foreground uppercase tracking-wider">대중교통</span>
+                              <p className="text-lg font-semibold mt-1">
+                                {formatLatestDeparture(recommendResult.comparison.latest.public.latestDeparture, 5, nowMinutesForStatus)}
+                              </p>
+                            </div>
+                            <div className="p-3 bg-surface-secondary rounded-md">
+                              <span className="text-xs text-muted-foreground uppercase tracking-wider">택시</span>
+                              <p className="text-lg font-semibold mt-1">
+                                {formatLatestDeparture(recommendResult.comparison.latest.taxi.latestDeparture, 5, nowMinutesForStatus)}
+                              </p>
+                            </div>
                           </div>
-                        </div>
+                        </>
                       )}
-                      {recommendResult?.taxi?.taxiFare != null && (
-                        <div className="p-3 bg-surface-secondary rounded-md text-sm">
-                          <span className="text-xs text-muted-foreground uppercase tracking-wider">택시 예상 요금</span>
-                          <p className="text-lg font-semibold mt-1">약 {recommendResult.taxi.taxiFare.toLocaleString('ko-KR')}원</p>
-                        </div>
+
+                      {/* 결과 없을 때 */}
+                      {!recommendResult && !recommendLoading && (
+                        <p className="text-sm text-muted-foreground text-center">
+                          아직 추천 결과가 없어요. 잠시 후 다시 확인해 주세요.
+                        </p>
                       )}
                     </Card.Content>
                   </Card>
+
                   {/* 출발 시각 조정용 DepartureControl */}
                   <Card className="w-full mt-4">
                     <Card.Content className="flex flex-col gap-4">
