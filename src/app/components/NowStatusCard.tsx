@@ -129,7 +129,7 @@ export function NowStatusCard({
         )}
 
         {/* ==== 2. 출근 전 가정: 대중교통 지각 여부 ==== */}
-        {status !== 'after-workhours' && (
+        {
           <div className="border-t border-border pt-3">
             <div className="flex items-center gap-2 mb-2">
               <Label className="font-medium text-sm">대중교통 지각 여부</Label>
@@ -162,7 +162,7 @@ export function NowStatusCard({
               </Description>
             )}
           </div>
-        )}
+        }
 
         {/* ==== 3. 대중교통 위험 시 택시 비교 정보 ==== */}
         {transit && transit.durationMinutes != null && comparison &&

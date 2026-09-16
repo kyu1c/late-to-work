@@ -300,6 +300,7 @@ export default function Home() {
   const runRecommend = useCallback(async () => {
     if (!profile) {
       setRecommendError('프로필이 없습니다. 프로필을 먼저 완료해주세요.');
+      setMessage('프로필이 없습니다. 프로필을 먼저 완료해주세요.');
       return;
     }
 
@@ -318,12 +319,15 @@ export default function Home() {
 
     if (!effectiveHomeCoords || !effectiveWorkCoords) {
       setRecommendError('집과 출근지 위치가 필요합니다. 프로필 수정에서 위치를 다시 선택해주세요.');
+      setMessage('집과 출근지 위치를 확인할 수 없습니다. 프로필을 수정해주세요.');
       return;
     }
     if (!targetArrival || !targetArrival.trim()) {
       setRecommendError('목표 도착 시각이 필요합니다. 프로필을 수정해주세요.');
+      setMessage('목표 도착 시각이 필요합니다. 프로필을 수정해주세요.');
       return;
     }
+    setMessage('추천을 계산하고 있어요…');
     setRecommendLoading(true);
     setRecommendError(null);
     setRecommendResult(null);
@@ -349,6 +353,7 @@ export default function Home() {
       return;
     }
     setRecommendResult(res.result!);
+    console.log('[runRecommend] 성공:', res.result ? 'result 있음' : 'result null');
   }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, departureInput, resolveCoords]);
 
   // runRecommend 성공 후 밤 추천도 함께 생성
