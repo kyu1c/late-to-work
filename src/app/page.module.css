@@ -1,793 +1,620 @@
-/* ========== 미정의 키 보강 (1단계 상단/하단 + 결과 + 밤새추천 + 온보딩 카드) ========== */
+/* page.module.css — page.tsx 전용 클래스만 유지 */
 
-/* ---- 다크모드 토글 ---- */
-.themeToggle {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+/* 페이지 루트 */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ---- 온보딩 카드 ---- */
-.onboardingCard {
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6) var(--space-4);
+  max-width: 720px;
+  margin: 0 auto;
   width: 100%;
 }
 
-/* ---- 프로필 카드 (상단) ---- */
-.profileCard {
-  width: 100%;
-}
-.profileCardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.profileCardTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--foreground, var(--foreground));
-}
-.profileCardContent {
-  padding: 0;
-}
-.profileEditButton {
-  margin-left: auto;
-}
-.profileRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.profileStrong {
-  font-weight: 600;
-  color: var(--foreground, var(--foreground));
-}
-.profileArrow {
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.profileClear {
-  margin-left: auto;
-}
-.profileAddress {
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-top: 6px;
-}
-.profileMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-@media (prefers-color-scheme: dark) {
-  .profileCardTitle {
-    color: var(--foreground);
-  }
-  .profileAddress {
-    color: var(--muted-foreground);
-  }
-  .profileStrong {
-    color: var(--foreground);
-  }
-  .profileArrow {
-    color: var(--muted-foreground);
-  }
-}
-.dark .profileCardTitle {
-  color: var(--foreground);
-}
-.dark .profileAddress {
-  color: var(--muted-foreground);
-}
-.dark .profileStrong {
-  color: var(--foreground);
-}
-.dark .profileArrow {
-  color: var(--muted-foreground);
+/* Intro */
+.intro {
+  text-align: center;
+  margin-bottom: var(--space-6);
 }
 
-/* ---- coordsWarning ---- */
+.introTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 var(--space-2);
+}
+
+.introSubtitle {
+  font-size: var(--font-size-base);
+  color: var(--muted-foreground);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* 저장된 정보 영역 */
+.storedInfoArea {
+  width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+/* 전날 밤 추천 영역 */
+.nightBeforeArea {
+  width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+/* 아침 재추천 영역 */
+.morningRecommendArea {
+  width: 100%;
+}
+
+/* coordsWarning */
 .coordsWarning {
-  width: 100%;
-  max-width: 420px;
-  padding: 10px 14px;
-  margin-top: 10px;
-  background: var(--destructive-subtle, var(--destructive-subtle));
-  border: 1px solid var(--destructive, var(--destructive-foreground));
-  border-radius: 10px;
-  color: var(--destructive-foreground, var(--destructive-foreground));
-  font-size: 13px;
-}
-@media (prefers-color-scheme: dark) {
-  .coordsWarning {
-    background: var(--destructive-subtle);
-    border-color: var(--destructive);
-    color: var(--destructive-foreground);
-  }
-}
-.dark .coordsWarning {
-  background: var(--destructive-subtle);
-  border-color: var(--destructive);
-  color: var(--destructive-foreground);
-}
-
-/* ---- 밤새 추천 카드 ---- */
-.nightBeforeCard {
-  width: 100%;
-}
-.nightBeforeHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-}
-.nightBeforeLabel {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.nightBeforeNote {
-  font-size: 13px;
-  color: var(--foreground, var(--foreground));
-  margin-top: 4px;
-}
-.nightBeforeDivider {
-  height: 1px;
-  background: var(--border, var(--border));
-  margin: 10px 0;
-}
-.nightBeforeBottom {
-  font-size: 12px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-top: 8px;
-}
-.nightBeforeTrigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-@media (prefers-color-scheme: dark) {
-  .nightBeforeLabel {
-    color: var(--muted-foreground);
-  }
-  .nightBeforeNote {
-    color: var(--foreground);
-  }
-  .nightBeforeDivider {
-    background: var(--border);
-  }
-  .nightBeforeBottom {
-    color: var(--muted-foreground);
-  }
-}
-.dark .nightBeforeLabel {
-  color: var(--muted-foreground);
-}
-.dark .nightBeforeNote {
-  color: var(--foreground);
-}
-.dark .nightBeforeDivider {
-  background: var(--border);
-}
-.dark .nightBeforeBottom {
-  color: var(--muted-foreground);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--destructive-subtle);
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius);
+  color: var(--destructive);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-3);
 }
 
-/* ---- 환영 카드 ---- */
+/* 환영 카드 */
 .welcomeCard {
   width: 100%;
 }
+
 .welcomeContent {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  gap: var(--space-3);
+  padding: var(--space-6);
   text-align: center;
 }
+
 .welcomeQuestion {
-  font-size: 17px;
+  font-size: var(--font-size-xl);
   font-weight: 600;
-  color: var(--foreground, var(--foreground));
+  color: var(--foreground);
   margin: 0;
 }
+
 .welcomeDesc {
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
   margin: 0;
   line-height: 1.5;
 }
+
+.profileSetupButton {
+  margin-top: var(--space-2);
+}
+
+/* 빠른 검색 영역 (비활성) */
+.quickSearchArea {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.quickSearchButton {
+  min-width: 160px;
+}
+
+.quickSearchHint {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+/* 밤새 추천 (기존 inline 스타일 — 이제 NightBeforeCard 컴포넌트 사용하므로 정리 대상) */
+.nightBeforeCard {
+  width: 100%;
+}
+
+.nightBeforeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.nightBeforeLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+.nightBeforeNote {
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+  margin-top: var(--space-1);
+}
+
+.nightBeforeDivider {
+  height: 1px;
+  background-color: var(--border);
+  margin: var(--space-3) 0;
+}
+
+.nightBeforeBottom {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+  margin-top: var(--space-2);
+}
+
+.nightBeforeTrigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+}
+
+/* 온보딩 카드 — 이제 OnboardingCard 컴포넌트에 있음 (잔여 클래스 정리) */
+.onboardingCard {
+  width: 100%;
+}
+
+/* 추천 영역 */
+.recommendArea {
+  width: 100%;
+}
+
+.recommendButtonArea {
+  width: 100%;
+  margin-top: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.recommendPrimaryButton {
+  min-width: 200px;
+}
+
+.departureTimeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.departureNowTime {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.departureChipRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.departureChipSeparator {
+  color: var(--muted-foreground);
+  padding: 0 var(--space-1);
+}
+
+.departureControlArea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-4);
+}
+
+.departureNowLabel {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+.departureTimeField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.departureTimeLabel {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+.departureTimeHint {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin: var(--space-2) 0 0;
+  text-align: center;
+}
+
+.calculateButtonArea {
+  margin-bottom: var(--space-4);
+}
+
+.resultArea {
+  padding: var(--space-4);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-height: 120px;
+}
+
+.resultEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+}
+
+/* 비교표 */
+.compareCard {
+  width: 100%;
+}
+
+.compareHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.muted {
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
+}
+
+.dataDisclaimer {
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--surface-secondary);
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border);
+}
+
+.weatherAlert {
+  margin-bottom: var(--space-3);
+}
+
+.weatherIcon {
+  margin-right: var(--space-1);
+}
+
+.compareTable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.compareRow {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 640px) {
+  .compareRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compareCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.compareLabel {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.compareSource {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+}
+
+.compareMuted {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+.conclusion {
+  padding: var(--space-4);
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  border-radius: var(--radius);
+  margin-top: var(--space-4);
+  text-align: center;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.actionItem {
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+.note {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-3);
+  line-height: 1.5;
+}
+
+.futureCard {
+  width: 100%;
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+}
+
+.futureHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+}
+
+.futureTable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.futureRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  background-color: var(--surface);
+  border-radius: var(--radius);
+}
+
+.futureCell {
+  font-size: var(--font-size-sm);
+}
+
+.futureNote {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-2);
+  line-height: 1.5;
+}
+
+/* 에러 */
+.errorText {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--destructive-subtle);
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius);
+  color: var(--destructive);
+  margin-top: var(--space-4);
+}
+
+.errorEditButton {
+  flex-shrink: 0;
+}
+
+/* 힌트 */
+.hint {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-top: var(--space-4);
+}
+
+/* 고급 설정 */
+.advancedCard {
+  width: 100%;
+  margin-top: var(--space-5);
+}
+
+.advancedToggle {
+  width: 100%;
+}
+
+.advancedForm {
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+}
+
+/* 메시지 */
+.message {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-4);
+}
+
+/* API 정보 */
+.apiInfo {
+  width: 100%;
+  margin-top: var(--space-8);
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+}
+
+.apiInfoTitle {
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.apiInfoList {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.apiInfoNote {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+  margin-top: var(--space-2);
+  line-height: 1.5;
+}
+
+/* 택시 링크 버튼 */
+.taxiLinkButton {
+  margin-top: var(--space-2);
+}
+
+/* 밤새 추천 새로고침 */
+.nightBeforeTrigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}
+
+.secondaryButton {
+  /* 공통 보조 버튼 */
+}
+
+/* 다크모드 대응 */
 @media (prefers-color-scheme: dark) {
+  .coordsWarning {
+    background-color: var(--destructive-subtle);
+    border-color: var(--destructive);
+    color: var(--destructive);
+  }
   .welcomeQuestion {
     color: var(--foreground);
   }
   .welcomeDesc {
     color: var(--muted-foreground);
   }
-}
-.dark .welcomeQuestion {
-  color: var(--foreground);
-}
-.dark .welcomeDesc {
-  color: var(--muted-foreground);
-}
-
-/* ---- 메시지 / 힌트 / 에러 ---- */
-
-/* ---- 고급 설정 ---- */
-.advancedCard {
-  padding: 12px 0;
-}
-.advancedToggle {
-  width: 100%;
-}
-.advancedForm {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px 0;
-}
-.checkRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* ---- 결과 비교 영역 ---- */
-.compareCard {
-  width: 100%;
-}
-.compareHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border, var(--border));
-  margin-bottom: 10px;
-  gap: 8px;
-}
-.compareTable {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.compareRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border, var(--border));
-}
-.compareCell {
-  flex: 1 1 30%;
-  min-width: 120px;
-}
-.compareLabel {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.compareSource {
-  font-size: 11px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-top: 2px;
-}
-.conclusion {
-  padding: 12px 14px;
-  background: var(--surface-secondary, var(--surface-secondary));
-  border-radius: 10px;
-  font-size: 14px;
-  color: var(--foreground, var(--foreground));
-  margin-top: 10px;
-}
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
-}
-.actionItem {
-  padding: 10px 14px;
-  background: var(--surface-secondary, var(--surface-secondary));
-  border-radius: 8px;
-  font-size: 13px;
-  color: var(--foreground, var(--foreground));
-}
-.note {
-  font-size: 12px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-top: 10px;
-}
-.taxiLinkButton {
-  margin-top: 8px;
-  width: 100%;
-}
-@media (prefers-color-scheme: dark) {
-  .compareHeader {
-    border-bottom-color: var(--border);
-  }
-  .compareRow {
-    border-bottom-color: var(--border);
-  }
-  .compareLabel {
+  .quickSearchHint {
     color: var(--muted-foreground);
   }
-  .compareSource {
+  .nightBeforeLabel {
+    color: var(--muted-foreground);
+  }
+  .nightBeforeNote {
+    color: var(--foreground);
+  }
+  .nightBeforeBottom {
+    color: var(--muted-foreground);
+  }
+  .nightBeforeTrigger {
+    /* buttons handle themselves */
+  }
+  .compareHeader {
+    border-color: var(--border);
+  }
+  .dataDisclaimer {
+    background-color: var(--surface-secondary);
+    color: var(--muted-foreground);
+  }
+  .compareRow {
+    background-color: var(--surface-secondary);
+  }
+  .compareMuted {
     color: var(--muted-foreground);
   }
   .conclusion {
-    background: var(--surface-secondary);
-    color: var(--foreground);
+    background-color: var(--accent);
+    color: var(--accent-foreground);
   }
   .actionItem {
-    background: var(--surface-secondary);
-    color: var(--foreground);
+    background-color: var(--surface);
+    border-color: var(--border);
   }
   .note {
     color: var(--muted-foreground);
   }
-}
-.dark .compareHeader {
-  border-bottom-color: var(--border);
-}
-.dark .compareRow {
-  border-bottom-color: var(--border);
-}
-.dark .compareLabel {
-  color: var(--muted-foreground);
-}
-.dark .compareSource {
-  color: var(--muted-foreground);
-}
-.dark .conclusion {
-  background: var(--surface-secondary);
-  color: var(--foreground);
-}
-.dark .actionItem {
-  background: var(--surface-secondary);
-  color: var(--foreground);
-}
-.dark .note {
-  color: var(--muted-foreground);
-}
-
-/* ---- 미래 운행 정보 ---- */
-.futureNote {
-  font-size: 12px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-top: 10px;
-}
-.dataDisclaimer {
-  font-size: 11px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-top: 8px;
-}
-@media (prefers-color-scheme: dark) {
+  .futureCard {
+    background-color: var(--surface-secondary);
+  }
+  .futureRow {
+    background-color: var(--surface);
+  }
   .futureNote {
     color: var(--muted-foreground);
   }
-  .dataDisclaimer {
+  .errorText {
+    background-color: var(--destructive-subtle);
+    border-color: var(--destructive);
+    color: var(--destructive);
+  }
+  .hint {
+    background-color: var(--surface-secondary);
     color: var(--muted-foreground);
   }
-}
-.dark .futureNote {
-  color: var(--muted-foreground);
-}
-.dark .dataDisclaimer {
-  color: var(--muted-foreground);
-}
-
-/* ---- 날씨 알림 ---- */
-.weatherAlert {
-  margin: 0 12px 10px;
-}
-.weatherIcon {
-  font-size: 16px;
-}
-
-/* ---- 기타 ---- */
-
-/* ========== 미정의 키 보강 (온보딩 + 하단 + 결과 + API 정보) ========== */
-
-/* ---- 레이아웃 ---- */
-.page {
-  min-height: 100vh;
-  background: var(--background);
-}
-.serviceInfoBar {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  padding: 10px 14px;
-  background: var(--surface-secondary, var(--surface-secondary));
-  border: 1px solid var(--border, var(--border));
-  border-radius: 10px;
-  margin-bottom: 14px;
-  font-size: 12px;
-}
-.serviceInfoItem {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 120px;
-  flex: 1 1 120px;
-}
-.serviceInfoLabel {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.serviceInfoValue {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--foreground, var(--foreground));
-}
-@media (prefers-color-scheme: dark) {
-  .serviceInfoBar {
-    background: var(--surface-secondary);
-    border-color: var(--border);
+  .advancedForm {
+    background-color: var(--surface-secondary);
   }
-  .serviceInfoLabel {
-    color: var(--muted-foreground);
+  .message {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
   }
-  .serviceInfoValue {
-    color: var(--foreground);
-  }
-}
-.dark .serviceInfoBar {
-  background: var(--surface-secondary);
-  border-color: var(--border);
-}
-.dark .serviceInfoLabel {
-  color: var(--muted-foreground);
-}
-.dark .serviceInfoValue {
-  color: var(--foreground);
-}
-.main {
-  min-height: 100vh;
-  padding: 12px 16px;
-  max-width: 680px;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-@media (prefers-color-scheme: dark) {
-  .page {
-    background: var(--background);
-  }
-  .main {
-    background: var(--background);
-  }
-}
-.dark .page {
-  background: var(--background);
-}
-.dark .main {
-  background: var(--background);
-}
-
-/* ---- 온보딩 섹션 ---- */
-.onboardingSection {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 10px 0;
-  margin-bottom: 8px;
-}
-
-/* ---- 온보딩 2단 그리드 (집/출근지) ---- */
-.onboardingGrid2col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  width: 100%;
-}
-
-/* ---- 온보딩 필드 (공통) ---- */
-.onboardingField {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-/* ---- 검색 행 ---- */
-.searchRow {
-  display: flex;
-  gap: var(--space-3);
-  width: 100%;
-  align-items: stretch;
-  margin-top: 6px;
-}
-.searchInput {
-  flex: 1 1 auto;
-  min-width: 0;
-  width: 100%;
-}
-
-.searchButton {
-  flex: 0 0 auto;
-  min-width: 80px;
-  width: auto;
-}
-
-/* ---- 검색 중 스켈레톤 ---- */
-.searchSkeleton {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 4px 0;
-}
-
-/* ---- 이동 소요 예상 ---- */
-.moveEstimate {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--surface-secondary, var(--surface-secondary));
-  border: 1px dashed var(--border, var(--border));
-  margin-bottom: 8px;
-}
-.moveEstimateLabel {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.moveEstimateValue {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--foreground, var(--foreground));
-}
-.moveEstimateHelp {
-  font-size: 12px;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-@media (prefers-color-scheme: dark) {
-  .moveEstimate {
-    background: var(--surface-secondary, var(--surface-secondary));
-    border-color: var(--border, var(--border));
-  }
-  .moveEstimateLabel {
-    color: var(--muted-foreground, var(--muted-foreground));
-  }
-  .moveEstimateValue {
-    color: var(--foreground, var(--foreground));
-  }
-  .moveEstimateHelp {
-    color: var(--muted-foreground, var(--muted-foreground));
-  }
-}
-.dark .moveEstimate {
-  background: var(--surface-secondary, var(--surface-secondary));
-  border-color: var(--border, var(--border));
-}
-.dark .moveEstimateLabel {
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.dark .moveEstimateValue {
-  color: var(--foreground, var(--foreground));
-}
-.dark .moveEstimateHelp {
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-
-/* ---- 필드 ---- */
-.fieldHelp {
-  font-size: 12px;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-@media (prefers-color-scheme: dark) {
-  .fieldHelp {
-    color: var(--muted-foreground, var(--muted-foreground));
-  }
-}
-.dark .fieldHelp {
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-
-/* ---- 하단 네비 버튼 ---- */
-.nextButton {
-  flex: 1 1 auto;
-  height: 50px;
-  font-size: 15px;
-  font-weight: 600;
-}
-.primaryButton {
-  flex: 1 1 auto;
-  height: 50px;
-  font-size: 15px;
-  font-weight: 600;
-}
-.backButton {
-  flex: 1 1 auto;
-  height: 50px;
-  font-size: 15px;
-  font-weight: 600;
-}
-.secondaryButton {
-  flex: 1 1 auto;
-  height: 50px;
-  font-size: 15px;
-  font-weight: 600;
-}
-.onboardingNav {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 14px;
-}
-.onboardingNav button {
-  flex: 1 1 0;
-  min-width: 0;
-}
-@media (prefers-color-scheme: dark) {
-  .nextButton,
-  .primaryButton,
-  .backButton,
-  .secondaryButton {
-    height: 50px;
-    font-size: 15px;
-  }
-}
-.dark .nextButton,
-.dark .primaryButton,
-.dark .backButton,
-.dark .secondaryButton {
-  height: 50px;
-  font-size: 15px;
-}
-
-/* ---- 선호 교통수단 Select ---- */
-
-/* ---- 집 주소 표시 ---- */
-.homeAddressDisplay {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--surface-secondary, var(--surface-secondary));
-  border: 1px solid var(--border, var(--border));
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-bottom: 12px;
-}
-.homeAddressDisplay strong {
-  color: var(--foreground, var(--foreground));
-  font-weight: 600;
-}
-.homeAddressDisplayDefault {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--surface-secondary, var(--surface-secondary));
-  border: 1px dashed var(--border, var(--border));
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin-bottom: 12px;
-}
-@media (prefers-color-scheme: dark) {
-  .homeAddressDisplay {
-    background: var(--surface-secondary, var(--surface-secondary));
-    border-color: var(--border, var(--border));
-    color: var(--muted-foreground, var(--muted-foreground));
-  }
-  .homeAddressDisplay strong {
-    color: var(--foreground, var(--foreground));
-  }
-}
-.dark .homeAddressDisplay {
-  background: var(--surface-secondary, var(--surface-secondary));
-  border-color: var(--border, var(--border));
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.dark .homeAddressDisplay strong {
-  color: var(--foreground, var(--foreground));
-}
-
-/* ---- 하단 추천 버튼 영역 ---- */
-.recommendButtonArea {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 14px;
-}
-.profileSetupButton {
-  width: 100%;
-  max-width: 320px;
-  margin: 0 auto;
-}
-.recommendPrimaryButton {
-  width: 100%;
-}
-.recommendArea {
-  width: 100%;
-}
-
-/* ---- 빠른 검색 영역 (프로필 없을 때) ---- */
-.quickSearchArea {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin-top: 14px;
-  padding: 16px;
-}
-.quickSearchButton {
-  width: 100%;
-  max-width: 280px;
-}
-.quickSearchHint {
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
-  margin: 0;
-  text-align: center;
-}
-@media (prefers-color-scheme: dark) {
-  .quickSearchHint {
-    color: var(--muted-foreground);
-  }
-}
-.dark .quickSearchHint {
-  color: var(--muted-foreground);
-}
-
-/* ---- API 정보 ---- */
-.apiInfo {
-  width: 100%;
-  margin-top: 20px;
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--surface);
-}
-.apiInfoTitle {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted-foreground);
-  margin-bottom: 8px;
-}
-.apiInfoList {
-  margin: 0 0 10px;
-  padding-left: 18px;
-  font-size: 12px;
-  color: var(--muted-foreground);
-  line-height: 1.6;
-}
-.apiInfoNote {
-  font-size: 11px;
-  color: var(--muted-foreground);
-  line-height: 1.5;
-  margin: 0;
-}
-@media (prefers-color-scheme: dark) {
   .apiInfo {
-    background: var(--surface-secondary);
-    border-color: var(--border);
-  }
-  .apiInfoTitle {
-    color: var(--muted-foreground);
+    background-color: var(--surface-secondary);
   }
   .apiInfoList {
     color: var(--muted-foreground);
@@ -796,176 +623,85 @@
     color: var(--muted-foreground);
   }
 }
-.dark .apiInfo {
-  background: var(--surface);
+
+.dark .coordsWarning {
+  background-color: var(--destructive-subtle);
+  border-color: var(--destructive);
+  color: var(--destructive);
+}
+.dark .welcomeQuestion {
+  color: var(--foreground);
+}
+.dark .welcomeDesc {
+  color: var(--muted-foreground);
+}
+.dark .quickSearchHint {
+  color: var(--muted-foreground);
+}
+.dark .nightBeforeLabel {
+  color: var(--muted-foreground);
+}
+.dark .nightBeforeNote {
+  color: var(--foreground);
+}
+.dark .nightBeforeBottom {
+  color: var(--muted-foreground);
+}
+.dark .compareHeader {
   border-color: var(--border);
 }
-.dark .apiInfoTitle {
+.dark .dataDisclaimer {
+  background-color: var(--surface-secondary);
   color: var(--muted-foreground);
+}
+.dark .compareRow {
+  background-color: var(--surface-secondary);
+}
+.dark .compareMuted {
+  color: var(--muted-foreground);
+}
+.dark .conclusion {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+.dark .actionItem {
+  background-color: var(--surface);
+  border-color: var(--border);
+}
+.dark .note {
+  color: var(--muted-foreground);
+}
+.dark .futureCard {
+  background-color: var(--surface-secondary);
+}
+.dark .futureRow {
+  background-color: var(--surface);
+}
+.dark .futureNote {
+  color: var(--muted-foreground);
+}
+.dark .errorText {
+  background-color: var(--destructive-subtle);
+  border-color: var(--destructive);
+  color: var(--destructive);
+}
+.dark .hint {
+  background-color: var(--surface-secondary);
+  color: var(--muted-foreground);
+}
+.dark .advancedForm {
+  background-color: var(--surface-secondary);
+}
+.dark .message {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+.dark .apiInfo {
+  background-color: var(--surface-secondary);
 }
 .dark .apiInfoList {
   color: var(--muted-foreground);
 }
 .dark .apiInfoNote {
   color: var(--muted-foreground);
-}
-
-/* ---- 미래 운행 정보 ---- */
-.futureCard {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px;
-  background: var(--surface);
-}
-.futureHeader {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--foreground);
-}
-.futureTable {
-  display: grid;
-  gap: 8px;
-  margin-top: 10px;
-}
-.futureRow {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 8px;
-  align-items: center;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-}
-.futureCell {
-  font-size: 13px;
-  color: var(--foreground);
-}
-@media (prefers-color-scheme: dark) {
-  .futureCard {
-    background: var(--surface-secondary);
-    border-color: var(--border);
-  }
-  .futureHeader {
-    color: var(--foreground);
-  }
-  .futureRow {
-    background: var(--surface-secondary);
-    border-color: var(--border);
-  }
-  .futureCell {
-    color: var(--foreground);
-  }
-}
-.dark .futureCard {
-  background: var(--surface-secondary);
-  border-color: var(--border);
-}
-.dark .futureHeader {
-  color: var(--foreground);
-}
-.dark .futureRow {
-  background: var(--surface-secondary);
-  border-color: var(--border);
-}
-.dark .futureCell {
-  color: var(--foreground);
-}
-
-/* ---- coordsWarning 편집 버튼 ---- */
-.coordsWarningEditBtn {
-  margin-left: auto;
-  color: var(--accent, var(--accent));
-  font-size: 13px;
-}
-.coordsWarningEditBtn:hover {
-  color: var(--accent-foreground, var(--surface));
-}
-@media (prefers-color-scheme: dark) {
-  .coordsWarningEditBtn {
-    color: var(--accent);
-  }
-  .coordsWarningEditBtn:hover {
-    color: var(--accent-hover);
-  }
-}
-.dark .coordsWarningEditBtn {
-  color: var(--accent);
-}
-.dark .coordsWarningEditBtn:hover {
-  color: var(--accent-foreground);
-}
-
-.onboardingSteps {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.onboardingTabList {
-  width: 100%;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.onboardingNav {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-  width: 100%;
-}
-.onboardingNav button {
-  flex: 1 1 0;
-  min-width: 0;
-}
-.cancelButton {
-  flex: 0 1 auto;
-  min-width: 100px;
-}
-
-
-/* ---- 선택된 주소 표시 (입력창 위, 기본 상태 포함) ---- */
-.selectedAddressBox {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--surface-secondary, var(--surface-secondary));
-  border: 1px solid var(--border, var(--border));
-  margin: 8px 0 12px;
-  width: 100%;
-}
-.selectedAddressBoxDefault {
-  font-size: 13px;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-.selectedAddressBoxName {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--foreground, var(--foreground));
-}
-.selectedAddressBoxAddr {
-  font-size: 12px;
-  color: var(--muted-foreground, var(--muted-foreground));
-}
-
-.dark .cancelButtonMain {
-  color: var(--foreground);
-  background: var(--surface-secondary);
-  border-color: var(--border);
-}
-.dark .cancelButtonMain:hover {
-  background: var(--default);
 }

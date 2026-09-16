@@ -1,7 +1,25 @@
 'use client';
 
 import { useState } from 'react';
-import { Tabs, ListBox, Label, Description, Input, Button, Fieldset, Alert, Skeleton, Select, SelectTrigger, SelectValue, SelectPopover, TimeField, NumberField, Separator, Card } from '@heroui/react';
+import {
+  Tabs,
+  ListBox,
+  Label,
+  Description,
+  Input,
+  Button,
+  Fieldset,
+  Alert,
+  Skeleton,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectPopover,
+  TimeField,
+  NumberField,
+  Separator,
+  Card,
+} from '@heroui/react';
 import { cn } from '@heroui/styles';
 import { parseTime } from '@internationalized/date';
 import styles from './OnboardingCard.module.css';
@@ -86,6 +104,17 @@ export function OnboardingCard({
   recommendResult,
   className,
 }: OnboardingCardProps) {
+  // 이동 소요 예상 계산: recommendResult의 transit.durationMinutes 우선, 없으면 usualTransitMinutes
+  const transitEstimate = (() => {
+    if (recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.transit.durationMinutes > 0) {
+      return { value: recommendResult.transit.durationMinutes, source: recommendResult.transit.source };
+    }
+    if (typeof usualTransitMinutes === 'number' && usualTransitMinutes > 0) {
+      return { value: usualTransitMinutes, source: '입력한 평소 소요 시간' };
+    }
+    return null;
+  })();
+
   return (
     <Card className={className ?? styles.onboardingCard}>
       <div className={styles.onboardingSteps}>
@@ -113,12 +142,14 @@ export function OnboardingCard({
         </Tabs>
       </div>
 
+      {/* ============ Step 1: 집 위치 ============ */}
       {onboardStep === 'home' && (
         <div className={styles.onboardingGrid2col}>
           <div className={styles.onboardingField}>
             <Fieldset>
               <Fieldset.Legend>집 위치 (검색 후 선택)</Fieldset.Legend>
               <Description>입력 후 검색을 누르면 결과가 아래에 떠요. 원하는 장소를 선택하세요.</Description>
+              {/* 선택된 집 표시 영역 — 항상 노출, 기본 "(선택되지 않음)" */}
               <div className={styles.selectedAddressBox}>
                 {selectedHome ? (
                   <>
@@ -196,6 +227,66 @@ export function OnboardingCard({
               ) : null}
             </Fieldset>
           </div>
+
+          {/* 출근지 위치 필드는 Step 1에서는 비활성화 상태로만 표시 (실제로는 Step 2에서 편집) */}
+          <div className={styles.onboardingField}>
+            <Fieldset>
+              <Fieldset.Legend>출근지 위치 (다음 단계에서 설정)</Fieldset.Legend>
+              <Description>다음 단계에서 출근지 위치를 검색·선택할 수 있어요.</Description>
+              <div className={styles.selectedAddressBox}>
+                {selectedWork ? (
+                  <>
+                    <span className={styles.selectedAddressBoxName}>{selectedWork.name}</span>
+                    <span className={styles.selectedAddressBoxAddr}>{selectedWork.address}</span>
+                  </>
+                ) : (
+                  <span className={styles.selectedAddressBoxDefault}>(아직 선택되지 않음)</span>
+                )}
+              </div>
+            </Fieldset>
+          </div>
+
+          <div className={styles.onboardingNav}>
+            <Button
+              variant="ghost"
+              className={styles.cancelButtonMain}
+              onPress={cancelOnboarding}
+            >
+              메인 화면으로
+            </Button>
+            <Button
+              className={styles.nextButton}
+              variant="primary"
+              onPress={() => { setSearchQuery(''); setOnboardStep('work'); }}
+              isDisabled={!selectedHome}
+            >
+              다음: 출근지 위치
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ============ Step 2: 출근지 위치 ============ */}
+      {onboardStep === 'work' && (
+        <div className={styles.onboardingGrid2col}>
+          {/* 집 위치 — 읽기 전용으로 표시 */}
+          <div className={styles.onboardingField}>
+            <Fieldset>
+              <Fieldset.Legend>집 위치 (설정 완료)</Fieldset.Legend>
+              <Description>집 위치가 설정되었어요. 수정하려면 이전 단계로 돌아가세요.</Description>
+              <div className={styles.selectedAddressBox}>
+                {selectedHome ? (
+                  <>
+                    <span className={styles.selectedAddressBoxName}>{selectedHome.name}</span>
+                    <span className={styles.selectedAddressBoxAddr}>{selectedHome.address}</span>
+                  </>
+                ) : (
+                  <span className={styles.selectedAddressBoxDefault}>(선택되지 않음)</span>
+                )}
+              </div>
+            </Fieldset>
+          </div>
+
           <div className={styles.onboardingField}>
             <Fieldset>
               <Fieldset.Legend>출근지 위치 (검색 후 선택)</Fieldset.Legend>
@@ -277,6 +368,7 @@ export function OnboardingCard({
               ) : null}
             </Fieldset>
           </div>
+
           <div className={styles.onboardingNav}>
             <Button
               variant="ghost"
@@ -288,7 +380,7 @@ export function OnboardingCard({
             <Button
               className={styles.nextButton}
               variant="primary"
-              onPress={() => { setSearchQuery(''); setOnboardStep('work'); }}
+              onPress={() => { setSearchQuery(''); setOnboardStep('time'); }}
               isDisabled={!selectedHome || !selectedWork}
             >
               다음: 목표 도착 시각
@@ -297,6 +389,7 @@ export function OnboardingCard({
         </div>
       )}
 
+      {/* ============ Step 3: 목표 도착 시각 + 선호 교통수단 ============ */}
       {onboardStep === 'time' && (
         <div className={styles.onboardingGrid2col}>
           <div className={styles.onboardingField}>
@@ -345,12 +438,13 @@ export function OnboardingCard({
           <div className={styles.onboardingNav}>
             <Button variant="outline" className={styles.backButton} onPress={() => setOnboardStep('work')}>뒤로</Button>
             <Button variant="primary" className={styles.nextButton} onPress={() => setOnboardStep('prefs')}>
-              다음: 선호 교통수단
+              다음: 이동 소요 예상
             </Button>
           </div>
         </div>
       )}
 
+      {/* ============ Step 4: 이동 소요 예상 + 평소 평균 소요 시간 ============ */}
       {onboardStep === 'prefs' && (
         <div className={styles.onboardingGrid2col}>
           <div className={styles.onboardingField}>
@@ -381,15 +475,17 @@ export function OnboardingCard({
               <Description>이동 소요 예상은 대중교통 검색 결과 기준이에요. 평소 평균 소요 시간은 시·분 따로 입력할 수 있어요.</Description>
               <div className={styles.moveEstimate}>
                 <span className={styles.moveEstimateLabel}>이동 소요 예상</span>
-                {recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.transit.durationMinutes > 0 ? (
-                  <span className={styles.moveEstimateValue}>약 {recommendResult.transit.durationMinutes}분 (대중교통, {recommendResult.transit.source})</span>
-                ) : usualTransitMinutes ? (
-                  <span className={styles.moveEstimateValue}>약 {typeof usualTransitMinutes === 'number' ? usualTransitMinutes : 0}분 (입력한 평소 소요 시간 기준)</span>
+                {transitEstimate ? (
+                  <span className={styles.moveEstimateValue}>
+                    약 {transitEstimate.value}분 (대중교통, {transitEstimate.source})
+                  </span>
                 ) : (
-                  <span className={styles.moveEstimateHelp}>입력한 평소 소요 시간이 있으면 여기에 반영돼요.</span>
+                  <span className={styles.moveEstimateHelp}>
+                    아직 검색 결과가 없어요. 아래 평소 소요 시간을 입력하면 여기에 반영돼요.
+                  </span>
                 )}
               </div>
-              <Label>평소 평균 이동 소요 시간 — 시 (선택)</Label>
+              <Label className={styles.inputLabel}>평소 평균 이동 소요 시간 — 시 (선택)</Label>
               <NumberField
                 name="usualHours"
                 value={usualHours === '' ? undefined : usualHours}
@@ -401,7 +497,7 @@ export function OnboardingCard({
                   <NumberField.Input placeholder="예: 0" />
                 </NumberField.Group>
               </NumberField>
-              <Label>평소 평균 이동 소요 시간 — 분 (선택)</Label>
+              <Label className={styles.inputLabel}>평소 평균 이동 소요 시간 — 분 (선택)</Label>
               <NumberField
                 name="usualMinutes"
                 value={usualMinutes === '' ? undefined : usualMinutes}

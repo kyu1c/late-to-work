@@ -1,0 +1,172 @@
+/* OnboardingCard.module.css */
+
+.onboardingCard {
+  width: 100%;
+  margin-top: var(--space-4);
+}
+
+.onboardingSteps {
+  padding: var(--space-4) var(--space-4) 0 var(--space-4);
+}
+
+.onboardingTabs {
+  /* Tabs 커스텀 필요 시 */
+}
+
+.onboardingTabList {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-2);
+}
+
+.onboardingGrid2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  padding: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .onboardingGrid2col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.onboardingField {
+  display: flex;
+  flex-direction: column;
+}
+
+.selectedAddressBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface-secondary);
+  min-height: 60px;
+  margin-bottom: var(--space-3);
+}
+
+.selectedAddressBoxName {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.selectedAddressBoxAddr {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+.selectedAddressBoxDefault {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.searchRow {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.searchInput {
+  flex: 1;
+}
+
+.searchButton {
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.fieldError {
+  margin-top: var(--space-2);
+}
+
+.searchSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+}
+
+.skel {
+  height: 20px;
+  border-radius: var(--radius);
+}
+
+.result {
+  margin-top: var(--space-2);
+}
+
+.onboardingNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.cancelButtonMain {
+  flex: 0 0 auto;
+}
+
+.nextButton {
+  flex: 1 1 auto;
+}
+
+.backButton {
+  flex: 0 0 auto;
+}
+
+.primaryButton {
+  flex: 1 1 auto;
+}
+
+.timeField {
+  width: 100%;
+}
+
+.selectTrigger {
+  width: 100%;
+}
+
+.moveEstimate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-top: var(--space-2);
+}
+
+.moveEstimateLabel {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.moveEstimateValue {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.moveEstimateHelp {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.inputLabel {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--foreground);
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-1);
+}

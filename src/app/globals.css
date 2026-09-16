@@ -98,58 +98,560 @@
 }
 
 /* ==========================================================================
-   기본 스타일
+   영역 박스 스타일 (PRD v3 + 사용자 피드백 반영)
+   - 각 기능 영역이 박스에 딱 붙지 않도록 margin 추가
+   - 주소 입력창 등 입력 영역의 visibility 향상
    ========================================================================== */
 
-html {
-  height: 100%;
-  scroll-behavior: smooth;
+/* 영역 카드 래퍼 — 카드들 사이 margin */
+.area-card {
+  width: 100%;
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-6);
 }
 
-body {
-  min-height: 100%;
+/* 카드 내부 요소들 간 간격 보강 */
+.card-gap-top {
+  padding-top: var(--space-4);
+}
+
+.card-gap-bottom {
+  padding-bottom: var(--space-4);
+}
+
+/* 입력창 visibility 보강 — HeroUI Input 기본 스타일 위에 레이어 */
+.input-visible {
+  @apply border-2;
+  border-color: var(--border);
+  background-color: var(--surface);
+}
+
+.input-visible:focus,
+.input-visible[data-focused="true"] {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+/* 버튼 고정 사이즈 — "검색 중…" 등으로 텍스트가 변해도 width 유지 */
+.button-fixed {
+  min-width: 80px;
+  width: auto;
+}
+
+/* 선택된 주소 표시 박스 스타일 (기본값 포함) */
+.selected-address-box {
   display: flex;
   flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface-secondary);
+  min-height: 60px;
+}
+
+.selected-address-box-name {
+  font-weight: 600;
   color: var(--foreground);
-  background: var(--background);
-  font-family: inherit;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* HeroUI 컴포넌트와 혼용할 때만 사용할 프로젝트 전용 유틸리티 */
-.ut-muted {
+.selected-address-box-addr {
+  font-size: var(--font-size-sm);
   color: var(--muted-foreground);
 }
 
-.ut-surface-secondary {
-  background-color: var(--surface-secondary);
+.selected-address-box-default {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  font-style: italic;
 }
 
-/* 집중 영역 컨테이너 */
-.container-centered {
-  width: 100%;
-  max-width: 720px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--space-4);
-  padding-right: var(--space-4);
+/* 검색 Input + Button 행 */
+.search-row {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.search-row .search-input {
+  flex: 1;
+}
+
+.search-row .search-button {
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+/* 온보딩 네비게이션 행 — 버튼 양옆 배치, 가로 사이즈 배정 */
+.onboarding-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.onboarding-nav .cancel-button {
+  flex: 0 0 auto;
+}
+
+.onboarding-nav .next-button {
+  flex: 1 1 auto;
+}
+
+/* 필드 간격 */
+.onboarding-field {
+  margin-bottom: var(--space-5);
+}
+
+.onboarding-field:last-child {
+  margin-bottom: 0;
+}
+
+/* 2열 그리드 */
+.onboarding-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
 }
 
 @media (min-width: 640px) {
-  .container-centered {
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
+  .onboarding-grid-2col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* 이동 소요 예상 박스 */
+.move-estimate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-top: var(--space-2);
+}
+
+.move-estimate-label {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.move-estimate-value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.move-estimate-help {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+/* 입력 라벨 스타일 보강 */
+.input-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--foreground);
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+/* 필드셋 레전드 마진 */
+.fieldset-legend {
+  margin-bottom: var(--space-1);
+}
+
+/* ==========================================================================
+   메인 페이지 레이아웃
+   ========================================================================== */
+
+/* 저장 정보 카드 영역 */
+.stored-info-area {
+  margin-top: var(--space-6);
+}
+
+/* 전날 밤 추천 영역 */
+.night-before-area {
+  margin-top: var(--space-6);
+}
+
+/* 아침 재추천 (메인 서비스) 영역 */
+.morning-recommend-area {
+  margin-top: var(--space-6);
+}
+
+/* 비교표 카드 */
+.compare-card {
+  width: 100%;
+}
+
+/* 데이터 disclaimer 문구 */
+.data-disclaimer {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-3);
+}
+
+/* 날씨 알림 */
+.weather-alert {
+  margin-bottom: var(--space-3);
+}
+
+/* 비교표 */
+.compare-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 640px) {
+  .compare-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compare-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.compare-label {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.compare-source {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+}
+
+.compare-detail {
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+.compare-muted {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+/* 한 줄 결론 */
+.conclusion {
+  padding: var(--space-4);
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  border-radius: var(--radius);
+  margin-top: var(--space-4);
+  font-size: var(--font-size-lg);
+  text-align: center;
+}
+
+/* 행동 목록 */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+/* 참고 문구 */
+.note {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-3);
+  line-height: 1.5;
+}
+
+/* 미래 운행 정보 카드 */
+.future-card {
+  width: 100%;
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+}
+
+.future-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+}
+
+.future-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.future-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  background-color: var(--surface);
+  border-radius: var(--radius);
+}
+
+.future-cell {
+  font-size: var(--font-size-sm);
+}
+
+.future-note {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-3);
+  line-height: 1.5;
+}
+
+/* 에러 표시 */
+.error-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--destructive-subtle);
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius);
+  color: var(--destructive);
+  margin-top: var(--space-4);
+}
+
+.error-edit-button {
+  flex-shrink: 0;
+}
+
+/* 힌트 텍스트 */
+.hint {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-top: var(--space-4);
+}
+
+/* 고급 설정 */
+.advanced-card {
+  margin-top: var(--space-5);
+}
+
+.advanced-toggle {
+  margin-bottom: var(--space-3);
+}
+
+.advanced-form {
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* 체크박스 행 */
+.check-row {
+  display: flex;
+  align-items: center;
+}
+
+/* 메시지 */
+.message {
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  margin-top: var(--space-4);
+  text-align: center;
+  font-size: var(--font-size-sm);
+}
+
+/* ==========================================================================
+   아침 재추천 영역 — 당신이 요구한 구조
+   ========================================================================== */
+
+/* 현재 시각 + 시간 조정 영역 */
+.departure-control-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-4);
+}
+
+.departure-now-time {
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--foreground);
+}
+
+.departure-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.departure-time-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.departure-time-hint {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-1);
+}
+
+/* 바로 계산 버튼 */
+.calculate-button-area {
+  margin-bottom: var(--space-4);
+}
+
+/* 결과 영역 (빈 상태 포함) */
+.result-area {
+  padding: var(--space-4);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-height: 120px;
+}
+
+.result-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+}
+
+/* API 정보 */
+.api-info {
+  margin-top: var(--space-8);
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+}
+
+.api-info-title {
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.api-info-list {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.api-info-note {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+  margin-top: var(--space-2);
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   다크모드 대응 보강
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  .input-visible {
+    background-color: var(--surface);
+    border-color: var(--border);
+  }
+  .input-visible:focus {
+    border-color: var(--ring);
+  }
+  .selected-address-box {
+    background-color: var(--surface-secondary);
+    border-color: var(--border);
+  }
+  .search-row .search-button {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+  .move-estimate {
+    background-color: var(--surface-secondary);
+  }
+  .compare-row {
+    background-color: var(--surface);
+    border-color: var(--border);
+  }
+  .conclusion {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+  .action-item {
+    background-color: var(--surface);
+    border-color: var(--border);
+  }
+  .future-card {
+    background-color: var(--surface-secondary);
+  }
+  .future-row {
+    background-color: var(--surface);
+  }
+  .error-text {
+    background-color: var(--destructive-subtle);
+    border-color: var(--destructive);
+  }
+  .hint {
+    background-color: var(--surface-secondary);
+  }
+  .advanced-form {
+    background-color: var(--surface-secondary);
+  }
+  .result-area {
+    background-color: var(--surface);
+    border-color: var(--border);
+  }
+  .departure-control-area {
+    background-color: var(--surface-secondary);
   }
 }
