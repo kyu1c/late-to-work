@@ -19,6 +19,9 @@ import { NightBeforeCard } from './components/NightBeforeCard';
 import { DepartureControl } from './components/DepartureControl';
 import { RecommendResultCard } from './components/RecommendResultCard';
 import { transitChain } from '@/lib/transitChain';
+import { taxiChain } from '@/lib/taxiChain';
+import { kmaUltraShortSnapshot } from '@/lib/api/kma';
+import { NaviDirectionsParams } from '@/lib/api/navi';
 import type { Profile, AddressSearchResult, RecommendResponse, NightBeforeResponse } from '@/lib/types';
 
 // ---------------------------------------------------------------------------
@@ -444,6 +447,33 @@ export default function Home() {
     }
 
     setRecommendLoading(true);
+    // recommendResult가 없어도 coords만으로 transitChain/taxiChain을 직접 호출하여 값 생성
+    let transitDurationMinutes = recommendResult?.transit.durationMinutes;
+    let transitTransfers = recommendResult?.transit.transfers;
+    let transitDistanceMeters = recommendResult?.transit.distanceMeters;
+    let taxiVehicleEtaMinutes = recommendResult?.taxi.vehicleEtaMinutes;
+    let taxiFare = recommendResult?.taxi.taxiFare;
+    let isRaining = recommendResult?.weather?.isRaining ?? false;
+    if (!recommendResult || recommendResult.transit.durationMinutes == null || recommendResult.taxi.vehicleEtaMinutes == null) {
+      // transitChain 직접 호출
+      const transitRes = await transitChain(homeCoordsNow.x, homeCoordsNow.y, workCoordsNow.x, workCoordsNow.y);
+      transitDurationMinutes = transitRes.durationMinutes;
+      transitTransfers = transitRes.transfers;
+      transitDistanceMeters = transitRes.distanceMeters;
+      // taxiChain 직접 호출
+      const taxiParams: NaviDirectionsParams = {
+        originLon: homeCoordsNow.x,
+        originLat: homeCoordsNow.y,
+        destLon: workCoordsNow.x,
+        destLat: workCoordsNow.y,
+      };
+      const taxiRes = await taxiChain(taxiParams);
+      taxiVehicleEtaMinutes = taxiRes.vehicleEtaMinutes;
+      taxiFare = taxiRes.taxiFare;
+      // 날씨 정보: KMA 초단기예보는 서버 전용 API이므로 여기서는 false로 기본값 사용
+      // (night-before API 라우트에서 필요시 KMA 호출을 추가할 수 있음)
+      isRaining = false;
+    }
     const body: Record<string, unknown> = {
       startX: homeCoordsNow.x,
       startY: homeCoordsNow.y,
@@ -453,12 +483,12 @@ export default function Home() {
       sharedPrepMinutes: prepMinutes,
       taxiCallAddOn,
       taxiCallAddMinutes,
-      transitDurationMinutes: recommendResult?.transit.durationMinutes,
-      transitTransfers: recommendResult?.transit.transfers,
-      transitDistanceMeters: recommendResult?.transit.distanceMeters,
-      taxiVehicleEtaMinutes: recommendResult?.taxi.vehicleEtaMinutes,
-      taxiFare: recommendResult?.taxi.taxiFare,
-      isRaining: recommendResult?.weather?.isRaining ?? false,
+      transitDurationMinutes,
+      transitTransfers,
+      transitDistanceMeters,
+      taxiVehicleEtaMinutes,
+      taxiFare,
+      isRaining,
       weekday: new Date().getDay(),
       preferTransport: profile.preferredTransport,
     };
@@ -468,20 +498,17 @@ export default function Home() {
       if (!silent) showMessage('전날 밤 추천을 새로고침할 수 없습니다.');
       return;
     }
-    // PRD v3: 전날 밤 추천은 transitMinutes와 vehicleEta가 둘 다 있을 때만 생성
+    // recommendResult 유무와 관계없이, 위에서 transitChain/taxiChain을 직접 호출하여 값을 생성했으므로
+    // 응답 성공 시 바로 저장
     const nb = res.result!;
-    if (recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.taxi.vehicleEtaMinutes != null) {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      saveNightBefore(nb, `${yyyy}-${mm}-${dd}`);
-      setNightBeforeResult(nb);
-      setShowNightBefore(true);
-      if (!silent) showMessage('전날 밤 추천이 새로고침되었습니다.');
-    } else {
-      if (!silent) showMessage('전날 밤 추천은 실시간 교통 정보가 있을 때만 생성됩니다.');
-    }
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    saveNightBefore(nb, `${yyyy}-${mm}-${dd}`);
+    setNightBeforeResult(nb);
+    setShowNightBefore(true);
+    if (!silent) showMessage('전날 밤 추천이 새로고침되었습니다.');
   }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, recommendResult, showMessage, resolveCoords]);
 
   // 전날 밤 추천 자동 상태 관리
@@ -534,7 +561,7 @@ export default function Home() {
     if (homeCoords && workCoords) {
       showMessage('프로필이 저장되었습니다. 지금 출발 기준을 계산하고 있어요...');
       requestAnimationFrame(() => {
-        runRecommend();
+        runRecommendAndRefresh();
       });
     } else {
       showMessage('프로필이 저장되었습니다. 위치 정보를 다시 가져오는 중이에요...');

@@ -61,7 +61,6 @@ interface OnboardingCardProps {
   usualTransitMinutes: number | '';
   setUsualTransitMinutes: (v: number | '') => void;
   transitPreview: { durationMinutes: number | null; source: string } | null;
-
   doSearch: (query: string, preferAddress?: boolean, setter?: (r: AddressSearchResult | null) => void, coordSetter?: (c: { x: number; y: number } | null) => void) => void;
   cancelOnboarding: () => void;
   saveProfileHandler: () => void;
@@ -409,7 +408,7 @@ export function OnboardingCard({
 
             <Fieldset>
               <Fieldset.Legend>이동 소요 예상 / 평소 평균 소요 시간</Fieldset.Legend>
-              <Description>이동 소요 예상은 대중교통 검색 결과 기준이에요. 평소 평균 소요 시간은 시·분 따로 입력할 수 있어요.</Description>
+              <Description>이동 소요 예상은 대중교통 검색 결과 기준이에요. 평소 평균 소요 시간은 분 단위로 입력할 수 있어요.</Description>
               <div className="flex flex-col gap-1 p-3 bg-surface-secondary rounded-md mt-2">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">이동 소요 예상</span>
                 {transitEstimate ? (
@@ -429,7 +428,6 @@ export function OnboardingCard({
                 onChange={(value) => setUsualTransitMinutes(value ?? '')}
                 minValue={0}
                 maxValue={999}
-                description="이 구간을 평소 이동하는 데 걸리는 평균 시간이에요. 예: 40분"
               >
                 <NumberField.Group>
                   <NumberField.Input placeholder="예: 40" />

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Table } from '@heroui/react';
+import { Button, Table, ToggleButton } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import styles from './Header.module.css';
 
@@ -11,11 +11,12 @@ export function Header() {
   return (
     <>
       <div className={styles.themeToggle}>
-        <Button
+        <ToggleButton
           className={`${styles.themeButton} ${activeTheme === 'dark' ? styles.themeButtonDark : ''}`}
           variant="ghost"
           size="sm"
-          onPress={() => setTheme(activeTheme === 'dark' ? 'light' : 'dark')}
+          isSelected={activeTheme === 'dark'}
+          onChange={() => setTheme(activeTheme === 'dark' ? 'light' : 'dark')}
           aria-label="다크모드 전환"
         >
           {activeTheme === 'light' ? (
@@ -36,7 +37,7 @@ export function Header() {
               <span>다크</span>
             </>
           )}
-        </Button>
+        </ToggleButton>
       </div>
 
       <Table aria-label="서비스 정보" className="w-full">

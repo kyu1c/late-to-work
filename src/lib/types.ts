@@ -17,9 +17,8 @@ export interface Profile {
   workY?: number; // 출근지 위도 (내부용)
   targetArrival: string; // 목표 도착 시각 (HH:MM)
   preferredTransport: 'subway' | 'bus' | 'any';
-  usualTransitMinutes?: number; // 평소 대중교통 소요시간 (분, 선택)
-  usualHours?: number; // 평소 평균 이동 소요 시간 — 시 (선택)
-  usualMinutes?: number; // 평소 평균 이동 소요 시간 — 분 (선택)
+  /** 평소 평균 이동 소요 시간 (분, 선택) */
+  usualTransitMinutes?: number;
   preferredTimeA?: string; // 전날 밤 선호 시간대 A (HH:MM)
   preferredTimeB?: string; // 전날 밤 선호 시간대 B (HH:MM)
   prepMinutes: number; // 공통 준비 시간 (분, 기본 5)
