@@ -876,6 +876,19 @@ export default function Home() {
           <>
             {/* 현재 시간 기준 안내 — 목표 도착 시각 대비 현재 시각 상태 */}
             <div className="mb-5">
+              {/* 디버깅: recommendResult 상태 표시 */}
+              {recommendResult ? (
+                <div className="mb-2 text-xs text-muted-foreground flex items-center gap-2">
+                  <span className="font-medium">디버그:</span>
+                  <span>transit: {recommendResult.transit ? `있음(${recommendResult.transit.durationMinutes ?? 'null'}분, ${recommendResult.transit.source})` : '없음'}</span>
+                  <span className="text-muted-foreground">|</span>
+                  <span>taxi: {recommendResult.taxi ? `있음(${recommendResult.taxi.vehicleEtaMinutes ?? 'null'}분, ${recommendResult.taxi.source})` : '없음'}</span>
+                </div>
+              ) : (
+                <div className="mb-2 text-xs text-muted-foreground">
+                  <span className="font-medium">디버그:</span> 추천 결과가 아직 없어요. (recommendResult = null)
+                </div>
+              )}
               <NowStatusCard
                 nowTimeString={nowTimeString}
                 targetArrival={targetArrival}
@@ -902,42 +915,42 @@ export default function Home() {
                   <span className={cn('text-sm', 'text-muted-foreground')}>계산 중…</span>
                 )}
               </div>
-              {recommendLoading ? (
-                <div className={cn('p-4', 'bg-surface-secondary', 'rounded-lg', 'text-center', 'text-sm', 'text-muted-foreground')}>
-                  지금 출발 기준을 계산하고 있어요…
-                </div>
-              ) : (
-                <div className={cn('flex', 'flex-col', 'gap-4')}>
-                  <DepartureControl
-                    nowTime={now}
-                    departureInput={departureInput}
-                    departureAdjusted={departureAdjusted}
-                    recommendLoading={recommendLoading}
-                    canRun={!profile || !homeCoords || !workCoords ? false : true}
-                    onSetDepartureInput={setDepartureInput}
-                    onSetDepartureAdjusted={setDepartureAdjusted}
-                    onRunRecommend={runRecommend}
-                  />
-                  <div>
-                    <RecommendResultCard
-                      recommendResult={recommendResult}
-                      recommendError={recommendError}
-                      recommendLoading={recommendLoading}
-                      resultEmpty={!recommendResult && !recommendError && !recommendLoading}
-                      onEditProfile={editProfileHandler}
-                    />
-                  </div>
-                  {/* 전날 밤 추천 새로고침 (아직 표시 안 된 경우) */}
-                  {!showNightBefore && profile && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <Button variant="outline" className="flex-1" onPress={() => refreshNightBefore(false)} isDisabled={recommendLoading}>
-                        {recommendLoading ? '새로고침 중…' : '전날 밤 추천 새로고침'}
-                      </Button>
-                      <span className="text-sm text-muted-foreground">오후 4시 이후 접속 시 자동으로 전날 밤 추천이 표시돼요.</span>
+              <Card className="w-full">
+                <Card.Content className="flex flex-col gap-4">
+                  {recommendLoading ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      지금 출발 기준을 계산하고 있어요…
                     </div>
+                  ) : (
+                    <>
+                      <DepartureControl
+                        nowTime={now}
+                        departureInput={departureInput}
+                        departureAdjusted={departureAdjusted}
+                        recommendLoading={recommendLoading}
+                        canRun={!profile || !homeCoords || !workCoords ? false : true}
+                        onSetDepartureInput={setDepartureInput}
+                        onSetDepartureAdjusted={setDepartureAdjusted}
+                        onRunRecommend={runRecommend}
+                      />
+                      <div>
+                        <RecommendResultCard
+                          recommendResult={recommendResult}
+                          recommendError={recommendError}
+                          recommendLoading={recommendLoading}
+                          resultEmpty={!recommendResult && !recommendError && !recommendLoading}
+                          onEditProfile={editProfileHandler}
+                        />
+                      </div>
+                      {!recommendResult && !recommendError && !recommendLoading && (
+                        <p className="text-sm text-muted-foreground text-center">
+                          출발 시각을 입력한 뒤 '새로운 출발 시간으로 계산' 버튼을 눌러주세요.
+                        </p>
+                      )}
+                    </>
                   )}
-                </div>
-              )}
+                </Card.Content>
+              </Card>
             </div>
 
             {/* 고급 설정 */}
