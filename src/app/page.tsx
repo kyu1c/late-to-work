@@ -874,10 +874,7 @@ export default function Home() {
               <NowStatusCard
                 nowTimeString={nowTimeString}
                 targetArrival={targetArrival}
-                transitResult={recommendResult?.transit ?? null}
-                taxiEta={recommendResult?.taxi.vehicleEtaMinutes ?? null}
-                taxiFare={recommendResult?.taxi.taxiFare ?? null}
-                onEditProfile={editProfileHandler}
+                recommendResult={recommendResult}
               />
             </div>
 
