@@ -1,0 +1,73 @@
+.card {
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border, var(--border));
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--foreground, var(--foreground));
+}
+
+.refreshButton {
+  color: var(--foreground, var(--foreground));
+}
+
+.content {
+  padding: 0;
+}
+
+.tightSection {
+  margin-bottom: 12px;
+}
+
+.tightHeader {
+  margin-bottom: 4px;
+}
+
+.tightNote {
+  font-size: 13px;
+  color: var(--muted-foreground, var(--muted-foreground));
+  margin-bottom: 2px;
+  line-height: 1.5;
+}
+
+.divider {
+  margin: 12px 0;
+  background: var(--border, var(--border));
+}
+
+.looseSection {
+  margin-bottom: 12px;
+}
+
+.looseHeader {
+  margin-bottom: 4px;
+}
+
+.looseNote {
+  font-size: 13px;
+  color: var(--muted-foreground, var(--muted-foreground));
+  margin-bottom: 2px;
+  line-height: 1.5;
+}
+
+.bottomNote {
+  font-size: 13px;
+  color: var(--muted-foreground, var(--muted-foreground));
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .title {
+    color: var(--foreground);
+  }
+}

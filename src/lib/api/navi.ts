@@ -94,7 +94,6 @@ export async function naviCarTrip(params: NaviDirectionsParams): Promise<ApiResu
   }
 
   const headers = {
-    Authorization: authHeader(),
     'Content-Type': 'application/json',
   };
 

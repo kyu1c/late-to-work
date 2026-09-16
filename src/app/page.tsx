@@ -1,19 +1,3 @@
-// src/app/page.tsx
-//
-// late-to-work 메인 화면.
-// - 프로필 있음/없음 상태에 따른 분기
-// - 온보딩(첫 방문 시): 집/출근지 검색·선택, 목표 도착 시각, 선호 교통수단
-// - 바로 추천 버튼 + 출발 시각 조절(칩 버튼 + 직접 입력)
-// - 비교표 + 한 줄 결론 + 행동
-// - 전날 밤 추천 미리 노출
-// - 고급 프로필 세팅(준비 시간, 택시 호출 시간 추가 on/off)
-// - 카카오T 앱 열기
-//
-// 원칙:
-//  - 클라이언트 소스·응답에 키 값 노출 0. 좌표는 서버 내부용, UI에는 이름+주소만.
-//  - 서버 시각 기준 계산(recommend API는 서버 시각 사용).
-//  - 실시간 정보 없을 때 평균/패턴 폴백(API 라우트에서 처리), 화면은 결과만 표시.
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -26,15 +10,11 @@ import {
   Card,
   Chip,
   Checkbox,
-  Badge,
   Fieldset,
-  Label,
   Description,
-  ErrorMessage,
-  FieldError,
+  Label,
   Skeleton,
   ListBox,
-  ListBoxItem,
   TimeField,
   Select,
   SelectTrigger,
@@ -43,15 +23,13 @@ import {
   Tabs,
   NumberField,
   Separator,
-  Breadcrumbs,
-  BreadcrumbsRoot,
-  BreadcrumbsItem,
-  ProgressBar,
-  ProgressBarRoot,
-  ProgressBarFill,
 } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { parseTime } from '@internationalized/date';
+import { Header } from './components/Header';
+import { ProfileSummaryCard } from './components/ProfileCard';
+import { OnboardingCard } from './components/OnboardingCard';
+import { NightBeforeCard } from './components/NightBeforeCard';
 
 // ---------------------------------------------------------------------------
 // 타입 (lib/types와 동일 — 여기서는 화면 전용으로 재선언하지 않고 필요한 것만)
@@ -477,7 +455,7 @@ export default function Home() {
       return;
     }
     setRecommendResult(res.result!);
-  }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, departureInput]);
+  }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, departureInput, departureAdjusted]);
 
   // 전날 밤 추천 새로고침 (조용히 실행하려면 silent=true)
   const refreshNightBefore = useCallback(async (silent = false) => {
@@ -661,75 +639,8 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <div className={styles.themeToggle}>
-          <Button
-            className={cn(
-              "h-11 w-11 rounded-full min-w-0",
-              activeTheme === "dark"
-                ? "bg-[var(--surface-secondary)] text-[var(--accent)]"
-                : "bg-[var(--surface-secondary)] text-[var(--foreground)]",
-            )}
-            variant="ghost"
-            onPress={() =>
-              setTheme(activeTheme === "dark" ? "light" : "dark")
-            }
-            aria-label="다크모드 전환"
-            size="sm"
-          >
-            {activeTheme === "light" ? (
-              <>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="size-5"
-                >
-                  <circle cx="12" cy="12" r="5" />
-                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                </svg>
-                <span>라이트</span>
-              </>
-            ) : (
-              <>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="size-5"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-                <span>다크</span>
-              </>
-            )}
-          </Button>
-        </div>
-
-        {/* 서비스 정보 바 */}
-        <div className={styles.serviceInfoBar}>
-          <div className={styles.serviceInfoItem}>
-            <span className={styles.serviceInfoLabel}>대회</span>
-            <span className={styles.serviceInfoValue}>MABC Final</span>
-          </div>
-          <div className={styles.serviceInfoItem}>
-            <span className={styles.serviceInfoLabel}>스킬명</span>
-            <span className={styles.serviceInfoValue}>late-to-work</span>
-          </div>
-          <div className={styles.serviceInfoItem}>
-            <span className={styles.serviceInfoLabel}>제작자</span>
-            <span className={styles.serviceInfoValue}>조규원</span>
-          </div>
-          <div className={styles.serviceInfoItem}>
-            <span className={styles.serviceInfoLabel}>개발 스펙</span>
-            <span className={styles.serviceInfoValue}>실시간 교통·날씨 API 기반 출퇴근 비교 추천</span>
-          </div>
-        </div>
+        {/* Header: 테마 토글 + 서비스 정보 바 */}
+        <Header />
 
         <div className={styles.intro}>
           <h1 className={styles.introTitle}>늦잠 잔 출근 아침의 5초 가치판단</h1>
@@ -739,49 +650,7 @@ export default function Home() {
         </div>
 
         {/* 프로필 요약 */}
-        {profile && (
-        <Card className={styles.profileCard}>
-          <Card.Header className={styles.profileCardHeader}>
-            <Card.Title className={styles.profileCardTitle}>저장된 정보</Card.Title>
-            <Button
-              className={styles.profileEditButton}
-              variant="ghost"
-              size="sm"
-              onPress={editProfileHandler}
-            >
-              수정
-            </Button>
-          </Card.Header>
-          <Card.Content className={styles.profileCardContent}>
-            <div className={styles.profileRow}>
-              <div>
-                <span className={styles.profileStrong}>{profile.homeName}</span>
-                <span className={styles.profileArrow}> → </span>
-                <span className={styles.profileStrong}>{profile.workName}</span>
-              </div>
-              <Button
-                className={styles.profileClear}
-                variant="ghost"
-                size="sm"
-                onPress={clearProfileHandler}
-              >
-                초기화
-              </Button>
-            </div>
-            <p className={styles.profileAddress}>
-              {profile.homeAddress} → {profile.workAddress}
-            </p>
-            <div className={styles.profileMeta}>
-              <Chip size="sm" variant="soft" color="default">
-                목표 도착: {profile.targetArrival}
-              </Chip>
-              <Chip size="sm" variant="soft" color="default">
-                선호: {profile.preferredTransport}
-              </Chip>
-            </div>
-          </Card.Content>
-        </Card>
-        )}
+        {profile && <ProfileSummaryCard profile={profile} onEdit={editProfileHandler} onClear={clearProfileHandler} />}
 
         {profile && (!homeCoords || !workCoords) && (
           <div className={styles.coordsWarning}>
@@ -925,7 +794,9 @@ export default function Home() {
                         </Button>
                       </div>
                       {searchError && (
-                        <FieldError>{searchError}</FieldError>
+                        <Alert status="danger" className={styles.fieldError}>
+                          {searchError}
+                        </Alert>
                       )}
                       {searching ? (
                         <div className={styles.searchSkeleton}>
@@ -954,7 +825,7 @@ export default function Home() {
                           }}
                         >
                           {searchResults.map((r) => (
-                            <ListBoxItem
+                            <ListBox.Item
                               key={r.name + '|' + r.address}
                               id={r.name + '|' + r.address}
                               textValue={r.name}
@@ -962,7 +833,7 @@ export default function Home() {
                             >
                               <Label>{r.name}</Label>
                               <Description>{r.address}</Description>
-                            </ListBoxItem>
+                            </ListBox.Item>
                           ))}
                         </ListBox>
                       ) : null}
@@ -1004,7 +875,9 @@ export default function Home() {
                         </Button>
                       </div>
                       {searchError && (
-                        <FieldError>{searchError}</FieldError>
+                        <Alert status="danger" className={styles.fieldError}>
+                          {searchError}
+                        </Alert>
                       )}
                       {searching ? (
                         <div className={styles.searchSkeleton}>
@@ -1033,7 +906,7 @@ export default function Home() {
                           }}
                         >
                           {searchResults.map((r) => (
-                            <ListBoxItem
+                            <ListBox.Item
                               key={r.name + '|' + r.address}
                               id={r.name + '|' + r.address}
                               textValue={r.name}
@@ -1041,7 +914,7 @@ export default function Home() {
                             >
                               <Label>{r.name}</Label>
                               <Description>{r.address}</Description>
-                            </ListBoxItem>
+                            </ListBox.Item>
                           ))}
                         </ListBox>
                       ) : null}
@@ -1104,9 +977,9 @@ export default function Home() {
                         <SelectPopover>
                           <ListBox selectionMode="single" aria-label="선호 교통수단 선택"
                             selectedKeys={preferredTransport ? [preferredTransport] : []}>
-                            <ListBoxItem id="subway">지하철 위주</ListBoxItem>
-                            <ListBoxItem id="bus">버스 위주</ListBoxItem>
-                            <ListBoxItem id="any">상관없음</ListBoxItem>
+                            <ListBox.Item id="subway">지하철 위주</ListBox.Item>
+                            <ListBox.Item id="bus">버스 위주</ListBox.Item>
+                            <ListBox.Item id="any">상관없음</ListBox.Item>
                           </ListBox>
                         </SelectPopover>
                       </Select>
@@ -1137,9 +1010,9 @@ export default function Home() {
                         <SelectPopover>
                           <ListBox selectionMode="single" aria-label="선호 교통수단 선택"
                             selectedKeys={preferredTransport ? [preferredTransport] : []}>
-                            <ListBoxItem id="subway">지하철 위주</ListBoxItem>
-                            <ListBoxItem id="bus">버스 위주</ListBoxItem>
-                            <ListBoxItem id="any">상관없음</ListBoxItem>
+                            <ListBox.Item id="subway">지하철 위주</ListBox.Item>
+                            <ListBox.Item id="bus">버스 위주</ListBox.Item>
+                            <ListBox.Item id="any">상관없음</ListBox.Item>
                           </ListBox>
                         </SelectPopover>
                       </Select>
