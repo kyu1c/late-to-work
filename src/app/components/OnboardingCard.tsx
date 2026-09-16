@@ -99,16 +99,13 @@ export function OnboardingCard({
   recommendResult,
   className,
 }: OnboardingCardProps) {
-  // 이동 소요 예상 계산: recommendResult의 transit.durationMinutes 우선, 없으면 usualTransitMinutes
+  // 이동 소요 예상 계산: transitPreview / recommendResult의 transit.durationMinutes 기준 (API 결과만 표시)
   const transitEstimate = (() => {
     if (recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.transit.durationMinutes > 0) {
       return { value: recommendResult.transit.durationMinutes, source: recommendResult.transit.source };
     }
     if (transitPreview && transitPreview.durationMinutes != null && transitPreview.durationMinutes > 0) {
       return { value: transitPreview.durationMinutes, source: transitPreview.source };
-    }
-    if (typeof usualTransitMinutes === 'number' && usualTransitMinutes > 0) {
-      return { value: usualTransitMinutes, source: '입력한 평소 소요 시간' };
     }
     return null;
   })();
