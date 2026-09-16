@@ -139,6 +139,39 @@ function minutesToHhmm(m: number): string {
   return `${pad2(h)}:${pad2(min)}`;
 }
 
+// HH:MM 문자열을 오전/오후 표기로 변환
+function toAmPm(hhmm: string | null): string {
+  if (!hhmm) return '-';
+  const [h, m] = hhmm.split(':').map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return hhmm;
+  const hour12 = h % 12 || 12;
+  const ampm = h < 12 ? '오전' : '오후';
+  return `${ampm} ${hour12}:${pad2(m)}`;
+}
+
+// 소스 정보를 라벨과 노트로 포맷
+function formatSource(source: string | undefined, note?: string | null): { label: string; detail?: string } {
+  const label = source === 'kakao' ? '카카오맵' :
+                source === 'tmap' ? 'Tmap' :
+                source === 'odsay' ? 'ODsay' :
+                source === 'tago' ? 'TAGO' :
+                source === 'navi' ? '카카오내비' :
+                source === 'none' ? '정보 없음' : source ?? '정보 없음';
+  return { label, detail: note ?? undefined };
+}
+
+// 출발 시한 텍스트를 포맷
+function formatLatestDeparture(latestDeparture: string | null, graceMinutes: number, nowMinutes: number): string {
+  if (!latestDeparture) return '확인 불가';
+  const mustLeaveMin = hhmmToMinutes(latestDeparture);
+  const nowMin = nowMinutes;
+  if (mustLeaveMin <= 0) return '이미 출발 시간이 지났어요';
+  const diff = mustLeaveMin - nowMin;
+  if (diff <= 0) return `지금 출발해야 해요 (${graceMinutes}분 여유 포함)`;
+  if (diff <= graceMinutes) return `지금 바로 출발! (${diff}분 남음, 여유 ${graceMinutes}분 포함)`;
+  return `${minutesToHhmm(mustLeaveMin)}까지 출발 (${diff}분 남음, 여유 ${graceMinutes}분 포함)`;
+}
+
 // ---------------------------------------------------------------------------
 // API 호출
 // ---------------------------------------------------------------------------
@@ -372,14 +405,17 @@ export default function Home() {
     if (departureInput.trim()) {
       body.departureTime = departureInput.trim();
     }
+    console.log('[runRecommend] 요청:', JSON.stringify(body));
 
     const res = await fetchRecommend(body);
+    console.log('[runRecommend] 응답:', res.ok ? 'ok' : 'fail', res.error ?? res.result ? 'result 있음' : '');
     setRecommendLoading(false);
     if (!res.ok) {
       setRecommendError(res.error ?? '추천을 계산할 수 없습니다.');
       return;
     }
     setRecommendResult(res.result!);
+    console.log('[runRecommend] 결과 설정 완료');
   }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, departureInput, resolveCoords]);
 
   // 프로필 완료(done) 상태 진입 시 자동 추천 실행
