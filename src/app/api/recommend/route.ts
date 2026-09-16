@@ -10,6 +10,7 @@ import { taxiChain } from '@/lib/taxiChain';
 import { calcCompareOptions, CalcCompareOptionsInput } from '@/lib/calc/calcTrip';
 import { NaviDirectionsParams, naviCarTrip } from '@/lib/api/navi';
 import { kmaUltraShortSnapshot } from '@/lib/api/kma';
+import { RecommendRequest } from '@/lib/types';
 import { EnvKeys } from '@/lib/config';
 
 function nowHHmm(): string {

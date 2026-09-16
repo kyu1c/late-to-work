@@ -6,21 +6,9 @@ import { cn } from '@heroui/styles';
 import {
   Button,
   Input,
-  Alert,
   Card,
-  Chip,
   Checkbox,
-  Fieldset,
-  Description,
   Label,
-  Skeleton,
-  ListBox,
-  TimeField,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectPopover,
-  Separator,
 } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { parseTime } from '@internationalized/date';
@@ -28,98 +16,15 @@ import { Header } from './components/Header';
 import { ProfileSummaryCard } from './components/ProfileCard';
 import { OnboardingCard } from './components/OnboardingCard';
 import { NightBeforeCard } from './components/NightBeforeCard';
-import type { Profile, AddressSearchResult } from '@/lib/types';
+import { DepartureControl } from './components/DepartureControl';
+import { RecommendResultCard } from './components/RecommendResultCard';
+import type { Profile, AddressSearchResult, RecommendResponse, NightBeforeResponse } from '@/lib/types';
 
 // ---------------------------------------------------------------------------
 // 타입 (lib/types와 동일 — 여기서는 화면 전용으로 재선언)
 // ---------------------------------------------------------------------------
 
 type Transport = 'subway' | 'bus' | 'any';
-
-// ---------------------------------------------------------------------------
-// 타입 정의 (lib/types에서 import하지 않는 이유: page.tsx에서 API 응답 처리용)
-// ---------------------------------------------------------------------------
-
-interface RecommendResult {
-  nowTime: string;
-  targetArrival: string;
-  sharedPrepMinutes: number;
-  taxiPrepTotalMinutes: number;
-  transit: {
-    durationMinutes: number | null;
-    transfers: number | null;
-    distanceMeters: number | null;
-    source: string;
-    note: string;
-    isEstimate: boolean;
-  };
-  taxi: {
-    vehicleEtaMinutes: number | null;
-    taxiFare: number | null;
-    distanceMeters: number | null;
-    source: string;
-    note: string;
-    isEstimate: boolean;
-  };
-  comparison: {
-    departureTimeUsed: string;
-    public: {
-      departureTime: string;
-      totalMinutes: number;
-      arrivalTime: string;
-      transitMinutes: number;
-      prepMinutes: number;
-    };
-    taxi: {
-      departureTime: string;
-      totalMinutes: number;
-      arrivalTime: string;
-      vehicleEtaMinutes: number;
-      prepMinutes: number;
-    };
-    latest: {
-      public: {
-        latestDeparture: string;
-        minutesUntilMustLeave: number;
-      };
-      taxi: {
-        latestDeparture: string;
-        minutesUntilMustLeave: number;
-      };
-    };
-    faster: 'public' | 'taxi' | 'same';
-    fasterMinutes: number;
-    statement: string;
-  };
-  actions: string[];
-  weather?: {
-    isRaining: boolean;
-    note: string;
-  };
-  note: string;
-  /** 미래 운행 정보: 3개 후보 출발 시각 기준 차량 ETA (P1-6) */
-  taxiFuture?: {
-    departureTimes: string[];
-    vehicleEtaMinutes: (number | null)[];
-    taxiFare: (number | null)[];
-  };
-}
-
-interface NightBeforeResult {
-  targetArrival: string;
-  isRaining: boolean;
-  tight: {
-    departureTime: string;
-    transportNote: string;
-    arrivalNote: string;
-  };
-  loose: {
-    departureTime: string;
-    transportNote: string;
-    arrivalNote: string;
-  };
-  note: string;
-}
 
 // ---------------------------------------------------------------------------
 // localStorage 키
@@ -153,19 +58,19 @@ function clearProfile() {
   localStorage.removeItem(PROFILE_KEY);
 }
 
-function loadNightBefore(): { result: NightBeforeResult | null; date: string | null } {
+function loadNightBefore(): { result: NightBeforeResponse | null; date: string | null } {
   try {
     const raw = localStorage.getItem(NIGHT_BEFORE_KEY);
     const dateRaw = localStorage.getItem(NIGHT_BEFORE_DATE_KEY);
     if (!raw || !dateRaw) return { result: null, date: null };
-    const result = JSON.parse(raw) as NightBeforeResult;
+    const result = JSON.parse(raw) as NightBeforeResponse;
     return { result, date: dateRaw };
   } catch {
     return { result: null, date: null };
   }
 }
 
-function saveNightBefore(result: NightBeforeResult, date: string) {
+function saveNightBefore(result: NightBeforeResponse, date: string) {
   localStorage.setItem(NIGHT_BEFORE_KEY, JSON.stringify(result));
   localStorage.setItem(NIGHT_BEFORE_DATE_KEY, date);
 }
@@ -226,7 +131,7 @@ async function searchAddress(query: string, preferAddress = false): Promise<{ ok
   return { ok: true, results: data.results };
 }
 
-async function fetchRecommend(body: Record<string, unknown>): Promise<{ ok: boolean; result?: RecommendResult; error?: string }> {
+async function fetchRecommend(body: Record<string, unknown>): Promise<{ ok: boolean; result?: RecommendResponse; error?: string }> {
   const res = await fetch('/api/recommend', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -239,7 +144,7 @@ async function fetchRecommend(body: Record<string, unknown>): Promise<{ ok: bool
   return { ok: true, result: data.result };
 }
 
-async function fetchNightBefore(body: Record<string, unknown>): Promise<{ ok: boolean; result?: NightBeforeResult; error?: string }> {
+async function fetchNightBefore(body: Record<string, unknown>): Promise<{ ok: boolean; result?: NightBeforeResponse; error?: string }> {
   const res = await fetch('/api/night-before', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -284,10 +189,10 @@ export default function Home() {
   const [taxiCallAddMinutes, setTaxiCallAddMinutes] = useState(0);
   const [departureInput, setDepartureInput] = useState('');
   const [departureAdjusted, setDepartureAdjusted] = useState(false);
-  const [recommendResult, setRecommendResult] = useState<RecommendResult | null>(null);
+  const [recommendResult, setRecommendResult] = useState<RecommendResponse | null>(null);
   const [recommendError, setRecommendError] = useState<string | null>(null);
   const [recommendLoading, setRecommendLoading] = useState(false);
-  const [nightBeforeResult, setNightBeforeResult] = useState<NightBeforeResult | null>(null);
+  const [nightBeforeResult, setNightBeforeResult] = useState<NightBeforeResponse | null>(null);
   const [showNightBefore, setShowNightBefore] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -779,277 +684,25 @@ export default function Home() {
 
             {/* 아침 재추천 영역 — 당신이 요구한 구조 */}
             <div className={styles.morningRecommendArea}>
-              {/* 현재 시각 + 시간 조정 */}
-              <div className={styles.departureControlArea}>
-                <span className={styles.departureNowLabel}>현재 시각:</span>
-                <span className={styles.departureNowTime}>
-                  {nowTimeString}
-                </span>
-                <div className={styles.departureChipRow}>
-                  <Button
-                    variant="ghost"
-                    onPress={() => {
-                      setDepartureInput('');
-                      setDepartureAdjusted(false);
-                    }}
-                    isDisabled={recommendLoading}
-                  >
-                    지금
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onPress={() => {
-                      if (!departureInput) {
-                        const now = new Date();
-                        setDepartureInput(`${pad2(now.getHours())}:${pad2(now.getMinutes())}`);
-                        setDepartureAdjusted(true);
-                      }
-                    }}
-                    isDisabled={recommendLoading}
-                  >
-                    현재 시각 입력
-                  </Button>
-                  <span className={styles.departureChipSeparator}>|</span>
-                  <Button
-                    variant="ghost"
-                    onPress={() => {
-                      const base = departureInput ? hhmmToMinutes(departureInput) : (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
-                      setDepartureInput(minutesToHhmm(base + 5));
-                      setDepartureAdjusted(true);
-                    }}
-                    isDisabled={recommendLoading}
-                  >
-                    +5분
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onPress={() => {
-                      const base = departureInput ? hhmmToMinutes(departureInput) : (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
-                      setDepartureInput(minutesToHhmm(base + 10));
-                      setDepartureAdjusted(true);
-                    }}
-                    isDisabled={recommendLoading}
-                  >
-                    +10분
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onPress={() => {
-                      const base = departureInput ? hhmmToMinutes(departureInput) : (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
-                      setDepartureInput(minutesToHhmm(base - 5));
-                      setDepartureAdjusted(true);
-                    }}
-                    isDisabled={recommendLoading}
-                  >
-                    -5분
-                  </Button>
-                </div>
-                {departureInput && (
-                  <div className={styles.departureTimeField}>
-                    <span className={styles.departureTimeLabel}>출발 시각:</span>
-                    <TimeField
-                      value={departureInput ? parseTime(departureInput) : null}
-                      onChange={(timeValue) => setDepartureInput(timeValue ? timeValue.toString() : '')}
-                      minValue={parseTime('00:00')}
-                      maxValue={parseTime('23:59')}
-                      isDisabled={recommendLoading}
-                      placeholderValue={parseTime('00:00')}
-                      granularity="minute"
-                    >
-                      <TimeField.Group>
-                        <TimeField.Input>
-                          {(segment) => <TimeField.Segment segment={segment} />}
-                        </TimeField.Input>
-                      </TimeField.Group>
-                    </TimeField>
-                  </div>
-                )}
-                <p className={styles.departureTimeHint}>
-                  출발 시각을 바꾸면 비교표가 다시 계산돼요.
-                </p>
-              </div>
-
-              {/* 바로 계산 버튼 */}
-              <div className={styles.calcButtonRow}>
-                <Button
-                  className={styles.recommendPrimaryButton}
-                  variant="primary"
-                  onPress={runRecommend}
-                  isDisabled={!profile || !homeCoords || !workCoords || recommendLoading}
-                >
-                  {recommendLoading
-                    ? '계산 중…'
-                    : departureAdjusted
-                      ? '출발 시각 조정됨 — 계산'
-                      : '지금 출발 계산'
-                  }
-                </Button>
-              </div>
-
-              {/* 결과 영역 */}
+              <DepartureControl
+                nowTimeString={nowTimeString}
+                departureInput={departureInput}
+                departureAdjusted={departureAdjusted}
+                recommendLoading={recommendLoading}
+                canRun={!profile || !homeCoords || !workCoords ? false : true}
+                onSetDepartureInput={setDepartureInput}
+                onSetDepartureAdjusted={setDepartureAdjusted}
+                onRunRecommend={runRecommend}
+              />
               <div className={styles.resultArea}>
-                {recommendResult ? (
-                  <>
-                    {/* 비교표 카드 — HeroUI Card.Content 안에 구성 */}
-                    <Card className={styles.cardFull}>
-                      <Card.Header className={styles.compareHeader}>
-                        <Card.Title>
-                          현재 시각 기준: {recommendResult.nowTime}
-                          <span className={styles.compareHeaderSub}>목표 도착: {recommendResult.targetArrival}</span>
-                        </Card.Title>
-                      </Card.Header>
-                      <Card.Content>
-                        <p className={styles.dataDisclaimer}>
-                          실시간 교통·날씨 정보가 없으면 평균·패턴 기반 추정치로 안내해요.
-                        </p>
-
-                        {/* 날씨 정보 */}
-                        {recommendResult.weather && (
-                          <Alert
-                            status={recommendResult.weather.isRaining ? 'danger' : 'success'}
-                            className={styles.weatherAlert}
-                          >
-                            <Alert.Description>
-                              <span className={styles.weatherAlertIcon}>
-                                {recommendResult.weather.isRaining ? '☔' : '☀️'}
-                              </span>
-                              <span>{recommendResult.weather.note}</span>
-                            </Alert.Description>
-                          </Alert>
-                        )}
-
-                        {/* 교통편 비교표 (HeroUI Table 대신 Card.Content 내 그리드) */}
-                        <div className={styles.compareTable}>
-                          {/* 대중교통 행 */}
-                          <div className={styles.compareRow}>
-                            <div className={styles.compareCell}>
-                              <span className={styles.compareLabel}>대중교통</span>
-                              <span className={styles.compareSource}>{recommendResult.transit.source}</span>
-                            </div>
-                            <div className={styles.compareCell}>
-                              <div>출발 기준: {recommendResult.comparison.public.departureTime}</div>
-                              <div>이동 {recommendResult.comparison.public.transitMinutes}분 + 준비 {recommendResult.comparison.public.prepMinutes}분</div>
-                              <div>도착 예상: {recommendResult.comparison.public.arrivalTime}</div>
-                            </div>
-                            <div className={styles.compareCell}>
-                              {recommendResult.transit.transfers != null && recommendResult.transit.transfers > 0 && (
-                                <div>환승: 약 {recommendResult.transit.transfers}회</div>
-                              )}
-                              {recommendResult.transit.distanceMeters != null && (
-                                <div>거리: {recommendResult.transit.distanceMeters.toFixed(0)}m</div>
-                              )}
-                              <div className={styles.compareMuted}>{recommendResult.transit.note}</div>
-                            </div>
-                          </div>
-
-                          {/* 택시 행 */}
-                          <div className={styles.compareRow}>
-                            <div className={styles.compareCell}>
-                              <span className={styles.compareLabel}>택시</span>
-                              <span className={styles.compareSource}>{recommendResult.taxi.source}</span>
-                            </div>
-                            <div className={styles.compareCell}>
-                              <div>출발 기준: {recommendResult.comparison.taxi.departureTime}</div>
-                              <div>차량 {recommendResult.comparison.taxi.vehicleEtaMinutes}분 + 준비 {recommendResult.comparison.taxi.prepMinutes}분</div>
-                              <div>도착 예상: {recommendResult.comparison.taxi.arrivalTime}</div>
-                            </div>
-                            <div className={styles.compareCell}>
-                              {recommendResult.taxi.taxiFare != null && (
-                                <div>예상 요금: {formatMoney(recommendResult.taxi.taxiFare)}원</div>
-                              )}
-                              {recommendResult.taxi.distanceMeters != null && (
-                                <div>거리: {recommendResult.taxi.distanceMeters.toFixed(0)}m</div>
-                              )}
-                              <div className={styles.compareMuted}>{recommendResult.taxi.note}</div>
-                              <Button className={styles.taxiLinkButton} onPress={() => { window.location.href = 'kakaot://'; }}>
-                                카카오T 앱 열기
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 한 줄 결론 */}
-                        <div className={styles.conclusion}>
-                          <strong className={styles.conclusionStrong}>{recommendResult.comparison.statement}</strong>
-                        </div>
-
-                        {/* 행동 */}
-                        <div className={styles.actions}>
-                          {recommendResult.actions.map((a: string, i: number) => (
-                            <div key={i} className={styles.actionItem}>{a}</div>
-                          ))}
-                        </div>
-
-                        {/* 참고 */}
-                        <div className={styles.note}>{recommendResult.note}</div>
-                        <p className={styles.muted} style={{ marginTop: 'var(--space-1)' }}>
-                          준비 시간은 개인 준비와 택시 호출 대기를 함께 고려한 초기 추정치예요. 고급 설정에서 조정할 수 있어요.
-                        </p>
-
-                        {/* 미래 운행 정보 */}
-                        {recommendResult.taxiFuture && recommendResult.taxiFuture.departureTimes.length > 0 && (() => {
-                          const tf = recommendResult.taxiFuture!;
-                          return (
-                            <div className={styles.futureCard}>
-                              <div className={styles.futureHeader}>
-                                <span>후보 출발 시각별 차량 예상 소요시간</span>
-                                <span className={styles.muted}>(미래 운행 정보 기준)</span>
-                              </div>
-                              <div className={styles.futureTable}>
-                                {tf.departureTimes.map((dep: string, i: number) => (
-                                  <div key={i} className={styles.futureRow}>
-                                    <div className={styles.futureCell}>
-                                      <strong>{dep}</strong> 출발
-                                    </div>
-                                    <div className={styles.futureCell}>
-                                      {tf.vehicleEtaMinutes[i] != null ? (
-                                        <span>약 {tf.vehicleEtaMinutes[i]}분</span>
-                                      ) : (
-                                        <span>확인 불가</span>
-                                      )}
-                                    </div>
-                                    <div className={styles.futureCell}>
-                                      {tf.taxiFare[i] != null ? (
-                                        <span>{formatMoney(tf.taxiFare[i])}원</span>
-                                      ) : (
-                                        <span>확인 불가</span>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                              <div className={styles.futureNote}>
-                                출발 시각을 몇 가지로 나눠서 각각에 대해 차가 얼마나 걸릴지 미리 본 결과예요.
-                                늦지 않는 마지막 출발 시각을 가늠하는 데 참고할 수 있어요.
-                              </div>
-                              <div className={styles.dataDisclaimer}>
-                                실시간 교통·날씨 정보가 없으면 평균·패턴 기반 추정치로 안내해요.
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </Card.Content>
-                    </Card>
-                  </>
-                ) : recommendError ? (
-                  <div className={styles.errorText}>
-                    <span>{recommendError}</span>
-                    {recommendError.includes('위치') || recommendError.includes('출발') || recommendError.includes('수정') ? (
-                      <Button
-                        className={styles.errorEditButton}
-                        variant="outline"
-                        size="sm"
-                        onPress={editProfileHandler}
-                      >
-                        프로필 수정하기
-                      </Button>
-                    ) : null}
-                  </div>
-                ) : !recommendLoading ? (
-                  <div className={styles.resultEmpty}>출발 시간을 입력해 주세요</div>
-                ) : null}
+                <RecommendResultCard
+                  recommendResult={recommendResult}
+                  recommendError={recommendError}
+                  recommendLoading={recommendLoading}
+                  resultEmpty={!recommendResult && !recommendError && !recommendLoading}
+                  onEditProfile={editProfileHandler}
+                />
               </div>
-
               {/* 전날 밤 추천 새로고침 (아직 표시 안 된 경우) */}
               {!showNightBefore && profile && (
                 <div className={styles.nightBeforeTrigger}>

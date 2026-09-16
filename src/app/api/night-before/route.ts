@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { calcNightBefore, NightBeforeInput } from '@/lib/calc/calcTrip';
+import { NightBeforeResponse } from '@/lib/types';
 
 function validateNightBody(body: unknown): {
   ok: true;

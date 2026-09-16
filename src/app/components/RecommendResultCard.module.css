@@ -1,0 +1,189 @@
+/* RecommendResultCard.module.css — 레이아웃 배치 전용 */
+
+.cardFull {
+  width: 100%;
+}
+
+.compareHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-3);
+}
+
+.compareHeaderSub {
+  margin-left: var(--space-2);
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+.dataDisclaimer {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.weatherAlert {
+  margin-bottom: var(--space-3);
+}
+
+.weatherAlertIcon {
+  flex-shrink: 0;
+}
+
+.compareTable {
+  width: 100%;
+}
+
+.compareRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.compareRow:last-child {
+  border-bottom: none;
+}
+
+.compareCell {
+  /* 비교 테이블 셀 */
+}
+
+.compareLabel {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  font-weight: 500;
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.compareSource {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+}
+
+.compareMuted {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-1);
+}
+
+.conclusion {
+  padding: var(--space-3);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-top: var(--space-3);
+}
+
+.conclusionStrong {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.actions {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.actionItem {
+  font-size: var(--font-size-md);
+  color: var(--foreground);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+}
+
+.note {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.resultEmpty {
+  color: var(--muted-foreground);
+  font-size: var(--font-size-md);
+  text-align: center;
+  padding: var(--space-6) 0;
+}
+
+.muted {
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
+}
+
+.futureCard {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+}
+
+.futureHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.futureTable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.futureRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.futureRow:last-child {
+  border-bottom: none;
+}
+
+.futureCell {
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+.futureNote {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
+.taxiLinkButton {
+  margin-top: var(--space-2);
+}
+
+.errorText {
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  color: var(--destructive);
+  font-size: var(--font-size-md);
+}
+
+.errorEditButton {
+  margin-top: var(--space-2);
+}

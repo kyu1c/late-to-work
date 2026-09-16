@@ -5,13 +5,13 @@
    - 이 파일의 역할은 "어떤 컴포넌트를 어디에 배치할지"의 레이아웃만 담당.
    - 간격은 --space-* 토큰, 반경은 --radius-* 토큰만 사용.
    - 색상은 HeroUI 토큰을 그대로 사용하므로 여기서 색상 지정 최소화.
+   - HeroUI 컴포넌트에 className을 붙일 때는 레이아웃 배치만 제어.
    ============================================================ */
 
 /* ----------------------------------------------------------
    페이지 루트
    ---------------------------------------------------------- */
 .page {
-  /* 배경/글자색은 HeroUI 테마가 body에 적용하므로 여기서 지정 안 함 */
   min-height: 100vh;
 }
 
@@ -43,136 +43,15 @@
   margin-bottom: var(--space-5);
 }
 
-.introTitle {
-  font-size: var(--font-size-xl);
-  font-weight: 700;
-  color: var(--foreground);
-  margin-bottom: var(--space-2);
-}
-
-.introBadges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-bottom: var(--space-3);
-}
-
-.introBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
-  background-color: var(--surface-secondary);
-  color: var(--foreground);
-  border-radius: var(--radius);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-}
-
-.introBadgeLabel {
-  color: var(--muted-foreground);
-  font-weight: 400;
-}
-
-.introDescription {
-  color: var(--foreground);
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-base);
-  margin-bottom: var(--space-4);
-}
-
 /* ----------------------------------------------------------
    랜딩 페이지 — 환영 카드 내부
+   (HeroUI Card의 Header/Content/Footer 슬롯 내부에
+    텍스트 스타일만 적용. 배경/테두리/반경은 HeroUI가 처리)
    ---------------------------------------------------------- */
-.welcomeCardHeader {
-  margin-bottom: var(--space-3);
-}
-
-.welcomeCardTitle {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-.welcomeCardBody {
-  color: var(--foreground);
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-base);
-  margin-bottom: var(--space-4);
-}
-
-.welcomeCardActions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.welcomeCardSecondaryAction {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.welcomeCardSecondaryActionText {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-}
 
 /* ----------------------------------------------------------
    랜딩 페이지 — API 정보 박스 (하단 고정)
    ---------------------------------------------------------- */
-.apiInfoBox {
-  margin-top: var(--space-5);
-  padding: var(--space-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background-color: var(--surface);
-  /* HeroUI Card와 달리 표 형태를 담을 수 있도록 */
-}
-
-.apiInfoBoxTitle {
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  color: var(--foreground);
-  margin-bottom: var(--space-3);
-}
-
-.apiInfoTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm);
-}
-
-.apiInfoTable th {
-  text-align: left;
-  padding: var(--space-2) var(--space-2);
-  border-bottom: 1px solid var(--border);
-  color: var(--muted-foreground);
-  font-weight: 500;
-  font-size: var(--font-size-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.apiInfoTable td {
-  padding: var(--space-2) var(--space-2);
-  border-bottom: 1px solid var(--border);
-  color: var(--foreground);
-  line-height: var(--line-height-compact);
-}
-
-.apiInfoTable tr:last-child td {
-  border-bottom: none;
-}
-
-.apiInfoTable .apiName {
-  font-weight: 500;
-  color: var(--foreground);
-}
-
-.apiInfoTable .apiSource {
-  color: var(--muted-foreground);
-}
 
 /* ----------------------------------------------------------
    온보딩 Card (HeroUI Card 자체는 컴포넌트에서 className 적용)
@@ -199,143 +78,16 @@
   margin-bottom: var(--space-5);
 }
 
-.morningRecommendCardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-}
-
-.currentTimeDisplay {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-}
-
-.currentTimeLabel {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-}
-
-.currentTimeValue {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.timeAdjustGroup {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-}
-
-.timeAdjustLabel {
-  font-size: var(--font-size-sm);
-  color: var(--foreground);
-}
-
-.timeAdjustButtons {
-  display: flex;
-  gap: var(--space-1);
-}
-
-.timeAdjustInput {
-  width: 60px;
-  text-align: center;
-}
-
-.calcButtonRow {
-  margin-top: var(--space-4);
-}
-
-.calcResultArea {
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border);
-}
-
-.calcResultEmpty {
-  color: var(--muted-foreground);
-  font-size: var(--font-size-md);
-  text-align: center;
-  padding: var(--space-6) 0;
-}
-
 /* ----------------------------------------------------------
-   비교 결과 테이블 (HeroUI Table 대신 Card.Content 안에 직접 구성)
-   여기서는 HeroUI Table을 쓰지 않고 각 행을 Card.Content의 flex/grid로 표현
-   ---------------------------------------------------------- */
-.compareTable {
-  width: 100%;
-}
-
-.compareRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.compareRow:last-child {
-  border-bottom: none;
-}
-
-.compareRowLabel {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  font-weight: 500;
-}
-
-.compareRowValue {
-  font-size: var(--font-size-md);
-  color: var(--foreground);
-  font-weight: 500;
-}
-
-.compareRowHighlight {
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-  padding: var(--space-3);
-  margin-top: var(--space-3);
-}
-
-.compareRowHighlightLabel {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-bottom: var(--space-1);
-}
-
-.compareRowHighlightValue {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-/* ----------------------------------------------------------
-   온보딩 내부 (OnboardingCard.module.css로 분리됨)
+   비교 결과 테이블 (HeroUI Card.Content 안에 구성)
+   — HeroUI Card.Content의 padding 안에서 그리드 배치만 제어.
+   — 배경/테두리/반경은 HeroUI Card.Content + 별도 레이아웃
+     컨테이너가 처리. 여기선 grid/flex만.
    ---------------------------------------------------------- */
 
 /* ----------------------------------------------------------
    날씨 알림 (HeroUI Alert 사용)
    ---------------------------------------------------------- */
-.weatherAlertRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-}
-
-.weatherAlertIcon {
-  flex-shrink: 0;
-}
-
-.weatherAlertText {
-  font-size: var(--font-size-sm);
-  color: var(--foreground);
-}
 
 /* HeroUI Button — 프로필 설정하기 등 주요 액션 (너비 100%) */
 .profileSetupButton {
@@ -351,15 +103,7 @@
 
 /* coordsWarning — 위치 정보 불완전 안내 */
 .coordsWarning {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
   margin-top: var(--space-3);
-  font-size: var(--font-size-sm);
-  color: var(--foreground);
 }
 
 /* ----------------------------------------------------------
@@ -370,318 +114,23 @@
    메인 화면 — 아침 재추천 영역
    ---------------------------------------------------------- */
 
-.departureControlArea {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-}
-
-.departureNowLabel {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-}
-
-.departureNowTime {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.departureChipRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-  align-items: center;
-}
-
-.departureChipSeparator {
-  color: var(--border);
-  font-size: var(--font-size-sm);
-}
-
-.departureTimeField {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-
-.departureTimeLabel {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-}
-
-.departureTimeHint {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-top: var(--space-1);
-}
-
-.calcButtonRow {
-  /* 이미 page.module.css에 있음 — 중복 방지 */
-}
-
-.recommendPrimaryButton {
-  width: 100%;
-}
-
 /* ----------------------------------------------------------
    비교 결과 (HeroUI Card.Content 안에 구성)
    ---------------------------------------------------------- */
 
-.compareCard {
-  /* HeroUI Card의 padding을 그대로 사용하므로 별도 padding 없음 */
-}
-
-.compareHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: var(--space-3);
-}
-
-.muted {
-  color: var(--muted-foreground);
-  font-size: var(--font-size-sm);
-}
-
-.dataDisclaimer {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--border);
-}
-
-.weatherAlert {
-  margin-bottom: var(--space-3);
-}
-
-.weatherAlertIcon {
-  flex-shrink: 0;
-}
-
-.compareCell {
-  /* 비교 테이블 셀 — HeroUI Card.Content 안에서 사용 */
-}
-
-.compareSource {
-  font-size: var(--font-size-xs);
-  color: var(--muted-foreground);
-}
-
-.compareMuted {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-top: var(--space-1);
-}
-
-.conclusion {
-  padding: var(--space-3);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-  margin-top: var(--space-3);
-}
-
-.conclusionStrong {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-.actions {
-  margin-top: var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.actionItem {
-  font-size: var(--font-size-md);
-  color: var(--foreground);
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-}
-
-.note {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border);
-}
-
-/* 미래 운행 정보 카드 */
-.futureCard {
-  margin-top: var(--space-4);
-  padding: var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-}
-
-.futureHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--border);
-}
-
-.futureTable {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.futureRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--space-3);
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.futureRow:last-child {
-  border-bottom: none;
-}
-
-.futureCell {
-  font-size: var(--font-size-sm);
-  color: var(--foreground);
-}
-
-.futureNote {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-top: var(--space-3);
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--border);
-}
+/* 미래 운행 정보 — HeroUI Card 등 컴포넌트 내부 레이아웃 */
 
 /* ----------------------------------------------------------
    에러 / 빈 상태
    ---------------------------------------------------------- */
-.errorText {
-  padding: var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-  color: var(--destructive);
-  font-size: var(--font-size-md);
-}
-
-.errorEditButton {
-  margin-top: var(--space-2);
-}
-
-.nightBeforeTrigger {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-  padding: var(--space-3);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-}
-
-.secondaryButton {
-  /* HeroUI Button variant=outline 사용 시 별도 스타일 불필요 */
-}
 
 /* ----------------------------------------------------------
    고급 설정
    ---------------------------------------------------------- */
-.advancedCard {
-  margin-top: var(--space-5);
-}
-
-.advancedToggle {
-  width: 100%;
-}
-
-.advancedForm {
-  margin-top: var(--space-3);
-  padding: var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.checkRow {
-  display: flex;
-  align-items: center;
-}
 
 /* ----------------------------------------------------------
    API 정보 박스 — 표 형태 (하단 고정)
    ---------------------------------------------------------- */
-.apiInfoBox {
-  margin-top: var(--space-5);
-  padding: var(--space-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background-color: var(--surface);
-}
-
-.apiInfoBoxTitle {
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  color: var(--foreground);
-  margin-bottom: var(--space-3);
-}
-
-.apiInfoTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm);
-}
-
-.apiInfoTable th {
-  text-align: left;
-  padding: var(--space-2) var(--space-2);
-  border-bottom: 1px solid var(--border);
-  color: var(--muted-foreground);
-  font-weight: 500;
-  font-size: var(--font-size-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.apiInfoTable td {
-  padding: var(--space-2) var(--space-2);
-  border-bottom: 1px solid var(--border);
-  color: var(--foreground);
-  line-height: var(--line-height-compact);
-}
-
-.apiInfoTable tr:last-child td {
-  border-bottom: none;
-}
-
-.apiInfoTable .apiName {
-  font-weight: 500;
-  color: var(--foreground);
-}
-
-.apiInfoTable .apiSource {
-  color: var(--muted-foreground);
-}
-
-.apiInfoNote {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border);
-}
 
 /* ----------------------------------------------------------
    메시지 (전역 고정)
@@ -691,74 +140,10 @@
   bottom: var(--space-4);
   left: 50%;
   transform: translateX(-50%);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  font-size: var(--font-size-sm);
-  color: var(--foreground);
   z-index: 100;
 }
 
 /* ----------------------------------------------------------
-   다크모드 대응
+   다크모드 대응 (HeroUI 토큰이 이미 .dark 컨텍스트에서 적용되므로
+   최소한의 추가만. HeroUI가 처리하지 않는 커스텀 클래스만 대상)
    ---------------------------------------------------------- */
-:global(.dark) .coordsWarning {
-  background-color: var(--surface-secondary);
-  color: var(--foreground);
-}
-
-:global(.dark) .departureChipSeparator {
-  color: var(--border);
-}
-
-:global(.dark) .conclusion {
-  background-color: var(--surface-secondary);
-}
-
-:global(.dark) .actionItem {
-  background-color: var(--surface-secondary);
-}
-
-:global(.dark) .futureCard {
-  background-color: var(--surface-secondary);
-}
-
-:global(.dark) .errorText {
-  background-color: var(--surface-secondary);
-}
-
-:global(.dark) .nightBeforeTrigger {
-  background-color: var(--surface-secondary);
-}
-
-:global(.dark) .advancedForm {
-  background-color: var(--surface-secondary);
-}
-
-:global(.dark) .message {
-  background-color: var(--surface);
-  border-color: var(--border);
-  color: var(--foreground);
-}
-
-:global(.dark) .apiInfoBox {
-  background-color: var(--surface);
-  border-color: var(--border);
-}
-
-:global(.dark) .apiInfoTable th {
-  color: var(--muted-foreground);
-  border-bottom-color: var(--border);
-}
-
-:global(.dark) .apiInfoTable td {
-  color: var(--foreground);
-  border-bottom-color: var(--border);
-}
-
-:global(.dark) .apiInfoNote {
-  color: var(--muted-foreground);
-  border-top-color: var(--border);
-}

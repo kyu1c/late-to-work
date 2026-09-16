@@ -96,6 +96,7 @@ export interface RecommendResponse {
     distanceMeters: number | null;
     source: string;
     note: string;
+    isEstimate: boolean;
   };
   taxi: {
     vehicleEtaMinutes: number | null;
@@ -103,6 +104,7 @@ export interface RecommendResponse {
     distanceMeters: number | null;
     source: string;
     note: string;
+    isEstimate: boolean;
   };
   comparison: {
     departureTimeUsed: string; // 계산에 사용한 출발 기준 시각 (HH:MM)
@@ -140,6 +142,12 @@ export interface RecommendResponse {
     note: string;
   };
   note: string; // 전체 참고 문구 (불확실성, 추정 표시 등)
+  /** 미래 운행 정보: 3개 후보 출발 시각 기준 차량 ETA (P1-6) */
+  taxiFuture?: {
+    departureTimes: string[];
+    vehicleEtaMinutes: (number | null)[];
+    taxiFare: (number | null)[];
+  };
 }
 
 /** 전날 밤 추천 응답 */

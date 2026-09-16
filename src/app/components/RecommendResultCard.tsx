@@ -1,0 +1,231 @@
+'use client';
+
+import { Button, Alert, Card } from '@heroui/react';
+import type { RecommendResponse } from '@/lib/types';
+import styles from './RecommendResultCard.module.css';
+
+interface RecommendResultCardProps {
+  recommendResult: RecommendResponse | null;
+  recommendError: string | null;
+  recommendLoading: boolean;
+  resultEmpty: boolean;
+  onEditProfile: () => void;
+}
+
+export function RecommendResultCard({
+  recommendResult,
+  recommendError,
+  recommendLoading,
+  resultEmpty,
+  onEditProfile,
+}: RecommendResultCardProps) {
+  if (recommendResult) {
+    return (
+      <Card className={styles.cardFull}>
+        <Card.Header className={styles.compareHeader}>
+          <Card.Title>
+            현재 시각 기준: {recommendResult.nowTime}
+            <span className={styles.compareHeaderSub}>
+              목표 도착: {recommendResult.targetArrival}
+            </span>
+          </Card.Title>
+        </Card.Header>
+        <Card.Content>
+          <p className={styles.dataDisclaimer}>
+            실시간 교통·날씨 정보가 없으면 평균·패턴 기반 추정치로 안내해요.
+          </p>
+
+          {/* 날씨 정보 */}
+          {recommendResult.weather && (
+            <Alert
+              status={recommendResult.weather.isRaining ? 'danger' : 'success'}
+              className={styles.weatherAlert}
+            >
+              <Alert.Description>
+                <span className={styles.weatherAlertIcon}>
+                  {recommendResult.weather.isRaining ? '☔' : '☀️'}
+                </span>
+                <span>{recommendResult.weather.note}</span>
+              </Alert.Description>
+            </Alert>
+          )}
+
+          {/* 교통편 비교표 */}
+          <div className={styles.compareTable}>
+            {/* 대중교통 행 */}
+            <div className={styles.compareRow}>
+              <div className={styles.compareCell}>
+                <span className={styles.compareLabel}>대중교통</span>
+                <span className={styles.compareSource}>
+                  {recommendResult.transit.source}
+                </span>
+              </div>
+              <div className={styles.compareCell}>
+                <div>
+                  출발 기준: {recommendResult.comparison.public.departureTime}
+                </div>
+                <div>
+                  이동 {recommendResult.comparison.public.transitMinutes}분 +
+                  준비 {recommendResult.comparison.public.prepMinutes}분
+                </div>
+                <div>도착 예상: {recommendResult.comparison.public.arrivalTime}</div>
+              </div>
+              <div className={styles.compareCell}>
+                {recommendResult.transit.transfers != null &&
+                  recommendResult.transit.transfers > 0 && (
+                    <div>환승: 약 {recommendResult.transit.transfers}회</div>
+                  )}
+                {recommendResult.transit.distanceMeters != null && (
+                  <div>거리: {recommendResult.transit.distanceMeters.toFixed(0)}m</div>
+                )}
+                <div className={styles.compareMuted}>
+                  {recommendResult.transit.note}
+                </div>
+              </div>
+            </div>
+
+            {/* 택시 행 */}
+            <div className={styles.compareRow}>
+              <div className={styles.compareCell}>
+                <span className={styles.compareLabel}>택시</span>
+                <span className={styles.compareSource}>
+                  {recommendResult.taxi.source}
+                </span>
+              </div>
+              <div className={styles.compareCell}>
+                <div>
+                  출발 기준: {recommendResult.comparison.taxi.departureTime}
+                </div>
+                <div>
+                  차량 {recommendResult.comparison.taxi.vehicleEtaMinutes}분 +
+                  준비 {recommendResult.comparison.taxi.prepMinutes}분
+                </div>
+                <div>도착 예상: {recommendResult.comparison.taxi.arrivalTime}</div>
+              </div>
+              <div className={styles.compareCell}>
+                {recommendResult.taxi.taxiFare != null && (
+                  <div>예상 요금: {formatMoney(recommendResult.taxi.taxiFare)}원</div>
+                )}
+                {recommendResult.taxi.distanceMeters != null && (
+                  <div>거리: {recommendResult.taxi.distanceMeters.toFixed(0)}m</div>
+                )}
+                <div className={styles.compareMuted}>{recommendResult.taxi.note}</div>
+                <Button
+                  className={styles.taxiLinkButton}
+                  variant="ghost"
+                  size="sm"
+                  onPress={() => {
+                    window.location.href = 'kakaot://';
+                  }}
+                >
+                  카카오T 앱 열기
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* 한 줄 결론 */}
+          <div className={styles.conclusion}>
+            <strong className={styles.conclusionStrong}>
+              {recommendResult.comparison.statement}
+            </strong>
+          </div>
+
+          {/* 행동 */}
+          <div className={styles.actions}>
+            {recommendResult.actions.map((a, i) => (
+              <div key={i} className={styles.actionItem}>
+                {a}
+              </div>
+            ))}
+          </div>
+
+          {/* 참고 */}
+          <div className={styles.note}>{recommendResult.note}</div>
+          <p className={styles.muted} style={{ marginTop: 'var(--space-1)' }}>
+            준비 시간은 개인 준비와 택시 호출 대기를 함께 고려한 초기 추정치예요.
+            고급 설정에서 조정할 수 있어요.
+          </p>
+
+          {/* 미래 운행 정보 */}
+          {recommendResult.taxiFuture &&
+            recommendResult.taxiFuture.departureTimes.length > 0 && (() => {
+              const tf = recommendResult.taxiFuture!;
+              return (
+                <div className={styles.futureCard}>
+                  <div className={styles.futureHeader}>
+                    <span>후보 출발 시각별 차량 예상 소요시간</span>
+                    <span className={styles.muted}>(미래 운행 정보 기준)</span>
+                  </div>
+                  <div className={styles.futureTable}>
+                    {tf.departureTimes.map((dep, i) => (
+                      <div key={i} className={styles.futureRow}>
+                        <div className={styles.futureCell}>
+                          <strong>{dep}</strong> 출발
+                        </div>
+                        <div className={styles.futureCell}>
+                          {tf.vehicleEtaMinutes[i] != null ? (
+                            <span>약 {tf.vehicleEtaMinutes[i]}분</span>
+                          ) : (
+                            <span>확인 불가</span>
+                          )}
+                        </div>
+                        <div className={styles.futureCell}>
+                          {tf.taxiFare[i] != null ? (
+                            <span>
+                              {formatMoney(tf.taxiFare[i])}원
+                            </span>
+                          ) : (
+                            <span>확인 불가</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div className={styles.futureNote}>
+                  출발 시각을 몇 가지로 나눠서 각각에 대해 차가 얼마나 걸릴지 미리 본
+                  결과예요. 늦지 않는 마지막 출발 시각을 가늠하는 데 참고할 수 있어요.
+                </div>
+                <p className={styles.dataDisclaimer}>
+                  실시간 교통·날씨 정보가 없으면 평균·패턴 기반 추정치로 안내해요.
+                </p>
+              </div>
+            );
+            })()}
+        </Card.Content>
+      </Card>
+    );
+  }
+
+  if (resultEmpty && !recommendResult && !recommendError) {
+    return (
+      <div className={styles.resultEmpty}>출발 시간을 입력해 주세요</div>
+    );
+  }
+
+  if (recommendError) {
+    return (
+      <div className={styles.errorText}>
+        <span>{recommendError}</span>
+        {recommendError.includes('위치') ||
+        recommendError.includes('출발') ||
+        recommendError.includes('수정') ? (
+          <Button
+            className={styles.errorEditButton}
+            variant="outline"
+            size="sm"
+            onPress={onEditProfile}
+          >
+            프로필 수정하기
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function formatMoney(won: number): string {
+  return won.toLocaleString('ko-KR');
+}
