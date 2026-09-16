@@ -214,6 +214,7 @@ export default function Home() {
     const p = loadProfile();
     setProfile(p);
     if (p) {
+      setOnboardStep('done');
       setTargetArrival(p.targetArrival);
       setPreferredTransport(p.preferredTransport);
       setUsualTransitMinutes(p.usualTransitMinutes ?? '');
