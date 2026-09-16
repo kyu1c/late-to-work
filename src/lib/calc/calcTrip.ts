@@ -316,7 +316,7 @@ export interface CalcCompareOptionsOutput {
     taxi: {
       departureTime: string;
       totalMinutes: number;
-      arrivalTime: string;
+      arrivalTime: string | null;
       vehicleEtaMinutes: number;
       prepMinutes: number;
     };
@@ -389,38 +389,51 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
   let taxiTotalMinutes: number;
   let taxiVehicleEtaMinutes: number;
   let taxiPrepMinutes: number;
+  let taxiArrivalTime: string | null;
 
   if (vehicleEta != null) {
     taxiVehicleEtaMinutes = vehicleEta;
     taxiDeparture = minutesToParsed(nowTotal);
     taxiTotalMinutes = vehicleEta + taxiPrepTotal;
     taxiPrepMinutes = taxiPrepTotal;
+    taxiArrivalTime = formatTime(minutesToParsed(nowTotal + taxiTotalMinutes));
   } else {
-    // 택시 실시간 정보 없음 → 계산 없이 downstream에 null 전달
+    // 택시 실시간 정보 없음 → taxi도 정보 없음으로 처리
     taxiVehicleEtaMinutes = 0;
     taxiDeparture = minutesToParsed(nowTotal);
     taxiTotalMinutes = taxiPrepTotal;
     taxiPrepMinutes = taxiPrepTotal;
+    taxiArrivalTime = null;
   }
 
-  const taxiArrival = minutesToParsed(nowTotal + taxiTotalMinutes);
-  const taxiArrivalTime = formatTime(taxiArrival);
-
-  // 가장 빠른 안 비교 (publicArrivalTime이 null이면 택시 안만 기준)
+  // 가장 빠른 안 비교 (둘 다 null이면 정보 없음으로 처리)
   let faster: 'public' | 'taxi';
   let diffMinutes: number;
-  if (publicArrivalTime == null) {
+  let statement: string;
+  if (publicArrivalTime == null && taxiArrivalTime == null) {
+    // 둘 다 실시간 정보 없음 — 비교 불가
     faster = 'taxi';
     diffMinutes = 0;
+    statement = '실시간 교통 정보를 확인할 수 없어 비교가 어려워요.';
+  } else if (publicArrivalTime == null) {
+    faster = 'taxi';
+    diffMinutes = 0;
+    statement = '택시가 더 빠르지만, 대중교통 정보는 확인이 필요해요.';
+  } else if (taxiArrivalTime == null) {
+    faster = 'public';
+    diffMinutes = 0;
+    statement = '대중교통이 더 빠르지만, 택시 정보는 확인이 필요해요.';
   } else {
     const cmp = compareByArrival(publicArrivalTime, taxiArrivalTime);
     if (!cmp) return null;
     if (cmp.faster === 'same') {
       faster = 'taxi';
       diffMinutes = 0;
+      statement = '도착 시각 차이가 거의 없습니다.';
     } else {
       faster = cmp.faster;
       diffMinutes = cmp.diffMinutes;
+      statement = cmp.statement;
     }
   }
 
