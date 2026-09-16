@@ -103,6 +103,25 @@ function pad2(n: number): string {
   return String(n).padStart(2, '0');
 }
 
+// HH:MM[:SS] 또는 "오전/오후 HH:MM" 문자열을 분 단위 숫자로 변환
+function parseAmPmToMinutes(t: string): number {
+  let m = t.match(/^(오전|오후)\s*(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (m) {
+    const hour = parseInt(m[2], 10);
+    const minute = parseInt(m[3], 10);
+    const isPm = m[1] === '오후';
+    const totalHour = isPm ? (hour === 12 ? 12 : hour + 12) : (hour === 12 ? 0 : hour);
+    return totalHour * 60 + minute;
+  }
+  m = t.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (m) {
+    const hour = parseInt(m[1], 10);
+    const minute = parseInt(m[2], 10);
+    return hour * 60 + minute;
+  }
+  return 0;
+}
+
 // HH:MM 문자열을 분 단위 숫자로 변환
 function hhmmToMinutes(t: string): number {
   if (!t) return 0;
@@ -356,6 +375,14 @@ export default function Home() {
     console.log('[runRecommend] 성공:', res.result ? 'result 있음' : 'result null');
   }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, departureInput, resolveCoords]);
 
+  // 프로필 완료(done) 상태 진입 시 자동 추천 실행
+  // runRecommend 내부에서 coords 재검색까지 처리하므로 단순히 호출만 함
+  useEffect(() => {
+    if (onboardStep === 'done' && profile) {
+      runRecommend();
+    }
+  }, [onboardStep, profile, runRecommend]);
+
   // runRecommend 성공 후 밤 추천도 함께 생성
   const runRecommendAndRefresh = useCallback(async () => {
     // 1. 실시간 추천 실행
@@ -579,6 +606,7 @@ export default function Home() {
     setOnboardStep('done');
     if (homeCoords && workCoords) {
       showMessage('프로필이 저장되었습니다. 지금 출발 기준을 계산하고 있어요...');
+      runRecommend();
     } else {
       showMessage('프로필이 저장되었습니다. 위치 정보를 다시 가져오는 중이에요...');
       // coords가 null이면 프로필 이름으로 재검색 시도 (백그라운드)
@@ -876,24 +904,27 @@ export default function Home() {
           <>
             {/* 현재 시간 기준 안내 — 목표 도착 시각 대비 현재 시각 상태 */}
             <div className="mb-5">
-              {/* 디버깅: recommendResult 상태 표시 */}
               {recommendResult ? (
-                <div className="mb-2 text-xs text-muted-foreground flex items-center gap-2">
-                  <span className="font-medium">디버그:</span>
-                  <span>transit: {recommendResult.transit ? `있음(${recommendResult.transit.durationMinutes ?? 'null'}분, ${recommendResult.transit.source})` : '없음'}</span>
-                  <span className="text-muted-foreground">|</span>
-                  <span>taxi: {recommendResult.taxi ? `있음(${recommendResult.taxi.vehicleEtaMinutes ?? 'null'}분, ${recommendResult.taxi.source})` : '없음'}</span>
-                </div>
+                <NowStatusCard
+                  nowTimeString={nowTimeString}
+                  targetArrival={targetArrival}
+                  recommendResult={recommendResult}
+                />
               ) : (
-                <div className="mb-2 text-xs text-muted-foreground">
-                  <span className="font-medium">디버그:</span> 추천 결과가 아직 없어요. (recommendResult = null)
+                <div className="flex flex-col gap-3 p-4 bg-surface-secondary rounded-lg">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Label className="font-medium">현재 시각</Label>
+                    <span className="text-foreground">{nowTimeString}</span>
+                    <span className="text-muted-foreground">→</span>
+                    <Label className="font-medium">목표 도착</Label>
+                    <span className="text-foreground">{targetArrival}</span>
+                    <span className="text-muted-foreground">(잔여 {parseAmPmToMinutes(targetArrival) - parseAmPmToMinutes(nowTimeString)}분)</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    저장 후 추천을 계산하는 중이에요. 잠시만 기다려 주세요.
+                  </p>
                 </div>
               )}
-              <NowStatusCard
-                nowTimeString={nowTimeString}
-                targetArrival={targetArrival}
-                recommendResult={recommendResult}
-              />
             </div>
 
             {/* 전날 밤 추천 영역 */}
