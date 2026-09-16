@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Alert, Card } from '@heroui/react';
+import { Button, Alert, Card, Table } from '@heroui/react';
 import { cn } from '@heroui/styles';
 import type { RecommendResponse } from '@/lib/types';
 
@@ -64,78 +64,99 @@ export function RecommendResultCard({
           )}
 
           {/* 교통편 비교표 */}
-          <div className={ cn('w-full') }>
-            {/* 대중교통 행 */}
-            <div className={ cn('grid', 'grid-cols-2', 'gap-3', 'py-3', 'border-b', 'border-border', 'last:border-none') }>
-              <div >
-                <span className={ cn('text-sm', 'text-muted-foreground', 'font-medium', 'block', 'mb-1') }>대중교통</span>
-                <span className={ cn('text-xs', 'text-muted-foreground') }>
-                  {formatSource(recommendResult.transit.source, recommendResult.transit.note)?.label ?? recommendResult.transit.source}
-                </span>
-              </div>
-              <div >
-                <div>
-                  출발 기준: {recommendResult.comparison.public.departureTime}
-                </div>
-                <div>
-                  이동 {recommendResult.comparison.public.transitMinutes}분 +
-                  준비 {recommendResult.comparison.public.prepMinutes}분
-                </div>
-                <div>도착 예상: {recommendResult.comparison.public.arrivalTime}</div>
-              </div>
-              <div >
-                {recommendResult.transit.transfers != null &&
-                  recommendResult.transit.transfers > 0 && (
-                    <div>환승: 약 {recommendResult.transit.transfers}회</div>
-                  )}
-                {recommendResult.transit.distanceMeters != null && (
-                  <div>거리: {recommendResult.transit.distanceMeters.toFixed(0)}m</div>
-                )}
-                <div className={ cn('text-sm', 'text-muted-foreground', 'mt-1') }>
-                  {recommendResult.transit.note}
-                </div>
-              </div>
-            </div>
+          <Table aria-label="교통편 비교표" className="w-full">
+            <Table.ScrollContainer>
+              <Table.Content>
+                <Table.Header>
+                  <Table.Column isRowHeader>교통편</Table.Column>
+                  <Table.Column>출발 기준</Table.Column>
+                  <Table.Column>이동 + 준비</Table.Column>
+                  <Table.Column>도착 예상</Table.Column>
+                  <Table.Column>출처 / 추가 정보</Table.Column>
+                </Table.Header>
+                <Table.Body>
+                  {/* 대중교통 행 */}
+                  <Table.Row>
+                    <Table.Cell>
+                      <div className={cn('flex', 'flex-col', 'gap-1')}>
+                        <span className={cn('text-sm', 'text-muted-foreground', 'font-medium')}>대중교통</span>
+                        <span className={cn('text-xs', 'text-muted-foreground')}>
+                          {formatSource(recommendResult.transit.source, recommendResult.transit.note)?.label ?? recommendResult.transit.source}
+                        </span>
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell>{recommendResult.comparison.public.departureTime}</Table.Cell>
+                    <Table.Cell>
+                      <span className={cn('text-sm', 'text-foreground')}>
+                        {recommendResult.comparison.public.transitMinutes != null
+                          ? `이동 ${recommendResult.comparison.public.transitMinutes}분 + 준비 ${recommendResult.comparison.public.prepMinutes}분`
+                          : '이동 확인 불가 / 실시간 정보 없음'}
+                      </span>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <span className={cn('text-sm', 'text-foreground')}>
+                        {recommendResult.comparison.public.arrivalTime != null
+                          ? recommendResult.comparison.public.arrivalTime
+                          : '도착 예상 확인 불가'}
+                      </span>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <div className={cn('text-xs', 'text-muted-foreground', 'flex', 'flex-col', 'gap-1')}>
+                        {recommendResult.transit.transfers != null && recommendResult.transit.transfers > 0 && (
+                          <span>환승: 약 {recommendResult.transit.transfers}회</span>
+                        )}
+                        {recommendResult.transit.distanceMeters != null && (
+                          <span>거리: {recommendResult.transit.distanceMeters.toFixed(0)}m</span>
+                        )}
+                        <span className={cn('mt-1')}>{recommendResult.transit.note}</span>
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
 
-            {/* 택시 행 */}
-            <div className={ cn('grid', 'grid-cols-2', 'gap-3', 'py-3', 'border-b', 'border-border', 'last:border-none') }>
-              <div >
-                <span className={ cn('text-sm', 'text-muted-foreground', 'font-medium', 'block', 'mb-1') }>택시</span>
-                <span className={ cn('text-xs', 'text-muted-foreground') }>
-                  {formatSource(recommendResult.taxi.source, recommendResult.taxi.note)?.label ?? recommendResult.taxi.source}
-                </span>
-              </div>
-              <div >
-                <div>
-                  출발 기준: {recommendResult.comparison.taxi.departureTime}
-                </div>
-                <div>
-                  차량 {recommendResult.comparison.taxi.vehicleEtaMinutes}분 +
-                  준비 {recommendResult.comparison.taxi.prepMinutes}분
-                </div>
-                <div>도착 예상: {recommendResult.comparison.taxi.arrivalTime}</div>
-              </div>
-              <div >
-                {recommendResult.taxi.taxiFare != null && (
-                  <div>예상 요금: {formatMoney(recommendResult.taxi.taxiFare)}원</div>
-                )}
-                {recommendResult.taxi.distanceMeters != null && (
-                  <div>거리: {recommendResult.taxi.distanceMeters.toFixed(0)}m</div>
-                )}
-                <div className={ cn('text-sm', 'text-muted-foreground', 'mt-1') }>{recommendResult.taxi.note}</div>
-                <Button
-                  className={ cn('mt-2') }
-                  variant="ghost"
-                  size="sm"
-                  onPress={() => {
-                    window.location.href = 'kakaot://';
-                  }}
-                >
-                  카카오T 앱 열기
-                </Button>
-              </div>
-            </div>
-          </div>
+                  {/* 택시 행 */}
+                  <Table.Row>
+                    <Table.Cell>
+                      <div className={cn('flex', 'flex-col', 'gap-1')}>
+                        <span className={cn('text-sm', 'text-muted-foreground', 'font-medium')}>택시</span>
+                        <span className={cn('text-xs', 'text-muted-foreground')}>
+                          {formatSource(recommendResult.taxi.source, recommendResult.taxi.note)?.label ?? recommendResult.taxi.source}
+                        </span>
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell>{recommendResult.comparison.taxi.departureTime}</Table.Cell>
+                    <Table.Cell>
+                      <span className={cn('text-sm', 'text-foreground')}>
+                        차량 {recommendResult.comparison.taxi.vehicleEtaMinutes}분 +
+                        준비 {recommendResult.comparison.taxi.prepMinutes}분
+                      </span>
+                    </Table.Cell>
+                    <Table.Cell>{recommendResult.comparison.taxi.arrivalTime}</Table.Cell>
+                    <Table.Cell>
+                      <div className={cn('text-xs', 'text-muted-foreground', 'flex', 'flex-col', 'gap-1')}>
+                        {recommendResult.taxi.taxiFare != null && (
+                          <span>예상 요금: {formatMoney(recommendResult.taxi.taxiFare)}원</span>
+                        )}
+                        {recommendResult.taxi.distanceMeters != null && (
+                          <span>거리: {recommendResult.taxi.distanceMeters.toFixed(0)}m</span>
+                        )}
+                        <span className={cn('mt-1')}>{recommendResult.taxi.note}</span>
+                        <Button
+                          className={cn('mt-2')}
+                          variant="ghost"
+                          size="sm"
+                          onPress={() => {
+                            window.location.href = 'kakaot://';
+                          }}
+                        >
+                          카카오T 앱 열기
+                        </Button>
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table.Content>
+            </Table.ScrollContainer>
+          </Table>
 
           {/* 한 줄 결론 */}
           <div className={ cn('p-3', 'bg-surface-secondary', 'rounded-lg', 'mt-3') }>

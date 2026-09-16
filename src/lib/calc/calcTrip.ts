@@ -309,8 +309,8 @@ export interface CalcCompareOptionsOutput {
     public: {
       departureTime: string;
       totalMinutes: number;
-      arrivalTime: string;
-      transitMinutes: number;
+      arrivalTime: string | null;
+      transitMinutes: number | null;
       prepMinutes: number;
     };
     taxi: {
@@ -366,28 +366,23 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
   // 대중교통 계산
   let publicDeparture: ParsedTime;
   let publicTotalMinutes: number;
-  let publicTransitMinutes: number;
+  let publicTransitMinutes: number | null;
   let publicPrepMinutes: number;
+  let publicArrivalTime: string | null;
 
   if (transitMinutes != null) {
     publicTransitMinutes = transitMinutes;
     publicDeparture = minutesToParsed(nowTotal);
     publicTotalMinutes = transitMinutes + sharedPrep;
     publicPrepMinutes = sharedPrep;
+    publicArrivalTime = formatTime(minutesToParsed(nowTotal + publicTotalMinutes));
   } else {
-    // 대중교통 실시간 정보 없음 → 계산 없이 downstream에 null 전달
-    publicTransitMinutes = 0;
+    publicTransitMinutes = null;
     publicDeparture = minutesToParsed(nowTotal);
     publicTotalMinutes = sharedPrep;
     publicPrepMinutes = sharedPrep;
+    publicArrivalTime = null;
   }
-
-  publicDeparture = {
-    hours: publicDeparture.hours,
-    minutes: publicDeparture.minutes,
-  };
-  const publicArrival = minutesToParsed(nowTotal + publicTotalMinutes);
-  const publicArrivalTime = formatTime(publicArrival);
 
   // 택시 계산
   let taxiDeparture: ParsedTime;
@@ -411,10 +406,22 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
   const taxiArrival = minutesToParsed(nowTotal + taxiTotalMinutes);
   const taxiArrivalTime = formatTime(taxiArrival);
 
-  // 가장 빠른 안 비교
-  const cmp = compareByArrival(publicArrivalTime, taxiArrivalTime);
-  if (!cmp) {
-    return null;
+  // 가장 빠른 안 비교 (publicArrivalTime이 null이면 택시 안만 기준)
+  let faster: 'public' | 'taxi';
+  let diffMinutes: number;
+  if (publicArrivalTime == null) {
+    faster = 'taxi';
+    diffMinutes = 0;
+  } else {
+    const cmp = compareByArrival(publicArrivalTime, taxiArrivalTime);
+    if (!cmp) return null;
+    if (cmp.faster === 'same') {
+      faster = 'taxi';
+      diffMinutes = 0;
+    } else {
+      faster = cmp.faster;
+      diffMinutes = cmp.diffMinutes;
+    }
   }
 
   // 대중교통 '늦지 않는 마지막 출발 시각' 역산
@@ -429,8 +436,8 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
 
   // 행동 문구
   const actions = buildActions(
-    cmp.faster,
-    cmp.diffMinutes,
+    faster,
+    diffMinutes,
     input.taxi.taxiFare,
     publicMinutesUntilMustLeave,
     taxiMinutesUntilMustLeave,
@@ -443,8 +450,8 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
 
   // 참고 문구
   const note = buildNote(
-    cmp.faster,
-    cmp.diffMinutes,
+    faster,
+    diffMinutes,
     input.transit.source,
     input.taxi.source,
     input.transit.isEstimate ?? false,
@@ -481,7 +488,7 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
         departureTime: formatTime(publicDeparture),
         totalMinutes: Math.round(publicTotalMinutes),
         arrivalTime: publicArrivalTime,
-        transitMinutes: Math.round(publicTransitMinutes),
+        transitMinutes: publicTransitMinutes != null ? Math.round(publicTransitMinutes) : null,
         prepMinutes: Math.round(publicPrepMinutes),
       },
       taxi: {
@@ -501,14 +508,16 @@ export function calcCompareOptions(input: CalcCompareOptionsInput): CalcCompareO
           minutesUntilMustLeave: Math.round(taxiMinutesUntilMustLeave),
         },
       },
-      faster: cmp.faster,
-      fasterMinutes: Math.round(cmp.diffMinutes),
-      statement: cmp.statement,
+      faster: faster,
+      fasterMinutes: diffMinutes,
+      statement: faster === 'taxi' 
+        ? `택시가 약 ${diffMinutes}분 더 빠릅니다.` 
+        : `대중교통이 약 ${diffMinutes}분 더 빠릅니다.`,
     },
     actions,
     note,
   };
-}
+  }
 
 // ---------------------------------------------------------------------------
 // 행동 문구 생성 (PRD 기반)

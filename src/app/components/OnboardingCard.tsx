@@ -220,7 +220,7 @@ export function OnboardingCard({
               <Button
                 className="flex-1"
                 variant="primary"
-                onPress={() => { setSearchQuery(''); setOnboardStep('work'); }}
+                onPress={() => { setSearchQuery(''); setSearchResults([]); setSearchError(null); setOnboardStep('work'); }}
                 isDisabled={!selectedHome}
               >
                 다음: 출근지 위치
@@ -405,7 +405,7 @@ export function OnboardingCard({
 
             <Fieldset>
               <Fieldset.Legend>이동 소요 예상 / 평소 평균 소요 시간</Fieldset.Legend>
-              <Description>이동 소요 예상은 대중교통 검색 결과 기준이에요. 평소 평균 소요 시간은 분 단위로 입력할 수 있어요.</Description>
+              <Description>이동 소요 예상은 대중교통 검색 결과 기준이에요. 보통 소요 시간은 분 단위로 직접 입력할 수 있어요.</Description>
               <div className="flex flex-col gap-1 p-3 bg-surface-secondary rounded-md mt-2">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">이동 소요 예상</span>
                 {transitEstimate ? (
@@ -414,7 +414,7 @@ export function OnboardingCard({
                   </span>
                 ) : (
                   <span className="text-sm text-muted-foreground italic">
-                    아직 검색 결과가 없어요. 아래 평소 소요 시간을 입력하면 여기에 반영돼요.
+                    아직 대중교통 소요 시간 검색 결과가 없어요.
                   </span>
                 )}
               </div>

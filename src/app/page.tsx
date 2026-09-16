@@ -402,7 +402,7 @@ export default function Home() {
         sharedPrepMinutes: prepMinutes,
         taxiCallAddOn,
         taxiCallAddMinutes,
-        transitDurationMinutes: res.result.transit.durationMinutes,
+        transitDurationMinutes: res.result.transit.durationMinutes ?? typeof usualTransitMinutes === 'number' ? usualTransitMinutes : undefined,
         transitTransfers: res.result.transit.transfers,
         transitDistanceMeters: res.result.transit.distanceMeters,
         taxiVehicleEtaMinutes: res.result.taxi.vehicleEtaMinutes,
@@ -575,10 +575,84 @@ export default function Home() {
 
   // 프로필 저장 완료 후 자동 추천 실행
   useEffect(() => {
-  if (onboardStep === 'done' && profile && homeCoords && workCoords) {
-    runRecommendAndRefresh();
-  }
-  }, [onboardStep, profile, homeCoords, workCoords, runRecommendAndRefresh]);
+    if (onboardStep === 'done' && profile && homeCoords && workCoords) {
+      runRecommend();
+    }
+  }, [onboardStep, profile, homeCoords, workCoords, runRecommend]);
+
+  // 'prefs' 단계에서 transitPreview가 없으면 대중교통 소요시간 재계산 (OnboardingCard 이동소요예상 표시용)
+  useEffect(() => {
+    if (onboardStep !== 'prefs') return;
+    if (!homeCoords || !workCoords) return;
+    if (transitPreview != null) return;
+    (async () => {
+      const result = await transitChain(homeCoords.x, homeCoords.y, workCoords.x, workCoords.y);
+      setTransitPreview({
+        durationMinutes: result.durationMinutes,
+        source: result.source,
+      });
+    })();
+  }, [onboardStep, homeCoords, workCoords, transitPreview]);
+
+  // 실시간 추천 결과가 새로 생기면 밤 추천도 생성 시도
+  useEffect(() => {
+    if (!recommendResult) return;
+    if (nightBeforeResult) return;
+
+    const runNightBefore = async () => {
+      if (!profile || !profile.homeName || !profile.workName) return;
+
+      let homeCoordsNow = homeCoords;
+      let workCoordsNow = workCoords;
+      if (!homeCoordsNow) {
+        homeCoordsNow = await resolveCoords(profile.homeName, true);
+      }
+      if (!workCoordsNow) {
+        workCoordsNow = await resolveCoords(profile.workName, true);
+      }
+      if (!homeCoordsNow || !workCoordsNow) return;
+
+      const transitDurationMinutes = recommendResult.transit.durationMinutes ?? typeof usualTransitMinutes === 'number' ? usualTransitMinutes : undefined;
+      const transitTransfers = recommendResult.transit.transfers;
+      const transitDistanceMeters = recommendResult.transit.distanceMeters;
+      const taxiVehicleEtaMinutes = recommendResult.taxi.vehicleEtaMinutes;
+      const taxiFare = recommendResult.taxi.taxiFare;
+      const isRaining = recommendResult.weather?.isRaining ?? false;
+
+      const nbBody: Record<string, unknown> = {
+        startX: homeCoordsNow.x,
+        startY: homeCoordsNow.y,
+        endX: workCoordsNow.x,
+        endY: workCoordsNow.y,
+        targetArrival,
+        sharedPrepMinutes: prepMinutes,
+        taxiCallAddOn,
+        taxiCallAddMinutes,
+        transitDurationMinutes,
+        transitTransfers,
+        transitDistanceMeters,
+        taxiVehicleEtaMinutes,
+        taxiFare,
+        isRaining,
+        weekday: new Date().getDay(),
+        preferTransport: profile.preferredTransport,
+      };
+
+      const nbRes = await fetchNightBefore(nbBody);
+      if (nbRes.ok && nbRes.result) {
+        const nb = nbRes.result;
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        saveNightBefore(nb, `${yyyy}-${mm}-${dd}`);
+        setNightBeforeResult(nb);
+        setShowNightBefore(true);
+      }
+    };
+
+    runNightBefore();
+  }, [recommendResult, nightBeforeResult, profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, resolveCoords, fetchNightBefore, saveNightBefore, setNightBeforeResult, setShowNightBefore]);
 
   const clearProfileHandler = useCallback(() => {
     clearProfile();
