@@ -321,6 +321,15 @@ export default function Home() {
  setRecommendResult(res.result!);
  }, [profile, homeCoords, workCoords, targetArrival, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, departureInput, resolveCoords]);
 
+ // runRecommend 성공 후 밤 추천도 함께 생성
+ const runRecommendAndRefresh = useCallback(async () => {
+   await runRecommend();
+   // recommendResult가 성공적으로 생성되었으면 밤 추천도 시도
+   if (recommendResult && recommendResult.transit.durationMinutes != null && recommendResult.taxi.vehicleEtaMinutes != null) {
+     await refreshNightBefore(false);
+   }
+ }, [runRecommend, recommendResult, refreshNightBefore]);
+
  // 전날 밤 추천 새로고침
  const refreshNightBefore = useCallback(async (silent = false) => {
  if (!profile || !profile.homeName || !profile.workName) {
@@ -544,28 +553,10 @@ export default function Home() {
  랜딩 페이지: 상단 소개 영역 (신규)
  ================================================================ */}
  <div className="mb-5">
- <h1 className="text-2xl font-bold mb-2">늦잠 잔 출근 아침의 5초 가치판단</h1>
- <div className="flex flex-wrap gap-2 mt-3">
- <span className="bg-secondary/50 px-2 py-1 rounded-md text-xs">
- <span className="font-medium text-foreground">대회:</span>
- <span>MABC Final</span>
- </span>
- <span className="bg-secondary/50 px-2 py-1 rounded-md text-xs">
- <span className="font-medium text-foreground">예선 스킬명:</span>
- <span>late-to-work</span>
- </span>
- <span className="bg-secondary/50 px-2 py-1 rounded-md text-xs">
- <span className="font-medium text-foreground">제작자:</span>
- <span>조규원</span>
- </span>
- <span className="bg-secondary/50 px-2 py-1 rounded-md text-xs">
- <span className="font-medium text-foreground">개발 스펙:</span>
- <span>실시간 교통·날씨 API 기반 출퇴근 비교 추천</span>
- </span>
- </div>
- <p className="text-sm text-muted-foreground mt-2">
- 지금 출발하면 대중교통과 택시 중 뭐가 더 나을지, 준비 시간까지 반영해 비교해드려요.
- </p>
+   <h1 className="text-2xl font-bold mb-2">늦잠 잔 출근 아침의 5초 가치판단</h1>
+   <p className="text-sm text-muted-foreground mt-2">
+     지금 출발하면 대중교통과 택시 중 뭐가 더 나을지, 준비 시간까지 반영해 비교해드려요.
+   </p>
  </div>
 
  {/* ================================================================
@@ -792,15 +783,20 @@ export default function Home() {
  <td className="text-muted-foreground">ODsay API</td>
  </tr>
  <tr>
- <td className="font-medium">KMA 초단기예보</td>
- <td>현재 날씨 (강수 여부, nx=61 ny=126)</td>
- <td className="text-muted-foreground">기상청</td>
+   <td className="font-medium">Tmap</td>
+   <td>차량 경로(택시 ETA 보조) 및 대중교통 경로 백업</td>
+   <td className="text-muted-foreground">Tmap/티맵 REST API</td>
+ </tr>
+ <tr>
+   <td className="font-medium">TAGO 버스·지하철</td>
+   <td>대중교통 버스·지하철 정보 백업 (버스정류소·지하철역 조회)</td>
+   <td className="text-muted-foreground">TAGO (한국대중교통정보)</td>
  </tr>
  </tbody>
  </table>
  <p className="text-xs text-muted-foreground mt-2">
  각 서비스는 개별 이용약관·라이선스를 따르며, 무료로 제공되는 범위 내에서 사용합니다.<br />
- Tmap·TAGO(버스·지하철)는 코드상 준비되어 있으나, 현재 추천 흐름에선 직접 사용하지 않습니다.
+ 현재 추천 흐름에서는 카카오맵·Navi·ODsay를 우선 사용하고, 필요 시 Tmap·TAGO가 백업으로 작동하도록 체인이 구성되어 있습니다.
  </p>
  </div>
  </main>

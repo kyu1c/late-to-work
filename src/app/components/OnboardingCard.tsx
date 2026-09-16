@@ -385,7 +385,7 @@ export function OnboardingCard({
                 name="targetArrival"
                 value={targetArrival ? parseTime(targetArrival) : null}
                 onChange={(timeValue) => {
-                  setTargetArrival(timeValue ? timeValue.toString() : '');
+                  setTargetArrival(timeValue ? timeValue.toString() : targetArrival);
                 }}
                 placeholderValue={parseTime('09:00')}
               >
