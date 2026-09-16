@@ -620,7 +620,7 @@ export default function Home() {
         showMessage('프로필이 저장되었습니다. 위치 정보를 다시 가져오는 중이에요...');
       }
     })();
-  }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, homeCoords, workCoords, runRecommendAndRefresh, resolveCoords]);
+  }, [selectedHome, selectedWork, targetArrival, preferredTransport, usualTransitMinutes, preferredTimeA, preferredTimeB, prepMinutes, taxiCallAddOn, taxiCallAddMinutes, showMessage, homeCoords, workCoords, resolveCoords]);
 
   // 프로필 저장 완료 후 자동 추천 실행
   useEffect(() => {
