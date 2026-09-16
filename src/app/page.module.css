@@ -1,228 +1,380 @@
-/* page.module.css — page.tsx 전용 클래스만 유지 */
+/* ============================================================
+   page.module.css — HeroUI v3 기반 레이아웃 배치 전용
+   설계 원칙:
+   - HeroUI 컴포넌트 자체의 스타일은 건드리지 않는다.
+   - 이 파일의 역할은 "어떤 컴포넌트를 어디에 배치할지"의 레이아웃만 담당.
+   - 간격은 --space-* 토큰, 반경은 --radius-* 토큰만 사용.
+   - 색상은 HeroUI 토큰을 그대로 사용하므로 여기서 색상 지정 최소화.
+   ============================================================ */
 
-/* 페이지 루트 */
+/* ----------------------------------------------------------
+   페이지 루트
+   ---------------------------------------------------------- */
 .page {
+  /* 배경/글자색은 HeroUI 테마가 body에 적용하므로 여기서 지정 안 함 */
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
-.main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: var(--space-6) var(--space-4);
-  max-width: 720px;
-  margin: 0 auto;
+/* ----------------------------------------------------------
+   공통 영역
+   ---------------------------------------------------------- */
+
+/* HeroUI Card 바깥에서 영역 간 간격을 줄 때 쓰는 wrapper */
+.areaWrapper {
+  margin-bottom: var(--space-5);
+}
+
+/* HeroUI Card를 그냥 width: 100%로 */
+.cardFull {
   width: 100%;
 }
 
-/* Intro */
-.intro {
-  text-align: center;
-  margin-bottom: var(--space-6);
+/* ----------------------------------------------------------
+   헤더
+   ---------------------------------------------------------- */
+.headerContainer {
+  margin-bottom: var(--space-5);
+}
+
+/* ----------------------------------------------------------
+   랜딩 페이지 — 상단 소개 영역
+   ---------------------------------------------------------- */
+.introArea {
+  margin-bottom: var(--space-5);
 }
 
 .introTitle {
   font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--foreground);
-  margin: 0 0 var(--space-2);
+  margin-bottom: var(--space-2);
 }
 
-.introSubtitle {
-  font-size: var(--font-size-base);
-  color: var(--muted-foreground);
-  margin: 0;
-  line-height: 1.6;
-}
-
-/* 저장된 정보 영역 */
-.storedInfoArea {
-  width: 100%;
-  margin-bottom: var(--space-5);
-}
-
-/* 전날 밤 추천 영역 */
-.nightBeforeArea {
-  width: 100%;
-  margin-bottom: var(--space-5);
-}
-
-/* 아침 재추천 영역 */
-.morningRecommendArea {
-  width: 100%;
-}
-
-/* coordsWarning */
-.coordsWarning {
+.introBadges {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.introBadge {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--destructive-subtle);
-  border: 1px solid var(--destructive);
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--surface-secondary);
+  color: var(--foreground);
   border-radius: var(--radius);
-  color: var(--destructive);
   font-size: var(--font-size-sm);
-  margin-top: var(--space-3);
+  font-weight: 500;
 }
 
-/* 환영 카드 */
-.welcomeCard {
-  width: 100%;
+.introBadgeLabel {
+  color: var(--muted-foreground);
+  font-weight: 400;
 }
 
-.welcomeContent {
+.introDescription {
+  color: var(--foreground);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-base);
+  margin-bottom: var(--space-4);
+}
+
+/* ----------------------------------------------------------
+   랜딩 페이지 — 환영 카드 내부
+   ---------------------------------------------------------- */
+.welcomeCardHeader {
+  margin-bottom: var(--space-3);
+}
+
+.welcomeCardTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.welcomeCardBody {
+  color: var(--foreground);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-base);
+  margin-bottom: var(--space-4);
+}
+
+.welcomeCardActions {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--space-3);
-  padding: var(--space-6);
+}
+
+.welcomeCardSecondaryAction {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.welcomeCardSecondaryActionText {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+/* ----------------------------------------------------------
+   랜딩 페이지 — API 정보 박스 (하단 고정)
+   ---------------------------------------------------------- */
+.apiInfoBox {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: var(--surface);
+  /* HeroUI Card와 달리 표 형태를 담을 수 있도록 */
+}
+
+.apiInfoBoxTitle {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: var(--space-3);
+}
+
+.apiInfoTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.apiInfoTable th {
+  text-align: left;
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-weight: 500;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.apiInfoTable td {
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  line-height: var(--line-height-compact);
+}
+
+.apiInfoTable tr:last-child td {
+  border-bottom: none;
+}
+
+.apiInfoTable .apiName {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.apiInfoTable .apiSource {
+  color: var(--muted-foreground);
+}
+
+/* ----------------------------------------------------------
+   온보딩 Card (HeroUI Card 자체는 컴포넌트에서 className 적용)
+   ---------------------------------------------------------- */
+
+/* ----------------------------------------------------------
+   메인 화면 — 저장된 정보 영역
+   ---------------------------------------------------------- */
+.savedInfoArea {
+  margin-bottom: var(--space-5);
+}
+
+/* ----------------------------------------------------------
+   메인 화면 — 전날 밤 추천 영역
+   ---------------------------------------------------------- */
+.nightBeforeArea {
+  margin-bottom: var(--space-5);
+}
+
+/* ----------------------------------------------------------
+   메인 화면 — 아침 재추천 영역
+   ---------------------------------------------------------- */
+.morningRecommendArea {
+  margin-bottom: var(--space-5);
+}
+
+.morningRecommendCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.currentTimeDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.currentTimeLabel {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+.currentTimeValue {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.timeAdjustGroup {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.timeAdjustLabel {
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+.timeAdjustButtons {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.timeAdjustInput {
+  width: 60px;
   text-align: center;
 }
 
-.welcomeQuestion {
-  font-size: var(--font-size-xl);
-  font-weight: 600;
-  color: var(--foreground);
-  margin: 0;
-}
-
-.welcomeDesc {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin: 0;
-  line-height: 1.5;
-}
-
-.profileSetupButton {
-  margin-top: var(--space-2);
-}
-
-/* 빠른 검색 영역 (비활성) */
-.quickSearchArea {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-4);
+.calcButtonRow {
   margin-top: var(--space-4);
 }
 
-.quickSearchButton {
-  min-width: 160px;
+.calcResultArea {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
 }
 
-.quickSearchHint {
-  font-size: var(--font-size-sm);
+.calcResultEmpty {
   color: var(--muted-foreground);
-  margin: 0;
+  font-size: var(--font-size-md);
+  text-align: center;
+  padding: var(--space-6) 0;
 }
 
-/* 밤새 추천 (기존 inline 스타일 — 이제 NightBeforeCard 컴포넌트 사용하므로 정리 대상) */
-.nightBeforeCard {
+/* ----------------------------------------------------------
+   비교 결과 테이블 (HeroUI Table 대신 Card.Content 안에 직접 구성)
+   여기서는 HeroUI Table을 쓰지 않고 각 행을 Card.Content의 flex/grid로 표현
+   ---------------------------------------------------------- */
+.compareTable {
   width: 100%;
 }
 
-.nightBeforeHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
+.compareRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.nightBeforeLabel {
+.compareRow:last-child {
+  border-bottom: none;
+}
+
+.compareRowLabel {
   font-size: var(--font-size-sm);
-  font-weight: 600;
   color: var(--muted-foreground);
+  font-weight: 500;
 }
 
-.nightBeforeNote {
-  font-size: var(--font-size-sm);
+.compareRowValue {
+  font-size: var(--font-size-md);
   color: var(--foreground);
-  margin-top: var(--space-1);
+  font-weight: 500;
 }
 
-.nightBeforeDivider {
-  height: 1px;
-  background-color: var(--border);
-  margin: var(--space-3) 0;
-}
-
-.nightBeforeBottom {
-  font-size: var(--font-size-xs);
-  color: var(--muted-foreground);
-  margin-top: var(--space-2);
-}
-
-.nightBeforeTrigger {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+.compareRowHighlight {
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  padding: var(--space-3);
   margin-top: var(--space-3);
 }
 
-/* 온보딩 카드 — 이제 OnboardingCard 컴포넌트에 있음 (잔여 클래스 정리) */
-.onboardingCard {
-  width: 100%;
+.compareRowHighlightLabel {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--space-1);
 }
 
-/* 추천 영역 */
-.recommendArea {
-  width: 100%;
-}
-
-.recommendButtonArea {
-  width: 100%;
-  margin-top: var(--space-5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.recommendPrimaryButton {
-  min-width: 200px;
-}
-
-.departureTimeRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.departureNowTime {
+.compareRowHighlightValue {
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--foreground);
 }
 
-.departureChipRow {
+/* ----------------------------------------------------------
+   온보딩 내부 (OnboardingCard.module.css로 분리됨)
+   ---------------------------------------------------------- */
+
+/* ----------------------------------------------------------
+   날씨 알림 (HeroUI Alert 사용)
+   ---------------------------------------------------------- */
+.weatherAlertRow {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
-.departureChipSeparator {
-  color: var(--muted-foreground);
-  padding: 0 var(--space-1);
+.weatherAlertIcon {
+  flex-shrink: 0;
 }
+
+.weatherAlertText {
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+/* HeroUI Button — 프로필 설정하기 등 주요 액션 (너비 100%) */
+.profileSetupButton {
+  width: 100%;
+}
+
+/* ----------------------------------------------------------
+   저장된 정보 영역
+   ---------------------------------------------------------- */
+.storedInfoArea {
+  margin-bottom: var(--space-5);
+}
+
+/* coordsWarning — 위치 정보 불완전 안내 */
+.coordsWarning {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
+  margin-top: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+/* ----------------------------------------------------------
+   온보딩 내부 요소 (OnboardingCard와 공유)
+   ---------------------------------------------------------- */
+
+/* ----------------------------------------------------------
+   메인 화면 — 아침 재추천 영역
+   ---------------------------------------------------------- */
 
 .departureControlArea {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
   margin-bottom: var(--space-4);
 }
 
@@ -231,10 +383,30 @@
   color: var(--muted-foreground);
 }
 
+.departureNowTime {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.departureChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.departureChipSeparator {
+  color: var(--border);
+  font-size: var(--font-size-sm);
+}
+
 .departureTimeField {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .departureTimeLabel {
@@ -245,43 +417,32 @@
 .departureTimeHint {
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
-  margin: var(--space-2) 0 0;
-  text-align: center;
+  margin-top: var(--space-1);
 }
 
-.calculateButtonArea {
-  margin-bottom: var(--space-4);
+.calcButtonRow {
+  /* 이미 page.module.css에 있음 — 중복 방지 */
 }
 
-.resultArea {
-  padding: var(--space-4);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  min-height: 120px;
-}
-
-.resultEmpty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 80px;
-  color: var(--muted-foreground);
-  font-size: var(--font-size-sm);
-  font-style: italic;
-}
-
-/* 비교표 */
-.compareCard {
+.recommendPrimaryButton {
   width: 100%;
+}
+
+/* ----------------------------------------------------------
+   비교 결과 (HeroUI Card.Content 안에 구성)
+   ---------------------------------------------------------- */
+
+.compareCard {
+  /* HeroUI Card의 padding을 그대로 사용하므로 별도 padding 없음 */
 }
 
 .compareHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-3);
 }
 
 .muted {
@@ -290,10 +451,10 @@
 }
 
 .dataDisclaimer {
-  padding: var(--space-2) var(--space-4);
-  background-color: var(--surface-secondary);
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--border);
 }
 
@@ -301,41 +462,12 @@
   margin-bottom: var(--space-3);
 }
 
-.weatherIcon {
-  margin-right: var(--space-1);
-}
-
-.compareTable {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-}
-
-.compareRow {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr 1fr;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-}
-
-@media (max-width: 640px) {
-  .compareRow {
-    grid-template-columns: 1fr;
-  }
+.weatherAlertIcon {
+  flex-shrink: 0;
 }
 
 .compareCell {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.compareLabel {
-  font-weight: 600;
-  color: var(--foreground);
+  /* 비교 테이블 셀 — HeroUI Card.Content 안에서 사용 */
 }
 
 .compareSource {
@@ -346,44 +478,47 @@
 .compareMuted {
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
+  margin-top: var(--space-1);
 }
 
 .conclusion {
-  padding: var(--space-4);
-  background-color: var(--accent);
-  color: var(--accent-foreground);
+  padding: var(--space-3);
+  background-color: var(--surface-secondary);
   border-radius: var(--radius);
-  margin-top: var(--space-4);
-  text-align: center;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-}
-
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
   margin-top: var(--space-3);
 }
 
-.actionItem {
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: var(--font-size-sm);
+.conclusionStrong {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
   color: var(--foreground);
+}
+
+.actions {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.actionItem {
+  font-size: var(--font-size-md);
+  color: var(--foreground);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--surface-secondary);
+  border-radius: var(--radius);
 }
 
 .note {
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
   margin-top: var(--space-3);
-  line-height: 1.5;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
 }
 
+/* 미래 운행 정보 카드 */
 .futureCard {
-  width: 100%;
   margin-top: var(--space-4);
   padding: var(--space-4);
   background-color: var(--surface-secondary);
@@ -395,7 +530,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--space-3);
-  font-weight: 600;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
 }
 
 .futureTable {
@@ -408,54 +544,60 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: var(--space-3);
-  padding: var(--space-2);
-  background-color: var(--surface);
-  border-radius: var(--radius);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.futureRow:last-child {
+  border-bottom: none;
 }
 
 .futureCell {
   font-size: var(--font-size-sm);
+  color: var(--foreground);
 }
 
 .futureNote {
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
-  margin-top: var(--space-2);
-  line-height: 1.5;
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
 }
 
-/* 에러 */
+/* ----------------------------------------------------------
+   에러 / 빈 상태
+   ---------------------------------------------------------- */
 .errorText {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--destructive-subtle);
-  border: 1px solid var(--destructive);
+  padding: var(--space-4);
+  background-color: var(--surface-secondary);
   border-radius: var(--radius);
   color: var(--destructive);
-  margin-top: var(--space-4);
+  font-size: var(--font-size-md);
 }
 
 .errorEditButton {
-  flex-shrink: 0;
+  margin-top: var(--space-2);
 }
 
-/* 힌트 */
-.hint {
-  padding: var(--space-4);
-  text-align: center;
-  color: var(--muted-foreground);
-  font-size: var(--font-size-sm);
+.nightBeforeTrigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding: var(--space-3);
   background-color: var(--surface-secondary);
   border-radius: var(--radius);
-  margin-top: var(--space-4);
 }
 
-/* 고급 설정 */
+.secondaryButton {
+  /* HeroUI Button variant=outline 사용 시 별도 스타일 불필요 */
+}
+
+/* ----------------------------------------------------------
+   고급 설정
+   ---------------------------------------------------------- */
 .advancedCard {
-  width: 100%;
   margin-top: var(--space-5);
 }
 
@@ -464,6 +606,7 @@
 }
 
 .advancedForm {
+  margin-top: var(--space-3);
   padding: var(--space-4);
   background-color: var(--surface-secondary);
   border-radius: var(--radius);
@@ -477,231 +620,145 @@
   align-items: center;
 }
 
-/* 메시지 */
-.message {
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  border-radius: var(--radius);
-  text-align: center;
-  font-size: var(--font-size-sm);
-  margin-top: var(--space-4);
-}
-
-/* API 정보 */
-.apiInfo {
-  width: 100%;
-  margin-top: var(--space-8);
+/* ----------------------------------------------------------
+   API 정보 박스 — 표 형태 (하단 고정)
+   ---------------------------------------------------------- */
+.apiInfoBox {
+  margin-top: var(--space-5);
   padding: var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: var(--surface);
 }
 
-.apiInfoTitle {
+.apiInfoBoxTitle {
+  font-size: var(--font-size-md);
   font-weight: 600;
-  margin-bottom: var(--space-2);
+  color: var(--foreground);
+  margin-bottom: var(--space-3);
 }
 
-.apiInfoList {
-  margin: 0;
-  padding-left: var(--space-4);
+.apiInfoTable {
+  width: 100%;
+  border-collapse: collapse;
   font-size: var(--font-size-sm);
+}
+
+.apiInfoTable th {
+  text-align: left;
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--border);
   color: var(--muted-foreground);
-  line-height: 1.6;
+  font-weight: 500;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.apiInfoTable td {
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  line-height: var(--line-height-compact);
+}
+
+.apiInfoTable tr:last-child td {
+  border-bottom: none;
+}
+
+.apiInfoTable .apiName {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.apiInfoTable .apiSource {
+  color: var(--muted-foreground);
 }
 
 .apiInfoNote {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--muted-foreground);
-  margin-top: var(--space-2);
-  line-height: 1.5;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
 }
 
-/* 택시 링크 버튼 */
-.taxiLinkButton {
-  margin-top: var(--space-2);
+/* ----------------------------------------------------------
+   메시지 (전역 고정)
+   ---------------------------------------------------------- */
+.message {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+  z-index: 100;
 }
 
-/* 밤새 추천 새로고침 */
-.nightBeforeTrigger {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  margin-top: var(--space-4);
-}
-
-.secondaryButton {
-  /* 공통 보조 버튼 */
-}
-
-/* 다크모드 대응 */
-@media (prefers-color-scheme: dark) {
-  .coordsWarning {
-    background-color: var(--destructive-subtle);
-    border-color: var(--destructive);
-    color: var(--destructive);
-  }
-  .welcomeQuestion {
-    color: var(--foreground);
-  }
-  .welcomeDesc {
-    color: var(--muted-foreground);
-  }
-  .quickSearchHint {
-    color: var(--muted-foreground);
-  }
-  .nightBeforeLabel {
-    color: var(--muted-foreground);
-  }
-  .nightBeforeNote {
-    color: var(--foreground);
-  }
-  .nightBeforeBottom {
-    color: var(--muted-foreground);
-  }
-  .nightBeforeTrigger {
-    /* buttons handle themselves */
-  }
-  .compareHeader {
-    border-color: var(--border);
-  }
-  .dataDisclaimer {
-    background-color: var(--surface-secondary);
-    color: var(--muted-foreground);
-  }
-  .compareRow {
-    background-color: var(--surface-secondary);
-  }
-  .compareMuted {
-    color: var(--muted-foreground);
-  }
-  .conclusion {
-    background-color: var(--accent);
-    color: var(--accent-foreground);
-  }
-  .actionItem {
-    background-color: var(--surface);
-    border-color: var(--border);
-  }
-  .note {
-    color: var(--muted-foreground);
-  }
-  .futureCard {
-    background-color: var(--surface-secondary);
-  }
-  .futureRow {
-    background-color: var(--surface);
-  }
-  .futureNote {
-    color: var(--muted-foreground);
-  }
-  .errorText {
-    background-color: var(--destructive-subtle);
-    border-color: var(--destructive);
-    color: var(--destructive);
-  }
-  .hint {
-    background-color: var(--surface-secondary);
-    color: var(--muted-foreground);
-  }
-  .advancedForm {
-    background-color: var(--surface-secondary);
-  }
-  .message {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
-  }
-  .apiInfo {
-    background-color: var(--surface-secondary);
-  }
-  .apiInfoList {
-    color: var(--muted-foreground);
-  }
-  .apiInfoNote {
-    color: var(--muted-foreground);
-  }
-}
-
-.dark .coordsWarning {
-  background-color: var(--destructive-subtle);
-  border-color: var(--destructive);
-  color: var(--destructive);
-}
-.dark .welcomeQuestion {
+/* ----------------------------------------------------------
+   다크모드 대응
+   ---------------------------------------------------------- */
+:global(.dark) .coordsWarning {
+  background-color: var(--surface-secondary);
   color: var(--foreground);
 }
-.dark .welcomeDesc {
-  color: var(--muted-foreground);
+
+:global(.dark) .departureChipSeparator {
+  color: var(--border);
 }
-.dark .quickSearchHint {
-  color: var(--muted-foreground);
+
+:global(.dark) .conclusion {
+  background-color: var(--surface-secondary);
 }
-.dark .nightBeforeLabel {
-  color: var(--muted-foreground);
+
+:global(.dark) .actionItem {
+  background-color: var(--surface-secondary);
 }
-.dark .nightBeforeNote {
-  color: var(--foreground);
+
+:global(.dark) .futureCard {
+  background-color: var(--surface-secondary);
 }
-.dark .nightBeforeBottom {
-  color: var(--muted-foreground);
+
+:global(.dark) .errorText {
+  background-color: var(--surface-secondary);
 }
-.dark .compareHeader {
+
+:global(.dark) .nightBeforeTrigger {
+  background-color: var(--surface-secondary);
+}
+
+:global(.dark) .advancedForm {
+  background-color: var(--surface-secondary);
+}
+
+:global(.dark) .message {
+  background-color: var(--surface);
   border-color: var(--border);
+  color: var(--foreground);
 }
-.dark .dataDisclaimer {
-  background-color: var(--surface-secondary);
-  color: var(--muted-foreground);
-}
-.dark .compareRow {
-  background-color: var(--surface-secondary);
-}
-.dark .compareMuted {
-  color: var(--muted-foreground);
-}
-.dark .conclusion {
-  background-color: var(--accent);
-  color: var(--accent-foreground);
-}
-.dark .actionItem {
+
+:global(.dark) .apiInfoBox {
   background-color: var(--surface);
   border-color: var(--border);
 }
-.dark .note {
+
+:global(.dark) .apiInfoTable th {
   color: var(--muted-foreground);
+  border-bottom-color: var(--border);
 }
-.dark .futureCard {
-  background-color: var(--surface-secondary);
+
+:global(.dark) .apiInfoTable td {
+  color: var(--foreground);
+  border-bottom-color: var(--border);
 }
-.dark .futureRow {
-  background-color: var(--surface);
-}
-.dark .futureNote {
+
+:global(.dark) .apiInfoNote {
   color: var(--muted-foreground);
-}
-.dark .errorText {
-  background-color: var(--destructive-subtle);
-  border-color: var(--destructive);
-  color: var(--destructive);
-}
-.dark .hint {
-  background-color: var(--surface-secondary);
-  color: var(--muted-foreground);
-}
-.dark .advancedForm {
-  background-color: var(--surface-secondary);
-}
-.dark .message {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-}
-.dark .apiInfo {
-  background-color: var(--surface-secondary);
-}
-.dark .apiInfoList {
-  color: var(--muted-foreground);
-}
-.dark .apiInfoNote {
-  color: var(--muted-foreground);
+  border-top-color: var(--border);
 }

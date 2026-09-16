@@ -1,144 +1,119 @@
+/* ============================================================
+   globals.css — Tailwind v4 + HeroUI v3 기반
+   설계 원칙:
+   - HeroUI 컴포넌트를 그대로 쓰고, 그 안에 내용만 넣는다.
+   - CSS는 레이아웃 배치(grid/flex)와 디자인 토큰 참조만 최소한으로 사용.
+   - 버튼의 텍스트 변화에 따른 너비 고정 등 HeroUI가 직접 제공하지 않는
+     최소한의 보정만 커스텀 클래스로 처리.
+   ============================================================ */
+
 @import "tailwindcss";
 @import "@heroui/styles";
 
-/* ==========================================================================
-   late-to-work — HeroUI v3 + Tailwind v4 디자인 토큰
-   PRD v3 기반. 의미 토큰(--background, --foreground, --surface, --accent,
-   --border, --muted, --destructive 등)을 HeroUI가 쓰는 값 기준으로 통일.
-   커스텀 영역도 같은 토큰을 쓰도록 Tailwind 유틸리티(bg-background 등)로
-   통일한다.
-   ========================================================================== */
+/* ----------------------------------------------------------
+   기본 설정
+   ---------------------------------------------------------- */
+html {
+  color-scheme: light dark;
+}
 
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+/* 다크모드 전역 적용 — next-themes와 HeroUI 테마 연동 */
+:global(.dark) {
+  color-scheme: dark;
+}
+
+/* ----------------------------------------------------------
+   디자인 토큰 (HeroUI 변수 기반, 우리 서비스 전용 추가 토큰)
+   ---------------------------------------------------------- */
 :root {
-  --background: #fafafa;
-  --foreground: #171717;
+  /* 폰트 */
+  --font-family-base: "Pretendard", -apple-system, BlinkMacSystemFont,
+    "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 
-  --surface: #ffffff;
-  --surface-foreground: #171717;
-  --surface-secondary: #f4f4f5;
-  --surface-secondary-foreground: #171717;
+  /* HeroUI 기본 토큰을 그대로 사용 (재정의 최소화) */
+  /* 간격: HeroUI --space-* 사용 (4px ~ 32px) */
+  /* 반경: HeroUI --radius-* 사용 (6px ~ 16px) */
+  /* 색상: HeroUI --background, --foreground, --border, --muted-foreground,
+            --accent, --accent-foreground, --surface, --surface-secondary,
+            --destructive, --success 등 */
 
-  --muted: #a1a1aa;
-  --muted-foreground: #71717a;
+  /* 우리 서비스 전용 추가 토큰 (HeroUI 토큰을 참조하거나 새 값) */
+  --font-size-xs: 12px;
+  --font-size-base: 15px;
+  --font-size-md: 15px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
 
-  --primary: #111111;
-  --primary-foreground: #ffffff;
-
-  --accent: #111111;
-  --accent-foreground: #ffffff;
-
-  --destructive: #b00020;
-  --destructive-foreground: #fecaca;
-
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #111111;
-
-  --radius: 12px;
-
-  /* 간격 스케일 */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-
-  /* 타이포그래피 */
-  --font-size-xs: 0.6875rem;   /* 11px */
-  --font-size-sm: 0.75rem;     /* 12px */
-  --font-size-base: 0.875rem;  /* 14px */
-  --font-size-md: 0.9375rem;   /* 15px */
-  --font-size-lg: 1rem;        /* 16px */
-  --font-size-xl: 1.375rem;    /* 22px */
+  --line-height-base: 1.6;
+  --line-height-compact: 1.4;
 }
 
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+/* ----------------------------------------------------------
+   공통 레이아웃 — 모든 페이지에 적용
+   ---------------------------------------------------------- */
 
-  --surface: #171717;
-  --surface-foreground: #ededed;
-  --surface-secondary: #262626;
-  --surface-secondary-foreground: #ededed;
-
-  --muted: #71717a;
-  --muted-foreground: #a1a1aa;
-
-  --primary: #f97316;
-  --primary-foreground: #0a0a0a;
-
-  --accent: #f97316;
-  --accent-foreground: #0a0a0a;
-
-  --destructive: #ef4444;
-  --destructive-foreground: #fecaca;
-
-  --border: #2e2e2e;
-  --input: #2e2e2e;
-  --ring: #f97316;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-
-  --font-size-xs: 0.6875rem;
-  --font-size-sm: 0.75rem;
-  --font-size-base: 0.875rem;
-  --font-size-md: 0.9375rem;
-  --font-size-lg: 1rem;
-  --font-size-xl: 1.375rem;
-}
-
-/* ==========================================================================
-   영역 박스 스타일 (PRD v3 + 사용자 피드백 반영)
-   - 각 기능 영역이 박스에 딱 붙지 않도록 margin 추가
-   - 주소 입력창 등 입력 영역의 visibility 향상
-   ========================================================================== */
-
-/* 영역 카드 래퍼 — 카드들 사이 margin */
-.area-card {
+/* 페이지 컨테이너: 모바일 우선, 최대 너비 일관 */
+.container {
   width: 100%;
-  margin-top: var(--space-6);
-  margin-bottom: var(--space-6);
-}
-
-/* 카드 내부 요소들 간 간격 보강 */
-.card-gap-top {
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
   padding-top: var(--space-4);
-}
-
-.card-gap-bottom {
   padding-bottom: var(--space-4);
 }
 
-/* 입력창 visibility 보강 — HeroUI Input 기본 스타일 위에 레이어 */
-.input-visible {
-  @apply border-2;
-  border-color: var(--border);
-  background-color: var(--surface);
+/* 반응형: 640px 이상에서 약간 넓게 */
+@media (min-width: 640px) {
+  .container {
+    max-width: 480px;
+  }
 }
 
-.input-visible:focus,
-.input-visible[data-focused="true"] {
-  border-color: var(--ring);
-  box-shadow: 0 0 0 2px var(--ring);
+/* 영역 박스 (Card 바깥에서 영역 간 구분용 최소 간격) */
+.section {
+  margin-bottom: var(--space-5);
 }
 
-/* 버튼 고정 사이즈 — "검색 중…" 등으로 텍스트가 변해도 width 유지 */
-.button-fixed {
+/* ----------------------------------------------------------
+   HeroUI 컴포넌트 보정 (HeroUI가 직접 제공하지 않는 최소 보정만)
+   ---------------------------------------------------------- */
+
+/* HeroUI Button — "검색 중…" 텍스트 변화에도 너비 유지 (최소 보정) */
+.heroui-button-fixed {
   min-width: 80px;
-  width: auto;
 }
 
-/* 선택된 주소 표시 박스 스타일 (기본값 포함) */
+/* HeroUI Input — 가로 100% (Flex 컨테이너 내에서) */
+.heroui-input-full {
+  width: 100%;
+}
+
+/* HeroUI Select Trigger — 가로 100% */
+.heroui-select-trigger-full {
+  width: 100%;
+}
+
+/* HeroUI Card — 전체 페이지에서 일관된 너비 (컨테이너 내에서 100%) */
+.heroui-card-full {
+  width: 100%;
+}
+
+/* ----------------------------------------------------------
+   사용자 리뷰 피드백 대응 스타일 (HeroUI 위에 덧씌우지 않는 선에서)
+   ---------------------------------------------------------- */
+
+/* 주소 선택 박스 (HeroUI가 별도 컴포넌트 없으므로 최소 스타일) */
 .selected-address-box {
   display: flex;
   flex-direction: column;
@@ -148,6 +123,7 @@
   border-radius: var(--radius);
   background-color: var(--surface-secondary);
   min-height: 60px;
+  margin-bottom: var(--space-3);
 }
 
 .selected-address-box-name {
@@ -166,61 +142,11 @@
   font-style: italic;
 }
 
-/* 검색 Input + Button 행 */
+/* 검색 행 (Input + Button 가로 배치) */
 .search-row {
   display: flex;
   gap: var(--space-2);
-  margin-top: var(--space-3);
-}
-
-.search-row .search-input {
-  flex: 1;
-}
-
-.search-row .search-button {
-  flex-shrink: 0;
-  min-width: 80px;
-}
-
-/* 온보딩 네비게이션 행 — 버튼 양옆 배치, 가로 사이즈 배정 */
-.onboarding-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-5);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border);
-}
-
-.onboarding-nav .cancel-button {
-  flex: 0 0 auto;
-}
-
-.onboarding-nav .next-button {
-  flex: 1 1 auto;
-}
-
-/* 필드 간격 */
-.onboarding-field {
-  margin-bottom: var(--space-5);
-}
-
-.onboarding-field:last-child {
-  margin-bottom: 0;
-}
-
-/* 2열 그리드 */
-.onboarding-grid-2col {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-5);
-}
-
-@media (min-width: 640px) {
-  .onboarding-grid-2col {
-    grid-template-columns: 1fr 1fr;
-  }
+  margin-top: var(--space-2);
 }
 
 /* 이동 소요 예상 박스 */
@@ -253,405 +179,68 @@
   font-style: italic;
 }
 
-/* 입력 라벨 스타일 보강 */
-.input-label {
-  display: block;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  color: var(--foreground);
-  margin-top: var(--space-3);
-  margin-bottom: var(--space-1);
-}
-
-/* 필드셋 레전드 마진 */
-.fieldset-legend {
-  margin-bottom: var(--space-1);
-}
-
-/* ==========================================================================
-   메인 페이지 레이아웃
-   ========================================================================== */
-
-/* 저장 정보 카드 영역 */
-.stored-info-area {
-  margin-top: var(--space-6);
-}
-
-/* 전날 밤 추천 영역 */
-.night-before-area {
-  margin-top: var(--space-6);
-}
-
-/* 아침 재추천 (메인 서비스) 영역 */
-.morning-recommend-area {
-  margin-top: var(--space-6);
-}
-
-/* 비교표 카드 */
-.compare-card {
-  width: 100%;
-}
-
-/* 데이터 disclaimer 문구 */
-.data-disclaimer {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-  margin-bottom: var(--space-3);
-}
-
-/* 날씨 알림 */
-.weather-alert {
-  margin-bottom: var(--space-3);
-}
-
-/* 비교표 */
-.compare-table {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin-top: var(--space-3);
-}
-
-.compare-row {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr 1fr;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-
-@media (max-width: 640px) {
-  .compare-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-.compare-cell {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.compare-label {
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-.compare-source {
-  font-size: var(--font-size-xs);
-  color: var(--muted-foreground);
-}
-
-.compare-detail {
-  font-size: var(--font-size-sm);
-  color: var(--foreground);
-}
-
-.compare-muted {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-}
-
-/* 한 줄 결론 */
-.conclusion {
-  padding: var(--space-4);
-  background-color: var(--accent);
-  color: var(--accent-foreground);
-  border-radius: var(--radius);
-  margin-top: var(--space-4);
-  font-size: var(--font-size-lg);
-  text-align: center;
-}
-
-/* 행동 목록 */
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-top: var(--space-4);
-}
-
-.action-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: var(--font-size-sm);
-  color: var(--foreground);
-}
-
-/* 참고 문구 */
-.note {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-top: var(--space-3);
-  line-height: 1.5;
-}
-
-/* 미래 운행 정보 카드 */
-.future-card {
-  width: 100%;
-  margin-top: var(--space-4);
-  padding: var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-}
-
-.future-header {
+/* 프로필 버튼 영역 */
+.profile-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-3);
-  font-weight: 600;
-}
-
-.future-table {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.future-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
   gap: var(--space-3);
-  padding: var(--space-2);
-  background-color: var(--surface);
-  border-radius: var(--radius);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
 }
 
-.future-cell {
-  font-size: var(--font-size-sm);
-}
-
-.future-note {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  margin-top: var(--space-3);
-  line-height: 1.5;
-}
-
-/* 에러 표시 */
-.error-text {
+/* 온보딩 내비게이션 (취소 / 다음 버튼 한 줄) */
+.onboarding-nav {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--destructive-subtle);
-  border: 1px solid var(--destructive);
-  border-radius: var(--radius);
-  color: var(--destructive);
-  margin-top: var(--space-4);
-}
-
-.error-edit-button {
-  flex-shrink: 0;
-}
-
-/* 힌트 텍스트 */
-.hint {
-  padding: var(--space-4);
-  text-align: center;
-  color: var(--muted-foreground);
-  font-size: var(--font-size-sm);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-  margin-top: var(--space-4);
-}
-
-/* 고급 설정 */
-.advanced-card {
   margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
 }
 
-.advanced-toggle {
-  margin-bottom: var(--space-3);
+.onboarding-nav-back {
+  flex: 0 0 auto;
 }
 
-.advanced-form {
-  padding: var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+.onboarding-nav-next {
+  flex: 1 1 auto;
 }
 
-/* 체크박스 행 */
-.check-row {
-  display: flex;
-  align-items: center;
+.onboarding-nav-cancel {
+  flex: 0 0 auto;
 }
 
-/* 메시지 */
-.message {
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  border-radius: var(--radius);
-  margin-top: var(--space-4);
-  text-align: center;
-  font-size: var(--font-size-sm);
+/* ----------------------------------------------------------
+   다크모드 대응 (HeroUI 토큰이 이미 .dark 컨텍스트에서 적용되므로
+   최소한의 추가만. HeroUI가 처리하지 않는 커스텀 클래스만 대상)
+   ---------------------------------------------------------- */
+:global(.dark) .selected-address-box-default {
+  color: var(--muted-foreground);
 }
 
-/* ==========================================================================
-   아침 재추천 영역 — 당신이 요구한 구조
-   ========================================================================== */
-
-/* 현재 시각 + 시간 조정 영역 */
-.departure-control-area {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
-  margin-bottom: var(--space-4);
-}
-
-.departure-now-time {
-  font-weight: 600;
-  font-size: var(--font-size-lg);
+:global(.dark) .selected-address-box-name {
   color: var(--foreground);
 }
 
-.departure-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.departure-time-field {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.departure-time-hint {
-  font-size: var(--font-size-sm);
+:global(.dark) .selected-address-box-addr {
   color: var(--muted-foreground);
-  margin-top: var(--space-1);
 }
 
-/* 바로 계산 버튼 */
-.calculate-button-area {
-  margin-bottom: var(--space-4);
-}
-
-/* 결과 영역 (빈 상태 포함) */
-.result-area {
-  padding: var(--space-4);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  min-height: 120px;
-}
-
-.result-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 80px;
+:global(.dark) .move-estimate-help {
   color: var(--muted-foreground);
-  font-size: var(--font-size-sm);
-  font-style: italic;
 }
 
-/* API 정보 */
-.api-info {
-  margin-top: var(--space-8);
-  padding: var(--space-4);
-  background-color: var(--surface-secondary);
-  border-radius: var(--radius);
+:global(.dark) .move-estimate-value {
+  color: var(--foreground);
 }
 
-.api-info-title {
-  font-weight: 600;
-  margin-bottom: var(--space-2);
+:global(.dark) .profile-actions {
+  border-top-color: var(--border);
 }
 
-.api-info-list {
-  margin: 0;
-  padding-left: var(--space-4);
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  line-height: 1.6;
-}
-
-.api-info-note {
-  font-size: var(--font-size-xs);
-  color: var(--muted-foreground);
-  margin-top: var(--space-2);
-  line-height: 1.5;
-}
-
-/* ==========================================================================
-   다크모드 대응 보강
-   ========================================================================== */
-
-@media (prefers-color-scheme: dark) {
-  .input-visible {
-    background-color: var(--surface);
-    border-color: var(--border);
-  }
-  .input-visible:focus {
-    border-color: var(--ring);
-  }
-  .selected-address-box {
-    background-color: var(--surface-secondary);
-    border-color: var(--border);
-  }
-  .search-row .search-button {
-    background-color: var(--accent);
-    color: var(--accent-foreground);
-  }
-  .move-estimate {
-    background-color: var(--surface-secondary);
-  }
-  .compare-row {
-    background-color: var(--surface);
-    border-color: var(--border);
-  }
-  .conclusion {
-    background-color: var(--accent);
-    color: var(--accent-foreground);
-  }
-  .action-item {
-    background-color: var(--surface);
-    border-color: var(--border);
-  }
-  .future-card {
-    background-color: var(--surface-secondary);
-  }
-  .future-row {
-    background-color: var(--surface);
-  }
-  .error-text {
-    background-color: var(--destructive-subtle);
-    border-color: var(--destructive);
-  }
-  .hint {
-    background-color: var(--surface-secondary);
-  }
-  .advanced-form {
-    background-color: var(--surface-secondary);
-  }
-  .result-area {
-    background-color: var(--surface);
-    border-color: var(--border);
-  }
-  .departure-control-area {
-    background-color: var(--surface-secondary);
-  }
+:global(.dark) .onboarding-nav {
+  border-top-color: var(--border);
 }
